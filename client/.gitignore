@@ -1,0 +1,16 @@
+# MacOS directory files
+.DS_Store
+
+# Ignore IDE specific files
+.vscode/
+.idea/
+
+# ESP-IDF generated files
+sdkconfig
+sdkconfig.old
+
+# ESP-IDF default build directory name
+build/
+
+# CMake generated files
+CmakeFiles/
