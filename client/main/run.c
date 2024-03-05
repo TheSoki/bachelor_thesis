@@ -6,15 +6,20 @@
 #include "esp_log.h"
 #include <sys/time.h>
 #include "esp_sleep.h"
+#include "wifi.h"
+#include "http_client.h"
+#include <stdbool.h>
 
 static const char *DISPLAY_TAG = "run.c";
 static const long long INTERVAL = 1000 * 60 * 60 * 24; // 24 hours
+
 
 /**
  * @brief Get the current timestamp in milliseconds.
  * @return The current timestamp in milliseconds.
  */
-long long current_timestamp() {
+long long current_timestamp(void);
+{
     struct timeval te; 
     // get current time
     gettimeofday(&te, NULL); 
@@ -26,24 +31,27 @@ long long current_timestamp() {
 /**
  * @brief Run the main application.
  */
-void run()
+void run(void)
 {
     ESP_LOGI(DISPLAY_TAG, "run");
 
     long long start = current_timestamp();
 
-    //! connect to wifi
-    //! download image
-    //! disconnect from wifi
-    //! if was successful, render image
-    //! if not, render error
-
+    bool isConnected = connect_to_wifi();
+    if (isConnected == true)
+    {
+         //! download image
+        http_get_task();
+        disconnect_from_wifi();
+        //! if was successful, render image
+        //! if not, render error
+    }
 
     long long end = current_timestamp();
     ESP_LOGI(DISPLAY_TAG, "run took %lld milliseconds", end - start);
     long long sleep = INTERVAL - (end - start);
 
-    printf("sleeping for %lld milliseconds\n", sleep);
+    ESP_LOGI(DISPLAY_TAG, "sleeping for %lld milliseconds\n", sleep);
 
     // sleep in microseconds
     long long sleep_in_us = sleep * 1000;
