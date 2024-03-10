@@ -18,7 +18,7 @@ static const long long INTERVAL = 1000 * 60 * 60 * 24; // 24 hours
  * @brief Get the current timestamp in milliseconds.
  * @return The current timestamp in milliseconds.
  */
-long long current_timestamp(void);
+long long current_timestamp(void)
 {
     struct timeval te; 
     // get current time
@@ -40,11 +40,8 @@ void run(void)
     bool isConnected = connect_to_wifi();
     if (isConnected == true)
     {
-         //! download image
         http_get_task();
         disconnect_from_wifi();
-        //! if was successful, render image
-        //! if not, render error
     }
 
     long long end = current_timestamp();
