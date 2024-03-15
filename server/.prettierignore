@@ -1,0 +1,40 @@
+# Build files
+dist/
+
+# Config files
+.env
+.env.*
+.husky/
+.prettierignore
+.gitignore
+.nvmrc
+
+# Ignore files for PNPM, NPM and YARN
+pnpm-lock.yaml
+pnpm-workspace.yaml
+package-lock.json
+yarn.lock
+
+# Icons and images
+*.svg
+*.gif
+*.jpg
+*.png
+
+# Public browser files
+*.xml
+*.ico
+*.pdf
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Docker
+docker-compose.yaml
+docker-compose.dev.yaml
+
+# Prisma
+*.sql
+*.prisma
+*.toml

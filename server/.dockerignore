@@ -1,0 +1,12 @@
+Dockerfile
+.dockerignore
+.git
+.gitignore
+dist
+node_modules
+README.md
+.prettierrc
+.prettierignore
+docker-compose.yaml
+docker-compose.local.yaml
+docker-compose.prod.yaml
