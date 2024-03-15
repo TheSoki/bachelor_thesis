@@ -10,6 +10,7 @@
         "migrate": "drizzle-kit generate:pg",
         "migrate:up": "tsx src/scripts/migrate.ts",
         "migrate:seed": "tsx src/scripts/seed.ts",
+        "migrate:clean": "tsx src/scripts/reset.ts",
         "format": "prettier --write ."
     },
     "dependencies": {
