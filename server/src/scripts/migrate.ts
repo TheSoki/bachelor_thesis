@@ -1,9 +1,9 @@
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import { Client } from 'pg';
-import { env } from '@/env/server';
-import * as schema from '../schema';
+import "dotenv/config";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { Client } from "pg";
+import { env } from "@/env/server";
+import * as schema from "../schema";
 
 const client = new Client({
     connectionString: env.DATABASE_URL,
@@ -18,7 +18,7 @@ const run = async () => {
     });
 
     await migrate(db, {
-        migrationsFolder: './drizzle',
+        migrationsFolder: "./drizzle",
     });
 };
 

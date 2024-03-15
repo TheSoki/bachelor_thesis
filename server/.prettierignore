@@ -34,7 +34,5 @@ Dockerfile
 docker-compose.yaml
 docker-compose.dev.yaml
 
-# Prisma
-*.sql
-*.prisma
-*.toml
+# Drizzle
+drizzle/
