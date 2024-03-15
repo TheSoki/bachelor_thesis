@@ -28,7 +28,7 @@ Then IN ONE TERMINAL run to setup the toolchain.
 Setup environment variables.
 
 ```
-cp ./main/env.example.h ./main/env.h
+cp ./main/environment.example.h ./main/environment.h
 ```
 
 And update them accordingly to your environment, `ESP_DEVICE_ID` and `ESP_DEVICE_SECRET` should be generated after you register your device on the web interface.

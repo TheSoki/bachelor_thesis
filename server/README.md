@@ -14,6 +14,14 @@ You need to have installed:
 
 ### Getting started
 
+Setup environment variables.
+
+```
+cp .env.example .env
+```
+
+And update them accordingly to your environment.
+
 Use nvm to install node.
 
 ```
