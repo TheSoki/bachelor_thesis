@@ -2,7 +2,7 @@ import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Client } from "pg";
 import { env } from "@/env/server";
-import * as schema from "../schema";
+import * as schema from "../db/schema";
 import { sql } from "drizzle-orm/sql";
 
 const client = new Client({
@@ -21,7 +21,7 @@ const run = async () => {
     if (!tablesSchema) throw new Error("Schema not loaded");
 
     const queries = Object.values(tablesSchema).map((table) => {
-        return sql.raw(`DELETE FROM ${table.dbName};`);
+        return sql.raw(`DROP TABLE IF EXISTS ${table.dbName} CASCADE;`);
     });
 
     await db.transaction(async (trx) => {
@@ -30,6 +30,7 @@ const run = async () => {
                 if (query) await trx.execute(query);
             }),
         );
+        await trx.execute(sql.raw("DROP SCHEMA IF EXISTS drizzle CASCADE;"));
     });
 };
 

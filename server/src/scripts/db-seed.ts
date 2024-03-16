@@ -1,9 +1,9 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { Client } from "pg";
 import { env } from "@/env/server";
-import * as schema from "../schema";
+import * as schema from "../db/schema";
+import { hash } from "bcrypt";
 
 const client = new Client({
     connectionString: env.DATABASE_URL,
@@ -17,9 +17,15 @@ const run = async () => {
         schema,
     });
 
-    await migrate(db, {
-        migrationsFolder: "./drizzle",
-    });
+    const password = await hash("password", env.BCRYPT_SALT_ROUNDS);
+
+    await db
+        .insert(schema.users)
+        .values({
+            email: "user@example.com",
+            password: password,
+        })
+        .returning();
 };
 
 run()
