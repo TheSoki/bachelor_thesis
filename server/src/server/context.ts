@@ -18,6 +18,7 @@ export type Context = Awaited<ReturnType<typeof createContextInner>>;
  * Creates context for an incoming request
  * @link https://trpc.io/docs/v11/context
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function createContext(opts: trpcNext.CreateNextContextOptions): Promise<Context> {
     // for API-response caching see https://trpc.io/docs/v11/caching
 

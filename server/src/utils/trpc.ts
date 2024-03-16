@@ -3,8 +3,6 @@ import { createTRPCNext } from "@trpc/next";
 
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import type { NextPageContext } from "next";
-// ℹ️ Type-only import:
-// https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export
 import type { AppRouter } from "@/server/routers/_app";
 import { transformer } from "./transformer";
 
@@ -77,6 +75,7 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
 
                         const {
                             // If you're using Node 18 before 18.15.0, omit the "connection" header
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             connection: _connection,
                             ...headers
                         } = ctx.req.headers;

@@ -6,12 +6,15 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint",
+        "lint": "next lint --max-warnings=0",
         "migrate": "drizzle-kit generate:pg",
         "migrate:up": "tsx src/scripts/migrate.ts",
         "migrate:seed": "tsx src/scripts/seed.ts",
         "migrate:clean": "tsx src/scripts/reset.ts",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "typecheck": "tsc --pretty --noEmit",
+        "validateDependencyTree": "tsx src/scripts/validateDependencyTree.ts",
+        "integrate": "pnpm run lint && pnpm run typecheck && pnpm run validateDependencyTree"
     },
     "dependencies": {
         "@tanstack/react-query": "^5.28.4",
@@ -37,7 +40,9 @@
         "@types/pg": "^8.11.2",
         "@types/react": "^18",
         "@types/react-dom": "^18",
+        "@typescript-eslint/eslint-plugin": "^7.2.0",
         "autoprefixer": "^10.0.1",
+        "dpdm": "^3.14.0",
         "drizzle-kit": "^0.20.14",
         "eslint": "^8",
         "eslint-config-next": "14.1.3",
