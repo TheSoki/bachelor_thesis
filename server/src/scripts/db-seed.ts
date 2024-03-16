@@ -1,12 +1,12 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Client } from "pg";
-import { env } from "@/env/server";
+import { serverEnv } from "@/env/server";
 import * as schema from "../db/schema";
 import { hash } from "bcrypt";
 
 const client = new Client({
-    connectionString: env.DATABASE_URL,
+    connectionString: serverEnv.DATABASE_URL,
 });
 
 const run = async () => {
@@ -17,7 +17,7 @@ const run = async () => {
         schema,
     });
 
-    const password = await hash("password", env.BCRYPT_SALT_ROUNDS);
+    const password = await hash("password", serverEnv.BCRYPT_SALT_ROUNDS);
 
     await db
         .insert(schema.users)

@@ -1,12 +1,12 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Client } from "pg";
-import { env } from "@/env/server";
+import { serverEnv } from "@/env/server";
 import * as schema from "../db/schema";
 import { sql } from "drizzle-orm/sql";
 
 const client = new Client({
-    connectionString: env.DATABASE_URL,
+    connectionString: serverEnv.DATABASE_URL,
 });
 
 const run = async () => {

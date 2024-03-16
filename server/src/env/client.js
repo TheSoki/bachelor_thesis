@@ -1,5 +1,9 @@
-import { formatErrors } from "./helpers";
-import { clientEnv, clientSchema } from "./schema";
+// @ts-check
+const { z } = require("zod");
+const { formatErrors } = require("./helpers");
+
+const clientSchema = z.object({});
+const clientEnv = {};
 
 const _clientEnv = clientSchema.safeParse(clientEnv);
 
@@ -16,4 +20,4 @@ for (const key of Object.keys(_clientEnv.data)) {
     }
 }
 
-export const env = _clientEnv.data;
+module.exports.clientEnv = _clientEnv.data;
