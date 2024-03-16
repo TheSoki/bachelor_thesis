@@ -1,5 +1,5 @@
 {
-  "id": "990331f0-a36e-404c-9c8d-031a7c5b2231",
+  "id": "2dafeee5-da87-4b32-824d-ed28c9f493af",
   "prevId": "7df8382d-f96c-4bff-8a68-a70828c881aa",
   "version": "5",
   "dialect": "pg",
@@ -17,10 +17,10 @@
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "text",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'now()'"
+          "default": "now()"
         },
         "token": {
           "name": "token",
@@ -67,10 +67,10 @@
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "text",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'now()'"
+          "default": "now()"
         },
         "email": {
           "name": "email",
