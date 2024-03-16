@@ -21,7 +21,7 @@ const run = async () => {
     if (!tablesSchema) throw new Error("Schema not loaded");
 
     const queries = Object.values(tablesSchema).map((table) => {
-        return sql.raw(`DROP TABLE IF EXISTS ${table.dbName} CASCADE;`);
+        return sql.raw(`DELETE FROM ${table.dbName};`);
     });
 
     await db.transaction(async (trx) => {
@@ -30,7 +30,6 @@ const run = async () => {
                 if (query) await trx.execute(query);
             }),
         );
-        await trx.execute(sql.raw("DROP SCHEMA IF EXISTS drizzle CASCADE;"));
     });
 };
 
