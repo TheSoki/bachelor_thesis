@@ -1,0 +1,1 @@
+ALTER TABLE "devices" DROP CONSTRAINT "devices_token_unique";
