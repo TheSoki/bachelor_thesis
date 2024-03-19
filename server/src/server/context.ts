@@ -1,26 +1,21 @@
-import type * as trpcNext from "@trpc/server/adapters/next";
-
-interface CreateContextOptions {
-    // session: Session | null
-}
-
-/**
- * Inner function for `createContext` where we create the context.
- * This is useful for testing when we don't want to mock Next.js' request/response
- */
-export async function createContextInner(_opts: CreateContextOptions) {
-    return {};
-}
-
-export type Context = Awaited<ReturnType<typeof createContextInner>>;
+import { db } from "@/db/connection";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
+import { getServerSession } from "next-auth/next";
 
 /**
  * Creates context for an incoming request
  * @link https://trpc.io/docs/v11/context
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function createContext(opts: trpcNext.CreateNextContextOptions): Promise<Context> {
-    // for API-response caching see https://trpc.io/docs/v11/caching
+export const createContext = async (opts: CreateNextContextOptions) => {
+    const session = await getServerSession(opts.req, opts.res, authOptions);
 
-    return await createContextInner({});
-}
+    // console.log("createContext for", session?.user?.name ?? "unknown user");
+
+    return {
+        session,
+        db,
+    };
+};
+
+export type Context = Awaited<ReturnType<typeof createContext>>;

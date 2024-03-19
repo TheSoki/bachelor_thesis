@@ -17,12 +17,13 @@ const run = async () => {
         schema,
     });
 
-    const password = await hash("password", serverEnv.BCRYPT_SALT_ROUNDS);
+    const password = await hash("default@example.com", serverEnv.BCRYPT_SALT_ROUNDS);
 
     await db
         .insert(schema.users)
         .values({
-            email: "user@example.com",
+            name: "System",
+            email: "default@example.com",
             password: password,
         })
         .returning();

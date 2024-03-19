@@ -8,7 +8,7 @@
  * @link https://trpc.io/docs/v11/procedures
  */
 
-import { initTRPC } from "@trpc/server";
+import { TRPCError, initTRPC } from "@trpc/server";
 import { transformer } from "@/utils/transformer";
 import type { Context } from "./context";
 
@@ -48,3 +48,20 @@ export const mergeRouters = t.mergeRouters;
  * @link https://trpc.io/docs/v11/server/server-side-calls
  */
 export const createCallerFactory = t.createCallerFactory;
+
+/**
+ * Protected base procedure
+ */
+export const authedProcedure = t.procedure.use(function isAuthed(opts) {
+    const user = opts.ctx.session?.user;
+
+    if (!user) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    return opts.next({
+        ctx: {
+            user,
+        },
+    });
+});
