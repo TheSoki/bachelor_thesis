@@ -8,7 +8,6 @@ declare module "next-auth" {
         user?: {
             name: string;
             email: string;
-            image: string | null;
         };
     }
 
@@ -16,10 +15,9 @@ declare module "next-auth" {
      * The shape of the user object returned in the OAuth providers' `profile` callback,
      * or the second parameter of the `session` callback, when using a database.
      */
-    interface User {
+    interface User extends Omit<User, "image"> {
         id: string;
         name: string;
         email: string;
-        image: string | null;
     }
 }

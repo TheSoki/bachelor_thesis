@@ -1,5 +1,5 @@
 {
-  "id": "0fe1bdfb-4e6c-47e1-ab0d-7cdab8b843e4",
+  "id": "769e4502-e25e-4ab1-a21c-01b3af77c71f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -82,12 +82,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
-        },
-        "profileImage": {
-          "name": "profileImage",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},

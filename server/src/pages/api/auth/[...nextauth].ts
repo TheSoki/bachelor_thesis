@@ -43,7 +43,6 @@ export const authOptions: AuthOptions = {
                             name: true,
                             email: true,
                             password: true,
-                            profileImage: true,
                         },
                         where(users, { eq }) {
                             return eq(users.email, user.email);
@@ -65,7 +64,6 @@ export const authOptions: AuthOptions = {
                     id: dbUser.id,
                     name: dbUser.name,
                     email: dbUser.email,
-                    image: dbUser.profileImage,
                 };
             },
         }),

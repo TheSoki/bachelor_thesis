@@ -12,6 +12,5 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"name" text NOT NULL,
 	"email" text NOT NULL,
 	"password" text NOT NULL,
-	"profileImage" text,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
