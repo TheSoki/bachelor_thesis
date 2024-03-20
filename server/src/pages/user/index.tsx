@@ -12,13 +12,26 @@ import {
     PaginationLink,
     PaginationNext,
 } from "@/shadcn/ui/pagination";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import clsx from "clsx";
 import Link from "next/link";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/shadcn/ui/dialog";
+import { Button } from "@/shadcn/ui/button";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const UserPage: NextPageWithLayout = () => {
     const router = useRouter();
+    const session = useSession();
+    const utils = trpc.useUtils();
 
     const queryParamPage = useMemo(() => {
         const page = Number(router.query.page);
@@ -26,6 +39,32 @@ const UserPage: NextPageWithLayout = () => {
     }, [router.query.page]);
 
     const userQuery = trpc.user.list.useQuery({ page: queryParamPage < 1 ? 1 : queryParamPage });
+
+    const deleteUser = trpc.user.delete.useMutation({
+        async onSuccess() {
+            // refetches users after a user is deleted
+            await utils.user.list.invalidate();
+        },
+    });
+
+    const onDeleteClick = useCallback(
+        async (id: string) => {
+            try {
+                const isUpdatedCurrentUser = id === session.data?.user.id;
+                await deleteUser.mutateAsync({
+                    id,
+                });
+
+                if (isUpdatedCurrentUser) {
+                    await signOut();
+                    await signIn();
+                }
+            } catch (error) {
+                console.error({ error }, "Failed to delete user");
+            }
+        },
+        [deleteUser, session.data?.user.id],
+    );
 
     if (userQuery.error) {
         return <Error title={userQuery.error.message} statusCode={userQuery.error.data?.httpStatus ?? 500} />;
@@ -57,7 +96,6 @@ const UserPage: NextPageWithLayout = () => {
                 <h2 className="text-3xl font-semibold">Users</h2>
                 <Link href="/user/create">Create User</Link>
             </div>
-
             <Table>
                 <TableCaption>{totalCount} users</TableCaption>
                 <TableHeader>
@@ -78,14 +116,31 @@ const UserPage: NextPageWithLayout = () => {
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.createdAt.toLocaleString("cs-CZ")}</TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="flex justify-end space-x-2 text-right">
                                 <Link href={`/user/${user.id}`}>Detail</Link>
+
+                                <Dialog>
+                                    <DialogTrigger>Delete</DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                                            <DialogDescription>
+                                                This action cannot be undone. This will permanently delete your account
+                                                and remove your data from our servers.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter>
+                                            <Button type="submit" onClick={() => onDeleteClick(user.id)}>
+                                                Confirm
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
-
             <Pagination>
                 <PaginationContent>
                     <PaginationItem>

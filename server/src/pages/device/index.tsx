@@ -12,13 +12,24 @@ import {
     PaginationLink,
     PaginationNext,
 } from "@/shadcn/ui/pagination";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import clsx from "clsx";
 import Link from "next/link";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/shadcn/ui/dialog";
+import { Button } from "@/shadcn/ui/button";
 
 const DevicePage: NextPageWithLayout = () => {
     const router = useRouter();
+    const utils = trpc.useUtils();
 
     const queryParamPage = useMemo(() => {
         const page = Number(router.query.page);
@@ -26,6 +37,26 @@ const DevicePage: NextPageWithLayout = () => {
     }, [router.query.page]);
 
     const deviceQuery = trpc.device.list.useQuery({ page: queryParamPage < 1 ? 1 : queryParamPage });
+
+    const deleteDevice = trpc.device.delete.useMutation({
+        async onSuccess() {
+            // refetches devices after a device is deleted
+            await utils.device.list.invalidate();
+        },
+    });
+
+    const onDeleteClick = useCallback(
+        async (id: string) => {
+            try {
+                await deleteDevice.mutateAsync({
+                    id,
+                });
+            } catch (error) {
+                console.error({ error }, "Failed to delete user");
+            }
+        },
+        [deleteDevice],
+    );
 
     if (deviceQuery.error) {
         return <Error title={deviceQuery.error.message} statusCode={deviceQuery.error.data?.httpStatus ?? 500} />;
@@ -76,8 +107,26 @@ const DevicePage: NextPageWithLayout = () => {
                             </TableCell>
                             <TableCell>{`${device.buildingId}${device.roomId}`}</TableCell>
                             <TableCell>{device.createdAt.toLocaleString("cs-CZ")}</TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="flex justify-end space-x-2 text-right">
                                 <Link href={`/device/${device.id}`}>Detail</Link>
+
+                                <Dialog>
+                                    <DialogTrigger>Delete</DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                                            <DialogDescription>
+                                                This action cannot be undone. This will permanently delete this device
+                                                and remove your data from our servers.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter>
+                                            <Button type="submit" onClick={() => onDeleteClick(device.id)}>
+                                                Confirm
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </TableCell>
                         </TableRow>
                     ))}
