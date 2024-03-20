@@ -32,11 +32,19 @@ const UserPage: NextPageWithLayout = () => {
 
     if (userQuery.status === "pending") {
         return (
-            <div>
-                <Skeleton className="h-8 w-32" />
-                <Skeleton className="h-8 w-32" />
-                <Skeleton className="h-8 w-32" />
-            </div>
+            <>
+                {[...Array(10)].map((_, i) => (
+                    <Skeleton
+                        className={clsx("mb-2 h-10", {
+                            "w-1/2": i % 2 === 0,
+                            "w-1/3": i % 3 === 0,
+                            "w-1/4": i % 4 === 0,
+                            "w-1/5": i % 5 === 0,
+                        })}
+                        key={`user-table-skeleton-${i}`}
+                    />
+                ))}
+            </>
         );
     }
 

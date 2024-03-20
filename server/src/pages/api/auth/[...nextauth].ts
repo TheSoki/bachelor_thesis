@@ -1,5 +1,5 @@
 import { db } from "@/db/connection";
-import NextAuth, { type AuthOptions } from "next-auth";
+import NextAuth, { type AuthOptions, type User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
 import { registerSchema } from "@/server/schema/user";
@@ -63,6 +63,19 @@ export const authOptions: AuthOptions = {
             },
         }),
     ],
+    callbacks: {
+        async jwt({ token, user }) {
+            if (user) {
+                token.user = user;
+            }
+            return token;
+        },
+
+        async session({ session, token }) {
+            session.user = token.user as User;
+            return session;
+        },
+    },
     theme: {
         logo: "/favicon.ico",
         brandColor: "#4C51BF",

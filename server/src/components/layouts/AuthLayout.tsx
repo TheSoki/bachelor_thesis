@@ -12,24 +12,28 @@ export const AuthLayout: FC<{
 
     return (
         <DefaultLayout>
-            <>
-                {match(session)
-                    .with(
-                        {
-                            status: P.when((status) => status === "loading"),
-                        },
-                        () => <Skeleton className="h-10" />,
-                    )
-                    .with(
-                        {
-                            status: P.when((status) => status === "authenticated"),
-                        },
-                        () => <>{children}</>,
-                    )
-                    .otherwise(() => (
-                        <Error statusCode={401} title="Unauthorized" />
-                    ))}
-            </>
+            {match(session)
+                .with(
+                    {
+                        status: P.when((status) => status === "loading"),
+                    },
+                    () => (
+                        <>
+                            <Skeleton className="mb-2 h-10 w-1/2" />
+                            <Skeleton className="mb-2 h-10 w-1/3" />
+                            <Skeleton className="mb-2 h-10 w-2/4" />
+                        </>
+                    ),
+                )
+                .with(
+                    {
+                        status: P.when((status) => status === "authenticated"),
+                    },
+                    () => <>{children}</>,
+                )
+                .otherwise(() => (
+                    <Error statusCode={401} title="Unauthorized" />
+                ))}
         </DefaultLayout>
     );
 };

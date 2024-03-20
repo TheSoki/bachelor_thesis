@@ -4,6 +4,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import type { FC, ReactNode } from "react";
 import { match, P } from "ts-pattern";
 
@@ -22,12 +23,12 @@ export const DefaultLayout: FC<{
             </Head>
 
             <header
-                className={`${inter.className} flex items-center justify-between space-x-4 px-4 py-4 sm:px-6 lg:px-8`}
+                className={`${inter.className} flex flex-col items-center justify-between space-x-4 px-4 py-4 sm:px-6 lg:flex-row lg:px-8`}
             >
-                <div className="flex items-center space-x-2">
+                <Link href="/" className="flex items-center space-x-2">
                     <Image src="/schedule.png" alt="Logo" className="h-8 w-8" width={32} height={32} />
                     <h1>OSU e-Schedule</h1>
-                </div>
+                </Link>
 
                 <div>
                     {match(session)
@@ -41,7 +42,15 @@ export const DefaultLayout: FC<{
                             {
                                 data: P.when((data) => !!data?.user),
                             },
-                            ({ data }) => <Button onClick={() => signOut()}>({data?.user?.name}) Sign Out</Button>,
+                            ({ data }) => (
+                                <div className="flex flex-col items-center space-x-4 lg:flex-row">
+                                    <Link href="/user">Users</Link>
+                                    <Link href="/device">Devices</Link>
+
+                                    <Link href={`/user/${data?.user.id}`}>({data?.user.name})</Link>
+                                    <Button onClick={() => signOut()}>Sign Out</Button>
+                                </div>
+                            ),
                         )
                         .otherwise(() => (
                             <Button onClick={() => signIn()}>Sign In</Button>
