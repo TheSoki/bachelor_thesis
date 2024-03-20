@@ -1,13 +1,8 @@
 import { db } from "@/db/connection";
 import NextAuth, { type AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { z } from "zod";
 import { compare } from "bcrypt";
-
-const userSchema = z.object({
-    email: z.string().email().min(5).max(100),
-    password: z.string().min(5).max(100),
-});
+import { registerSchema } from "@/server/schema/user";
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -29,7 +24,7 @@ export const authOptions: AuthOptions = {
                     password: credentials.password,
                 };
 
-                const validatedUser = userSchema.safeParse(user);
+                const validatedUser = registerSchema.safeParse(user);
 
                 if (!validatedUser.success) {
                     return null;
