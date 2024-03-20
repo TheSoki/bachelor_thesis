@@ -26,6 +26,7 @@ import {
     DialogTrigger,
 } from "@/shadcn/ui/dialog";
 import { Button } from "@/shadcn/ui/button";
+import { match, P } from "ts-pattern";
 
 const DevicePage: NextPageWithLayout = () => {
     const router = useRouter();
@@ -56,6 +57,21 @@ const DevicePage: NextPageWithLayout = () => {
             }
         },
         [deleteDevice],
+    );
+
+    const onCopyTokenClick = useCallback(
+        async (id: string) => {
+            try {
+                const data = await utils.device.getDeviceToken.fetch({
+                    id,
+                });
+
+                navigator.clipboard.writeText(data.token);
+            } catch (error) {
+                console.error({ error }, "Failed to copy token");
+            }
+        },
+        [utils.device.getDeviceToken],
     );
 
     if (deviceQuery.error) {
@@ -90,12 +106,24 @@ const DevicePage: NextPageWithLayout = () => {
             </div>
 
             <Table>
-                <TableCaption>{totalCount} devices</TableCaption>
+                <TableCaption>
+                    {match(totalCount)
+                        .with(
+                            P.when((totalCount) => totalCount === 0),
+                            () => "No devices",
+                        )
+                        .with(
+                            P.when((totalCount) => totalCount === 1),
+                            () => "One device",
+                        )
+                        .otherwise(() => `${totalCount} devices`)}
+                </TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-[400px]">ID</TableHead>
                         <TableHead>Room</TableHead>
                         <TableHead>Created At</TableHead>
+                        <TableHead>Token</TableHead>
                         <TableHead className="text-right">Action</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -107,8 +135,15 @@ const DevicePage: NextPageWithLayout = () => {
                             </TableCell>
                             <TableCell>{`${device.buildingId}${device.roomId}`}</TableCell>
                             <TableCell>{device.createdAt.toLocaleString("cs-CZ")}</TableCell>
-                            <TableCell className="flex justify-end space-x-2 text-right">
-                                <Link href={`/device/${device.id}`}>Detail</Link>
+                            <TableCell>
+                                <Button onClick={() => onCopyTokenClick(device.id)} variant="ghost">
+                                    Copy to clipboard
+                                </Button>
+                            </TableCell>
+                            <TableCell className="text-right">
+                                <Link href={`/device/${device.id}`} className="mr-2">
+                                    Detail
+                                </Link>
 
                                 <Dialog>
                                     <DialogTrigger>Delete</DialogTrigger>
@@ -121,7 +156,11 @@ const DevicePage: NextPageWithLayout = () => {
                                             </DialogDescription>
                                         </DialogHeader>
                                         <DialogFooter>
-                                            <Button type="submit" onClick={() => onDeleteClick(device.id)}>
+                                            <Button
+                                                type="submit"
+                                                onClick={() => onDeleteClick(device.id)}
+                                                variant="destructive"
+                                            >
                                                 Confirm
                                             </Button>
                                         </DialogFooter>

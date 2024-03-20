@@ -125,4 +125,31 @@ export const deviceRouter = router({
             });
         }
     }),
+    getDeviceToken: authedProcedure.input(deviceSchema).query(async ({ ctx, input }) => {
+        const { id } = input;
+
+        try {
+            const device = await ctx.db.query.devices.findFirst({
+                columns: {
+                    id: true,
+                    token: true,
+                },
+                where: (devices, { eq }) => eq(devices.id, id),
+            });
+
+            if (!device) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: `No device with id '${id}'`,
+                });
+            }
+
+            return device;
+        } catch (e) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+                message: `No device with id '${id}'`,
+            });
+        }
+    }),
 });

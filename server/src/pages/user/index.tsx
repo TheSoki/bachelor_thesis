@@ -27,6 +27,7 @@ import {
 } from "@/shadcn/ui/dialog";
 import { Button } from "@/shadcn/ui/button";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { match, P } from "ts-pattern";
 
 const UserPage: NextPageWithLayout = () => {
     const router = useRouter();
@@ -97,7 +98,18 @@ const UserPage: NextPageWithLayout = () => {
                 <Link href="/user/create">Create User</Link>
             </div>
             <Table>
-                <TableCaption>{totalCount} users</TableCaption>
+                <TableCaption>
+                    {match(totalCount)
+                        .with(
+                            P.when((totalCount) => totalCount === 0),
+                            () => "No users",
+                        )
+                        .with(
+                            P.when((totalCount) => totalCount === 1),
+                            () => "One user",
+                        )
+                        .otherwise(() => `${totalCount} users`)}
+                </TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-[400px]">ID</TableHead>
@@ -116,8 +128,10 @@ const UserPage: NextPageWithLayout = () => {
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.createdAt.toLocaleString("cs-CZ")}</TableCell>
-                            <TableCell className="flex justify-end space-x-2 text-right">
-                                <Link href={`/user/${user.id}`}>Detail</Link>
+                            <TableCell className="text-right">
+                                <Link href={`/user/${user.id}`} className="mr-2">
+                                    Detail
+                                </Link>
 
                                 <Dialog>
                                     <DialogTrigger>Delete</DialogTrigger>
@@ -130,7 +144,11 @@ const UserPage: NextPageWithLayout = () => {
                                             </DialogDescription>
                                         </DialogHeader>
                                         <DialogFooter>
-                                            <Button type="submit" onClick={() => onDeleteClick(user.id)}>
+                                            <Button
+                                                type="submit"
+                                                onClick={() => onDeleteClick(user.id)}
+                                                variant="destructive"
+                                            >
                                                 Confirm
                                             </Button>
                                         </DialogFooter>
