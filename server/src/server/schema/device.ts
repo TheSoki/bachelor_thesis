@@ -5,12 +5,12 @@ export const deviceSchema = z.object({
 });
 
 export const createDeviceSchema = z.object({
-    buildingId: z.string().min(1).max(255),
-    roomId: z.string().min(1).max(255),
+    buildingId: z.string().max(255),
+    roomId: z.string().max(255),
 });
 
 export const updateDeviceSchema = z.object({
     id: z.string(),
-    buildingId: z.string().min(1).max(255).optional(),
-    roomId: z.string().min(1).max(255).optional(),
+    buildingId: z.string().max(255).optional(),
+    roomId: z.string().max(255).optional(),
 });
