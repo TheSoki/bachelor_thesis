@@ -1,5 +1,5 @@
 import { db } from "@/db/connection";
-import NextAuth, { type AuthOptions, type User } from "next-auth";
+import NextAuth, { type AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { z } from "zod";
 import { compare } from "bcrypt";
@@ -66,10 +66,15 @@ export const authOptions: AuthOptions = {
                     name: dbUser.name,
                     email: dbUser.email,
                     image: dbUser.profileImage,
-                } satisfies User;
+                };
             },
         }),
     ],
+    theme: {
+        logo: "/favicon.ico",
+        brandColor: "#4C51BF",
+        colorScheme: "light",
+    },
 };
 
 export default NextAuth(authOptions);
