@@ -1,5 +1,5 @@
 {
-  "id": "fe1c9df3-5e62-47e5-bd10-43c4e8a803df",
+  "id": "0fe1bdfb-4e6c-47e1-ab0d-7cdab8b843e4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -24,9 +24,10 @@
         },
         "token": {
           "name": "token",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "building": {
           "name": "building",
@@ -81,6 +82,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "profileImage": {
+          "name": "profileImage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},

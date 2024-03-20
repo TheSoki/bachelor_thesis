@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "devices" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
-	"token" text NOT NULL,
+	"token" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"building" text NOT NULL,
 	"room" text NOT NULL
 );
@@ -12,5 +12,6 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"name" text NOT NULL,
 	"email" text NOT NULL,
 	"password" text NOT NULL,
+	"profileImage" text,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
