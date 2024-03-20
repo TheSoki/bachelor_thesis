@@ -2,7 +2,7 @@ import { router, authedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { devices, type InsertDevice } from "@/db/schema/devices";
 import { count, eq } from "drizzle-orm";
-import { deviceSchema, deviceCreateSchema, deviceUpdateSchema } from "../schema/device";
+import { deviceSchema, createDeviceSchema, updateDeviceSchema } from "../schema/device";
 import { paginationSchema } from "../schema/general";
 
 const defaultDeviceSelect = {
@@ -20,23 +20,30 @@ export const deviceRouter = router({
     list: authedProcedure.input(paginationSchema).query(async ({ ctx, input }) => {
         const offset = (input.page - 1) * limit;
 
-        const list = await ctx.db.query.devices.findMany({
-            columns: defaultDeviceSelect,
-            limit,
-            offset,
-            orderBy: (devices, { asc }) => [asc(devices.createdAt)],
-        });
+        try {
+            const list = await ctx.db.query.devices.findMany({
+                columns: defaultDeviceSelect,
+                limit,
+                offset,
+                orderBy: (devices, { asc }) => [asc(devices.createdAt)],
+            });
 
-        const totalCountQuery = await ctx.db.select({ value: count() }).from(devices);
-        const totalCount = totalCountQuery[0]?.value ?? 0;
-        const totalPages = Math.ceil(totalCount / limit);
+            const totalCountQuery = await ctx.db.select({ value: count() }).from(devices);
+            const totalCount = totalCountQuery[0]?.value ?? 0;
+            const totalPages = Math.ceil(totalCount / limit);
 
-        return {
-            list,
-            page: input.page,
-            totalPages,
-            totalCount,
-        };
+            return {
+                list,
+                page: input.page,
+                totalPages,
+                totalCount,
+            };
+        } catch (e) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Error fetching devices",
+            });
+        }
     }),
     byId: authedProcedure.input(deviceSchema).query(async ({ ctx, input }) => {
         const { id } = input;
@@ -62,7 +69,7 @@ export const deviceRouter = router({
             });
         }
     }),
-    add: authedProcedure.input(deviceCreateSchema).mutation(async ({ ctx, input }) => {
+    add: authedProcedure.input(createDeviceSchema).mutation(async ({ ctx, input }) => {
         const { buildingId, roomId } = input;
 
         try {
@@ -82,13 +89,13 @@ export const deviceRouter = router({
             });
         }
     }),
-    update: authedProcedure.input(deviceUpdateSchema).mutation(async ({ ctx, input }) => {
+    update: authedProcedure.input(updateDeviceSchema).mutation(async ({ ctx, input }) => {
         const { id, buildingId, roomId } = input;
 
         try {
             const set: Partial<InsertDevice> = {};
-            if (buildingId) set.buildingId = buildingId;
-            if (roomId) set.roomId = roomId;
+            if (!!buildingId) set.buildingId = buildingId;
+            if (!!roomId) set.roomId = roomId;
 
             const device = await ctx.db
                 .update(devices)

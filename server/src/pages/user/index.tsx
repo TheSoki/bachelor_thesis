@@ -15,6 +15,7 @@ import {
 import { useMemo } from "react";
 import { useRouter } from "next/router";
 import clsx from "clsx";
+import Link from "next/link";
 
 const UserPage: NextPageWithLayout = () => {
     const router = useRouter();
@@ -68,11 +69,15 @@ const UserPage: NextPageWithLayout = () => {
                 <TableBody>
                     {list.map((user) => (
                         <TableRow key={user.id}>
-                            <TableCell className="font-medium">{user.id}</TableCell>
+                            <TableCell className="font-medium">
+                                <Link href={`/user/${user.id}`}>{user.id}</Link>
+                            </TableCell>
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.createdAt.toLocaleString("cs-CZ")}</TableCell>
-                            <TableCell className="text-right"></TableCell>
+                            <TableCell className="text-right">
+                                <Link href={`/user/${user.id}`}>Detail</Link>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

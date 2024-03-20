@@ -4,13 +4,13 @@ export const userSchema = z.object({
     id: z.string(),
 });
 
-export const userCreateSchema = z.object({
+export const createUserSchema = z.object({
     name: z.string().min(1).max(255),
     email: z.string().email().min(1).max(255),
     password: z.string().min(1).max(255),
 });
 
-export const userUpdateSchema = z.object({
+export const updateUserSchema = z.object({
     id: z.string(),
     name: z.string().min(1).max(255).optional(),
     email: z.string().email().min(1).max(255).optional(),

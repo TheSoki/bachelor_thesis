@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { users, type InsertUser } from "@/db/schema/users";
 import { count, eq } from "drizzle-orm";
 import { paginationSchema } from "../schema/general";
-import { userSchema, userCreateSchema, userUpdateSchema } from "../schema/user";
+import { userSchema, createUserSchema, updateUserSchema } from "../schema/user";
 import { hash } from "bcrypt";
 import { serverEnv } from "@/env/server";
 
@@ -22,23 +22,30 @@ export const userRouter = router({
     list: authedProcedure.input(paginationSchema).query(async ({ ctx, input }) => {
         const offset = (input.page - 1) * limit;
 
-        const list = await ctx.db.query.users.findMany({
-            columns: defaultUserSelect,
-            limit,
-            offset,
-            orderBy: (users, { asc }) => [asc(users.createdAt)],
-        });
+        try {
+            const list = await ctx.db.query.users.findMany({
+                columns: defaultUserSelect,
+                limit,
+                offset,
+                orderBy: (users, { asc }) => [asc(users.createdAt)],
+            });
 
-        const totalCountQuery = await ctx.db.select({ value: count() }).from(users);
-        const totalCount = totalCountQuery[0]?.value ?? 0;
-        const totalPages = Math.ceil(totalCount / limit);
+            const totalCountQuery = await ctx.db.select({ value: count() }).from(users);
+            const totalCount = totalCountQuery[0]?.value ?? 0;
+            const totalPages = Math.ceil(totalCount / limit);
 
-        return {
-            list,
-            page: input.page,
-            totalPages,
-            totalCount,
-        };
+            return {
+                list,
+                page: input.page,
+                totalPages,
+                totalCount,
+            };
+        } catch (e) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Error fetching users",
+            });
+        }
     }),
     byId: authedProcedure.input(userSchema).query(async ({ ctx, input }) => {
         const { id } = input;
@@ -63,7 +70,7 @@ export const userRouter = router({
             });
         }
     }),
-    add: authedProcedure.input(userCreateSchema).mutation(async ({ ctx, input }) => {
+    add: authedProcedure.input(createUserSchema).mutation(async ({ ctx, input }) => {
         const { email, name, password } = input;
 
         try {
@@ -86,14 +93,14 @@ export const userRouter = router({
             });
         }
     }),
-    update: authedProcedure.input(userUpdateSchema).mutation(async ({ ctx, input }) => {
+    update: authedProcedure.input(updateUserSchema).mutation(async ({ ctx, input }) => {
         const { id, email, name, password } = input;
 
         try {
             const set: Partial<InsertUser> = {};
-            if (email) set.email = email;
-            if (name) set.name = name;
-            if (password) set.password = await hash(password, serverEnv.BCRYPT_SALT_ROUNDS);
+            if (!!email) set.email = email;
+            if (!!name) set.name = name;
+            if (!!password) set.password = await hash(password, serverEnv.BCRYPT_SALT_ROUNDS);
 
             const user = await ctx.db.update(users).set(set).where(eq(users.id, id)).returning({ updatedId: users.id });
 
