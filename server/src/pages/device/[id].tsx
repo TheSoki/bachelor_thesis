@@ -11,7 +11,7 @@ import { Label } from "@/shadcn/ui/label";
 import { Input } from "@/shadcn/ui/input";
 import { Button } from "@/shadcn/ui/button";
 import clsx from "clsx";
-import { useCallback, useEffect, type FC } from "react";
+import { useCallback, useEffect, useMemo, type FC } from "react";
 import { Skeleton } from "@/shadcn/ui/skeleton";
 
 type ValidationSchema = z.infer<typeof updateDeviceSchema>;
@@ -67,11 +67,14 @@ const DeviceForm: FC<{
         reset,
     } = useForm<ValidationSchema>({
         resolver: zodResolver(updateDeviceSchema),
-        defaultValues: {
-            id: device.id,
-            buildingId: device.buildingId,
-            roomId: device.roomId,
-        },
+        defaultValues: useMemo(
+            () => ({
+                id: device.id,
+                buildingId: device.buildingId,
+                roomId: device.roomId,
+            }),
+            [device],
+        ),
     });
 
     useEffect(() => {

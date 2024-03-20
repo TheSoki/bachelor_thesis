@@ -13,7 +13,7 @@ import { Button } from "@/shadcn/ui/button";
 import clsx from "clsx";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 import { Skeleton } from "@/shadcn/ui/skeleton";
-import { signIn, signOut } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 type ValidationSchema = z.infer<typeof updateUserSchema>;
 
@@ -51,6 +51,7 @@ const UserForm: FC<{
     user: UserByIdOutput;
 }> = ({ user }) => {
     const utils = trpc.useUtils();
+    const session = useSession();
 
     const updateUserMutation = trpc.user.update.useMutation({
         async onSuccess() {
@@ -68,7 +69,6 @@ const UserForm: FC<{
         reset,
     } = useForm<ValidationSchema>({
         resolver: zodResolver(updateUserSchema),
-        reValidateMode: "onChange",
         defaultValues: useMemo(
             () => ({
                 id: user.id,
@@ -93,7 +93,7 @@ const UserForm: FC<{
     const onSubmit = useCallback(
         async (data: ValidationSchema) => {
             try {
-                const isUpdatedCurrentUser = data.id == user.id;
+                const isUpdatedCurrentUser = user.id === session.data?.user.id;
                 await updateUserMutation.mutateAsync({
                     ...data,
                     password: !!data.password ? data.password : undefined,
@@ -109,7 +109,7 @@ const UserForm: FC<{
                 console.error({ error }, "Failed to update user");
             }
         },
-        [reset, updateUserMutation, user.id],
+        [reset, session.data?.user.id, updateUserMutation, user.id],
     );
 
     return (

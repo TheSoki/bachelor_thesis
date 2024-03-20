@@ -53,7 +53,10 @@ const UserPage: NextPageWithLayout = () => {
 
     return (
         <div className="py-8">
-            <h2 className="text-3xl font-semibold">Users</h2>
+            <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-3xl font-semibold">Users</h2>
+                <Link href="/user/create">Create User</Link>
+            </div>
 
             <Table>
                 <TableCaption>{totalCount} users</TableCaption>

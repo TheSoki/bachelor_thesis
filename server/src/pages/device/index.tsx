@@ -53,7 +53,10 @@ const DevicePage: NextPageWithLayout = () => {
 
     return (
         <div className="py-8">
-            <h2 className="text-3xl font-semibold">Devices</h2>
+            <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-3xl font-semibold">Devices</h2>
+                <Link href="/device/create">Create Device</Link>
+            </div>
 
             <Table>
                 <TableCaption>{totalCount} devices</TableCaption>
