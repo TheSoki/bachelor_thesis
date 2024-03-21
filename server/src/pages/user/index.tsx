@@ -12,27 +12,15 @@ import {
     PaginationLink,
     PaginationNext,
 } from "@/shadcn/ui/pagination";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/router";
 import clsx from "clsx";
 import Link from "next/link";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/shadcn/ui/dialog";
-import { Button } from "@/shadcn/ui/button";
-import { signIn, signOut, useSession } from "next-auth/react";
 import { match, P } from "ts-pattern";
+import { DeleteUserModal } from "@/components/modals/DeleteUserModal";
 
 const UserPage: NextPageWithLayout = () => {
     const router = useRouter();
-    const session = useSession();
-    const utils = trpc.useUtils();
 
     const queryParamPage = useMemo(() => {
         const page = Number(router.query.page);
@@ -40,32 +28,6 @@ const UserPage: NextPageWithLayout = () => {
     }, [router.query.page]);
 
     const userQuery = trpc.user.list.useQuery({ page: queryParamPage < 1 ? 1 : queryParamPage });
-
-    const deleteUser = trpc.user.delete.useMutation({
-        async onSuccess() {
-            // refetches users after a user is deleted
-            await utils.user.list.invalidate();
-        },
-    });
-
-    const onDeleteClick = useCallback(
-        async (id: string) => {
-            try {
-                const isUpdatedCurrentUser = id === session.data?.user.id;
-                await deleteUser.mutateAsync({
-                    id,
-                });
-
-                if (isUpdatedCurrentUser) {
-                    await signOut();
-                    await signIn();
-                }
-            } catch (error) {
-                console.error({ error }, "Failed to delete user");
-            }
-        },
-        [deleteUser, session.data?.user.id],
-    );
 
     if (userQuery.error) {
         return <Error title={userQuery.error.message} statusCode={userQuery.error.data?.httpStatus ?? 500} />;
@@ -75,15 +37,7 @@ const UserPage: NextPageWithLayout = () => {
         return (
             <>
                 {[...Array(10)].map((_, i) => (
-                    <Skeleton
-                        className={clsx("mb-2 h-10", {
-                            "w-1/2": i % 2 === 0,
-                            "w-1/3": i % 3 === 0,
-                            "w-1/4": i % 4 === 0,
-                            "w-1/5": i % 5 === 0,
-                        })}
-                        key={`user-table-skeleton-${i}`}
-                    />
+                    <Skeleton className="mb-2 h-10" key={`device-table-skeleton-${i}`} />
                 ))}
             </>
         );
@@ -133,27 +87,7 @@ const UserPage: NextPageWithLayout = () => {
                                     Detail
                                 </Link>
 
-                                <Dialog>
-                                    <DialogTrigger>Delete</DialogTrigger>
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>Are you absolutely sure?</DialogTitle>
-                                            <DialogDescription>
-                                                This action cannot be undone. This will permanently delete your account
-                                                and remove your data from our servers.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <DialogFooter>
-                                            <Button
-                                                type="submit"
-                                                onClick={() => onDeleteClick(user.id)}
-                                                variant="destructive"
-                                            >
-                                                Confirm
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                <DeleteUserModal id={user.id} />
                             </TableCell>
                         </TableRow>
                     ))}

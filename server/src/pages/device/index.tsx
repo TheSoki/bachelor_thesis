@@ -16,17 +16,9 @@ import { useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import clsx from "clsx";
 import Link from "next/link";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/shadcn/ui/dialog";
 import { Button } from "@/shadcn/ui/button";
 import { match, P } from "ts-pattern";
+import { DeleteDeviceModal } from "@/components/modals/DeleteDeviceModal";
 
 const DevicePage: NextPageWithLayout = () => {
     const router = useRouter();
@@ -38,26 +30,6 @@ const DevicePage: NextPageWithLayout = () => {
     }, [router.query.page]);
 
     const deviceQuery = trpc.device.list.useQuery({ page: queryParamPage < 1 ? 1 : queryParamPage });
-
-    const deleteDevice = trpc.device.delete.useMutation({
-        async onSuccess() {
-            // refetches devices after a device is deleted
-            await utils.device.list.invalidate();
-        },
-    });
-
-    const onDeleteClick = useCallback(
-        async (id: string) => {
-            try {
-                await deleteDevice.mutateAsync({
-                    id,
-                });
-            } catch (error) {
-                console.error({ error }, "Failed to delete user");
-            }
-        },
-        [deleteDevice],
-    );
 
     const onCopyTokenClick = useCallback(
         async (id: string) => {
@@ -82,15 +54,7 @@ const DevicePage: NextPageWithLayout = () => {
         return (
             <>
                 {[...Array(10)].map((_, i) => (
-                    <Skeleton
-                        className={clsx("mb-2 h-10", {
-                            "w-1/2": i % 2 === 0,
-                            "w-1/3": i % 3 === 0,
-                            "w-1/4": i % 4 === 0,
-                            "w-1/5": i % 5 === 0,
-                        })}
-                        key={`device-table-skeleton-${i}`}
-                    />
+                    <Skeleton className="mb-2 h-10" key={`device-table-skeleton-${i}`} />
                 ))}
             </>
         );
@@ -136,7 +100,7 @@ const DevicePage: NextPageWithLayout = () => {
                             <TableCell>{`${device.buildingId}${device.roomId}`}</TableCell>
                             <TableCell>{device.createdAt.toLocaleString("cs-CZ")}</TableCell>
                             <TableCell>
-                                <Button onClick={() => onCopyTokenClick(device.id)} variant="ghost">
+                                <Button onClick={() => onCopyTokenClick(device.id)} variant="ghost" size="sm">
                                     Copy to clipboard
                                 </Button>
                             </TableCell>
@@ -145,27 +109,7 @@ const DevicePage: NextPageWithLayout = () => {
                                     Detail
                                 </Link>
 
-                                <Dialog>
-                                    <DialogTrigger>Delete</DialogTrigger>
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>Are you absolutely sure?</DialogTitle>
-                                            <DialogDescription>
-                                                This action cannot be undone. This will permanently delete this device
-                                                and remove your data from our servers.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <DialogFooter>
-                                            <Button
-                                                type="submit"
-                                                onClick={() => onDeleteClick(device.id)}
-                                                variant="destructive"
-                                            >
-                                                Confirm
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                <DeleteDeviceModal id={device.id} />
                             </TableCell>
                         </TableRow>
                     ))}
