@@ -27,7 +27,7 @@ export const userRouter = router({
                 columns: defaultUserSelect,
                 limit,
                 offset,
-                orderBy: (users, { asc }) => [asc(users.createdAt)],
+                orderBy: (users, { desc }) => [desc(users.createdAt)],
             });
 
             const totalCountQuery = await ctx.db.select({ value: count() }).from(users);
@@ -97,12 +97,17 @@ export const userRouter = router({
         const { id, email, name, password } = input;
 
         try {
-            const set: Partial<InsertUser> = {};
-            if (!!email) set.email = email;
-            if (!!name) set.name = name;
-            if (!!password) set.password = await hash(password, serverEnv.BCRYPT_SALT_ROUNDS);
+            const data: Partial<InsertUser> = {
+                email,
+                name,
+            };
+            if (!!password) data.password = await hash(password, serverEnv.BCRYPT_SALT_ROUNDS);
 
-            const user = await ctx.db.update(users).set(set).where(eq(users.id, id)).returning({ updatedId: users.id });
+            const user = await ctx.db
+                .update(users)
+                .set(data)
+                .where(eq(users.id, id))
+                .returning({ updatedId: users.id });
 
             return user;
         } catch (e) {

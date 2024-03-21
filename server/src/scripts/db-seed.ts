@@ -22,7 +22,7 @@ const run = async () => {
     await db
         .insert(schema.users)
         .values({
-            name: "System",
+            name: "Default",
             email: "default@example.com",
             password: password,
         })

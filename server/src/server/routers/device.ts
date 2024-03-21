@@ -10,7 +10,6 @@ const defaultDeviceSelect = {
     createdAt: true,
     buildingId: true,
     roomId: true,
-    lastSeen: true,
     displayWidth: true,
     displayHeight: true,
 } satisfies {
@@ -25,10 +24,10 @@ export const deviceRouter = router({
 
         try {
             const list = await ctx.db.query.devices.findMany({
-                columns: defaultDeviceSelect,
+                columns: { ...defaultDeviceSelect, lastSeen: true },
                 limit,
                 offset,
-                orderBy: (devices, { asc }) => [asc(devices.createdAt)],
+                orderBy: (devices, { desc }) => [desc(devices.createdAt)],
             });
 
             const totalCountQuery = await ctx.db.select({ value: count() }).from(devices);
@@ -98,15 +97,16 @@ export const deviceRouter = router({
         const { id, buildingId, roomId, displayHeight, displayWidth } = input;
 
         try {
-            const set: Partial<InsertDevice> = {};
-            if (!!buildingId) set.buildingId = buildingId;
-            if (!!roomId) set.roomId = roomId;
-            if (!!displayHeight) set.displayHeight = displayHeight;
-            if (!!displayWidth) set.displayWidth = displayWidth;
+            const data: InsertDevice = {
+                buildingId,
+                roomId,
+                displayHeight,
+                displayWidth,
+            };
 
             const device = await ctx.db
                 .update(devices)
-                .set(set)
+                .set(data)
                 .where(eq(devices.id, id))
                 .returning({ updatedId: devices.id });
 

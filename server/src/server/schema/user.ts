@@ -5,19 +5,19 @@ export const userSchema = z.object({
 });
 
 export const createUserSchema = z.object({
-    name: z.string().max(255),
-    email: z.string().email().max(255),
-    password: z.string().max(255),
+    name: z.string().min(3).max(255),
+    email: z.string().email().min(3).max(255),
+    password: z.string().min(3).max(255),
 });
 
 export const updateUserSchema = z.object({
     id: z.string(),
-    name: z.string().max(255).optional(),
-    email: z.string().email().max(255).optional(),
-    password: z.string().max(255).optional().nullable(),
+    name: z.string().min(3).max(255),
+    email: z.string().email().min(3).max(255),
+    password: z.string().min(3).max(255).optional(),
 });
 
 export const registerSchema = z.object({
-    email: z.string().email().max(255),
-    password: z.string().max(255),
+    email: z.string().email().min(3).max(255),
+    password: z.string().min(3).max(255),
 });
