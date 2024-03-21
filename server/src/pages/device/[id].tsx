@@ -4,7 +4,7 @@ import { trpc, type RouterOutput } from "@/utils/trpc";
 import type { NextPageWithLayout } from "../_app";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { updateDeviceSchema } from "@/server/schema/device";
-import type { z } from "zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/shadcn/ui/label";
@@ -14,7 +14,14 @@ import clsx from "clsx";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 import { Skeleton } from "@/shadcn/ui/skeleton";
 
-type ValidationSchema = z.infer<typeof updateDeviceSchema>;
+const schema = updateDeviceSchema.merge(
+    z.object({
+        displayWidth: z.string(),
+        displayHeight: z.string(),
+    }),
+);
+
+type ValidationSchema = z.infer<typeof schema>;
 
 type DeviceByIdOutput = RouterOutput["device"]["byId"];
 
@@ -66,12 +73,14 @@ const DeviceForm: FC<{
         formState: { errors, isSubmitting },
         reset,
     } = useForm<ValidationSchema>({
-        resolver: zodResolver(updateDeviceSchema),
+        resolver: zodResolver(schema),
         defaultValues: useMemo(
             () => ({
                 id: device.id,
                 buildingId: device.buildingId,
                 roomId: device.roomId,
+                displayWidth: `${device.displayWidth}`,
+                displayHeight: `${device.displayHeight}`,
             }),
             [device],
         ),
@@ -82,6 +91,8 @@ const DeviceForm: FC<{
             id: device.id,
             buildingId: device.buildingId,
             roomId: device.roomId,
+            displayWidth: `${device.displayWidth}`,
+            displayHeight: `${device.displayHeight}`,
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [device]);
@@ -89,7 +100,14 @@ const DeviceForm: FC<{
     const onSubmit = useCallback(
         async (data: ValidationSchema) => {
             try {
-                await updateDeviceMutation.mutateAsync(data);
+                const displayHeight = parseInt(data.displayHeight);
+                const displayWidth = parseInt(data.displayWidth);
+
+                await updateDeviceMutation.mutateAsync({
+                    ...data,
+                    displayHeight,
+                    displayWidth,
+                });
 
                 reset();
             } catch (error) {
@@ -129,6 +147,42 @@ const DeviceForm: FC<{
                     {...register("roomId")}
                 />
                 {errors.roomId && <p className="mt-2 text-xs italic text-red-500">{errors.roomId?.message}</p>}
+            </div>
+
+            <div className="mb-4">
+                <Label htmlFor="displayWidth" className="mb-2">
+                    Display Width
+                </Label>
+                <Input
+                    className={clsx({
+                        "border-red-500": errors.displayWidth,
+                    })}
+                    id="displayWidth"
+                    type="number"
+                    min={0}
+                    {...register("displayWidth")}
+                />
+                {errors.displayWidth && (
+                    <p className="mt-2 text-xs italic text-red-500">{errors.displayWidth?.message}</p>
+                )}
+            </div>
+
+            <div className="mb-4">
+                <Label htmlFor="displayHeight" className="mb-2">
+                    Display Height
+                </Label>
+                <Input
+                    className={clsx({
+                        "border-red-500": errors.displayHeight,
+                    })}
+                    id="displayHeight"
+                    type="number"
+                    min={0}
+                    {...register("displayHeight")}
+                />
+                {errors.displayHeight && (
+                    <p className="mt-2 text-xs italic text-red-500">{errors.displayHeight?.message}</p>
+                )}
             </div>
 
             <div className="mb-6 text-center">

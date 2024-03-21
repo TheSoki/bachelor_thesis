@@ -1,4 +1,4 @@
-import { uuid, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { uuid, pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 
 export const devices = pgTable("devices", {
@@ -7,6 +7,9 @@ export const devices = pgTable("devices", {
     token: uuid("token").notNull().defaultRandom(),
     buildingId: text("building").notNull(),
     roomId: text("room").notNull(),
+    lastSeen: timestamp("lastSeen"),
+    displayWidth: integer("displayWidth").notNull(),
+    displayHeight: integer("displayHeight").notNull(),
 });
 
 export type SelectDevice = InferSelectModel<typeof devices>;

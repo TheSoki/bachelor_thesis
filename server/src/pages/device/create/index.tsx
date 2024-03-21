@@ -3,7 +3,7 @@ import { trpc } from "@/utils/trpc";
 import type { NextPageWithLayout } from "../../_app";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { createDeviceSchema } from "@/server/schema/device";
-import type { z } from "zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/shadcn/ui/label";
@@ -12,7 +12,14 @@ import { Button } from "@/shadcn/ui/button";
 import clsx from "clsx";
 import { useCallback } from "react";
 
-type ValidationSchema = z.infer<typeof createDeviceSchema>;
+const schema = createDeviceSchema.merge(
+    z.object({
+        displayWidth: z.string(),
+        displayHeight: z.string(),
+    }),
+);
+
+type ValidationSchema = z.infer<typeof schema>;
 
 const DeviceCreatePage: NextPageWithLayout = () => {
     const router = useRouter();
@@ -25,13 +32,26 @@ const DeviceCreatePage: NextPageWithLayout = () => {
         formState: { errors, isSubmitting },
         reset,
     } = useForm<ValidationSchema>({
-        resolver: zodResolver(createDeviceSchema),
+        resolver: zodResolver(schema),
+        defaultValues: {
+            buildingId: "",
+            roomId: "",
+            displayWidth: "1448",
+            displayHeight: "1072",
+        },
     });
 
     const onSubmit = useCallback(
         async (data: ValidationSchema) => {
             try {
-                await createDeviceMutation.mutateAsync(data);
+                const displayHeight = parseInt(data.displayHeight);
+                const displayWidth = parseInt(data.displayWidth);
+
+                await createDeviceMutation.mutateAsync({
+                    ...data,
+                    displayHeight,
+                    displayWidth,
+                });
 
                 reset();
                 router.push("/device");
@@ -72,6 +92,42 @@ const DeviceCreatePage: NextPageWithLayout = () => {
                     {...register("roomId")}
                 />
                 {errors.roomId && <p className="mt-2 text-xs italic text-red-500">{errors.roomId?.message}</p>}
+            </div>
+
+            <div className="mb-4">
+                <Label htmlFor="displayWidth" className="mb-2">
+                    Display Width
+                </Label>
+                <Input
+                    className={clsx({
+                        "border-red-500": errors.displayWidth,
+                    })}
+                    id="displayWidth"
+                    type="number"
+                    min={0}
+                    {...register("displayWidth")}
+                />
+                {errors.displayWidth && (
+                    <p className="mt-2 text-xs italic text-red-500">{errors.displayWidth?.message}</p>
+                )}
+            </div>
+
+            <div className="mb-4">
+                <Label htmlFor="displayHeight" className="mb-2">
+                    Display Height
+                </Label>
+                <Input
+                    className={clsx({
+                        "border-red-500": errors.displayHeight,
+                    })}
+                    id="displayHeight"
+                    type="number"
+                    min={0}
+                    {...register("displayHeight")}
+                />
+                {errors.displayHeight && (
+                    <p className="mt-2 text-xs italic text-red-500">{errors.displayHeight?.message}</p>
+                )}
             </div>
 
             <div className="mb-6 text-center">

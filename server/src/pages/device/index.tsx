@@ -86,8 +86,10 @@ const DevicePage: NextPageWithLayout = () => {
                     <TableRow>
                         <TableHead className="w-[400px]">ID</TableHead>
                         <TableHead>Room</TableHead>
-                        <TableHead>Created At</TableHead>
+                        <TableHead>Size</TableHead>
+                        <TableHead>Last Seen At</TableHead>
                         <TableHead>Token</TableHead>
+                        <TableHead>Created At</TableHead>
                         <TableHead className="text-right">Action</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -98,12 +100,16 @@ const DevicePage: NextPageWithLayout = () => {
                                 <Link href={`/device/${device.id}`}>{device.id}</Link>
                             </TableCell>
                             <TableCell>{`${device.buildingId}${device.roomId}`}</TableCell>
-                            <TableCell>{device.createdAt.toLocaleString("cs-CZ")}</TableCell>
+                            <TableCell>{`${device.displayWidth}x${device.displayHeight}`}</TableCell>
+                            <TableCell>
+                                {device.lastSeen ? new Date(device.lastSeen).toLocaleString("cs-CZ") : "Never"}
+                            </TableCell>
                             <TableCell>
                                 <Button onClick={() => onCopyTokenClick(device.id)} variant="ghost" size="sm">
                                     Copy to clipboard
                                 </Button>
                             </TableCell>
+                            <TableCell>{device.createdAt.toLocaleString("cs-CZ")}</TableCell>
                             <TableCell className="text-right">
                                 <Link href={`/device/${device.id}`} className="mr-2">
                                     Detail

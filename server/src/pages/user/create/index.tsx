@@ -26,6 +26,11 @@ const UserCreatePage: NextPageWithLayout = () => {
         reset,
     } = useForm<ValidationSchema>({
         resolver: zodResolver(createUserSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            password: "",
+        },
     });
 
     const onSubmit = useCallback(

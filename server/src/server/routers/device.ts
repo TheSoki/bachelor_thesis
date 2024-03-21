@@ -10,6 +10,9 @@ const defaultDeviceSelect = {
     createdAt: true,
     buildingId: true,
     roomId: true,
+    lastSeen: true,
+    displayWidth: true,
+    displayHeight: true,
 } satisfies {
     [K in keyof InsertDevice]?: boolean;
 };
@@ -70,7 +73,7 @@ export const deviceRouter = router({
         }
     }),
     add: authedProcedure.input(createDeviceSchema).mutation(async ({ ctx, input }) => {
-        const { buildingId, roomId } = input;
+        const { buildingId, roomId, displayHeight, displayWidth } = input;
 
         try {
             const device = await ctx.db
@@ -78,6 +81,8 @@ export const deviceRouter = router({
                 .values({
                     buildingId,
                     roomId,
+                    displayHeight,
+                    displayWidth,
                 })
                 .returning({ insertedId: devices.id });
 
@@ -90,12 +95,14 @@ export const deviceRouter = router({
         }
     }),
     update: authedProcedure.input(updateDeviceSchema).mutation(async ({ ctx, input }) => {
-        const { id, buildingId, roomId } = input;
+        const { id, buildingId, roomId, displayHeight, displayWidth } = input;
 
         try {
             const set: Partial<InsertDevice> = {};
             if (!!buildingId) set.buildingId = buildingId;
             if (!!roomId) set.roomId = roomId;
+            if (!!displayHeight) set.displayHeight = displayHeight;
+            if (!!displayWidth) set.displayWidth = displayWidth;
 
             const device = await ctx.db
                 .update(devices)
