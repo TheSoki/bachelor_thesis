@@ -31,7 +31,7 @@ export const devices = pgTable("devices", {
 
 export const devicesRelations = relations(devices, ({ one }) => ({
     author: one(users, {
-        fields: [devices.id],
+        fields: [devices.authorId],
         references: [users.id],
     }),
 }));

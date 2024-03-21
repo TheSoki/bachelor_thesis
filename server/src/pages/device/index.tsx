@@ -110,7 +110,7 @@ const DevicePage: NextPageWithLayout = () => {
                                     Copy to clipboard
                                 </Button>
                             </TableCell>
-                            <TableCell>{device.createdBy.name}</TableCell>
+                            <TableCell>{device.author.name}</TableCell>
                             <TableCell>{device.createdAt.toLocaleString("cs-CZ")}</TableCell>
                             <TableCell className="text-right">
                                 <Link href={`/device/${device.id}`} className="mr-2">
