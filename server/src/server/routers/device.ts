@@ -1,6 +1,6 @@
 import { router, authedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { devices, type InsertDevice } from "@/db/schema/devices";
+import { devices, type InsertDevice } from "@/db/schema";
 import { count, eq } from "drizzle-orm";
 import { deviceSchema, createDeviceSchema, updateDeviceSchema } from "../schema/device";
 import { paginationSchema } from "../schema/general";

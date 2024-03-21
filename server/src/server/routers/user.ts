@@ -1,6 +1,6 @@
 import { router, authedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { users, type InsertUser } from "@/db/schema/users";
+import { users, type InsertUser } from "@/db/schema";
 import { count, eq } from "drizzle-orm";
 import { paginationSchema } from "../schema/general";
 import { userSchema, createUserSchema, updateUserSchema } from "../schema/user";

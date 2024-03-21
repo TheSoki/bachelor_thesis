@@ -1,7 +1,20 @@
 import { uuid, pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
 import { relations, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
-import { users } from "./users";
 
+//! Users
+export const users = pgTable("users", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    name: text("name").notNull(),
+    email: text("email").unique().notNull(),
+    password: text("password").notNull(),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+    devices: many(devices),
+}));
+
+//! Devices
 export const devices = pgTable("devices", {
     id: uuid("id").primaryKey().defaultRandom(),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
@@ -23,5 +36,8 @@ export const devicesRelations = relations(devices, ({ one }) => ({
     }),
 }));
 
+//! Types
+export type SelectUser = InferSelectModel<typeof users>;
+export type InsertUser = InferInsertModel<typeof users>;
 export type SelectDevice = InferSelectModel<typeof devices>;
 export type InsertDevice = InferInsertModel<typeof devices>;
