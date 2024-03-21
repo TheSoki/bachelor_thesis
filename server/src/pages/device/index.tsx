@@ -84,14 +84,14 @@ const DevicePage: NextPageWithLayout = () => {
                 </TableCaption>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[400px]">ID</TableHead>
+                        <TableHead>ID</TableHead>
                         <TableHead>Room</TableHead>
                         <TableHead>Size</TableHead>
                         <TableHead>Last Seen At</TableHead>
                         <TableHead>Token</TableHead>
                         <TableHead>Created By</TableHead>
                         <TableHead>Created At</TableHead>
-                        <TableHead className="text-right">Action</TableHead>
+                        <TableHead className="w-[150px] text-right">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -103,14 +103,14 @@ const DevicePage: NextPageWithLayout = () => {
                             <TableCell>{`${device.buildingId}${device.roomId}`}</TableCell>
                             <TableCell>{`${device.displayWidth}x${device.displayHeight}`}</TableCell>
                             <TableCell>
-                                {device.lastSeen ? new Date(device.lastSeen).toLocaleString("cs-CZ") : "Never"}
+                                {device.lastSeen ? new Date(device.lastSeen).toLocaleString("cs-CZ") : <i>Never</i>}
                             </TableCell>
                             <TableCell>
                                 <Button onClick={() => onCopyTokenClick(device.id)} variant="ghost" size="sm">
                                     Copy to clipboard
                                 </Button>
                             </TableCell>
-                            <TableCell>{device.author?.name ?? <i>DELETED</i>}</TableCell>
+                            <TableCell>{device.author?.name ?? <i>Deleted</i>}</TableCell>
                             <TableCell>{device.createdAt.toLocaleString("cs-CZ")}</TableCell>
                             <TableCell className="text-right">
                                 <Link href={`/device/${device.id}`} className="mr-2">

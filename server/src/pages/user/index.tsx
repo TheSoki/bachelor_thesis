@@ -66,11 +66,11 @@ const UserPage: NextPageWithLayout = () => {
                 </TableCaption>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[400px]">ID</TableHead>
+                        <TableHead>ID</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Created At</TableHead>
-                        <TableHead className="text-right">Action</TableHead>
+                        <TableHead className="w-[150px] text-right">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
