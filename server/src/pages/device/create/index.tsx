@@ -56,7 +56,7 @@ const DeviceCreatePage: NextPageWithLayout = () => {
                 reset();
                 router.push("/device");
             } catch (error) {
-                console.error({ error }, "Failed to update device");
+                console.error({ error }, "Failed to create device");
             }
         },
         [reset, router, createDeviceMutation],

@@ -41,7 +41,7 @@ const UserCreatePage: NextPageWithLayout = () => {
                 reset();
                 router.push("/user");
             } catch (error) {
-                console.error({ error }, "Failed to update user");
+                console.error({ error }, "Failed to create user");
             }
         },
         [createUserMutation, reset, router],

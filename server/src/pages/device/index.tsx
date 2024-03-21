@@ -89,6 +89,7 @@ const DevicePage: NextPageWithLayout = () => {
                         <TableHead>Size</TableHead>
                         <TableHead>Last Seen At</TableHead>
                         <TableHead>Token</TableHead>
+                        <TableHead>Created By</TableHead>
                         <TableHead>Created At</TableHead>
                         <TableHead className="text-right">Action</TableHead>
                     </TableRow>
@@ -109,6 +110,7 @@ const DevicePage: NextPageWithLayout = () => {
                                     Copy to clipboard
                                 </Button>
                             </TableCell>
+                            <TableCell>{device.createdBy.name}</TableCell>
                             <TableCell>{device.createdAt.toLocaleString("cs-CZ")}</TableCell>
                             <TableCell className="text-right">
                                 <Link href={`/device/${device.id}`} className="mr-2">

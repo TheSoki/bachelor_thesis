@@ -1,5 +1,6 @@
 import { uuid, pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
-import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { relations, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
+import { users } from "./users";
 
 export const devices = pgTable("devices", {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -10,7 +11,17 @@ export const devices = pgTable("devices", {
     lastSeen: timestamp("lastSeen"),
     displayWidth: integer("displayWidth").notNull(),
     displayHeight: integer("displayHeight").notNull(),
+    authorId: uuid("authorId")
+        .notNull()
+        .references(() => users.id),
 });
+
+export const devicesRelations = relations(devices, ({ one }) => ({
+    author: one(users, {
+        fields: [devices.id],
+        references: [users.id],
+    }),
+}));
 
 export type SelectDevice = InferSelectModel<typeof devices>;
 export type InsertDevice = InferInsertModel<typeof devices>;

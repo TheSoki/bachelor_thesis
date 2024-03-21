@@ -25,6 +25,11 @@ export const deviceRouter = router({
         try {
             const list = await ctx.db.query.devices.findMany({
                 columns: { ...defaultDeviceSelect, lastSeen: true },
+                with: {
+                    author: {
+                        columns: { id: true, name: true },
+                    },
+                },
                 limit,
                 offset,
                 orderBy: (devices, { desc }) => [desc(devices.createdAt)],
@@ -82,6 +87,7 @@ export const deviceRouter = router({
                     roomId,
                     displayHeight,
                     displayWidth,
+                    authorId: ctx.user.id,
                 })
                 .returning({ insertedId: devices.id });
 
@@ -97,7 +103,7 @@ export const deviceRouter = router({
         const { id, buildingId, roomId, displayHeight, displayWidth } = input;
 
         try {
-            const data: InsertDevice = {
+            const data: Partial<InsertDevice> = {
                 buildingId,
                 roomId,
                 displayHeight,

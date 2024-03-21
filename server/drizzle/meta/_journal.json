@@ -15,6 +15,13 @@
       "when": 1711036381665,
       "tag": "0001_quick_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1711042388869,
+      "tag": "0002_superb_skin",
+      "breakpoints": true
     }
   ]
 }
