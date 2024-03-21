@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1710899604832,
-      "tag": "0000_marvelous_zemo",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1711036381665,
-      "tag": "0001_quick_captain_cross",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1711042388869,
-      "tag": "0002_superb_skin",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1711043470558,
-      "tag": "0003_mixed_millenium_guard",
+      "when": 1711043703776,
+      "tag": "0000_brave_the_captain",
       "breakpoints": true
     }
   ]

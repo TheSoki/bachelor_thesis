@@ -1,1 +1,0 @@
-ALTER TABLE "devices" ALTER COLUMN "authorId" DROP NOT NULL;
