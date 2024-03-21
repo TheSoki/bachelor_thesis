@@ -24,9 +24,7 @@ export const devices = pgTable("devices", {
     lastSeen: timestamp("lastSeen"),
     displayWidth: integer("displayWidth").notNull(),
     displayHeight: integer("displayHeight").notNull(),
-    authorId: uuid("authorId")
-        .notNull()
-        .references(() => users.id),
+    authorId: uuid("authorId").references(() => users.id),
 });
 
 export const devicesRelations = relations(devices, ({ one }) => ({

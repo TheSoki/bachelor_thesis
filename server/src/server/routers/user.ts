@@ -1,6 +1,6 @@
 import { router, authedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { users, type InsertUser } from "@/db/schema";
+import { devices, users, type InsertUser } from "@/db/schema";
 import { count, eq } from "drizzle-orm";
 import { paginationSchema } from "../schema/general";
 import { userSchema, createUserSchema, updateUserSchema } from "../schema/user";
@@ -121,7 +121,16 @@ export const userRouter = router({
         const { id } = input;
 
         try {
-            const user = await ctx.db.delete(users).where(eq(users.id, id)).returning({ deletedId: users.id });
+            const user = ctx.db.transaction(async (trx) => {
+                await trx
+                    .update(devices)
+                    .set({
+                        authorId: null,
+                    })
+                    .where(eq(devices.authorId, id));
+
+                return await trx.delete(users).where(eq(users.id, id)).returning({ deletedId: users.id });
+            });
 
             return user;
         } catch (e) {
