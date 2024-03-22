@@ -14,8 +14,30 @@ import { useCallback } from "react";
 
 const schema = createDeviceSchema.merge(
     z.object({
-        displayWidth: z.string(),
-        displayHeight: z.string(),
+        displayWidth: z.string().refine(
+            (value) => {
+                const displayWidth = parseInt(value);
+                if (isNaN(displayWidth)) {
+                    return false;
+                }
+                return displayWidth >= 300 && displayWidth <= 10000;
+            },
+            {
+                message: "Display width must be a number between 300 and 10000",
+            },
+        ),
+        displayHeight: z.string().refine(
+            (value) => {
+                const displayHeight = parseInt(value);
+                if (isNaN(displayHeight)) {
+                    return false;
+                }
+                return displayHeight >= 200 && displayHeight <= 10000;
+            },
+            {
+                message: "Display height must be a number between 200 and 10000",
+            },
+        ),
     }),
 );
 
