@@ -22,7 +22,7 @@ const UserCreatePage: NextPageWithLayout = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting, isDirty },
         reset,
     } = useForm<ValidationSchema>({
         resolver: zodResolver(createUserSchema),
@@ -95,7 +95,7 @@ const UserCreatePage: NextPageWithLayout = () => {
             </div>
 
             <div className="mb-6 text-center">
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting || !isDirty}>
                     Create User
                 </Button>
             </div>

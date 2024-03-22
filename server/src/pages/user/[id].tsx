@@ -65,7 +65,7 @@ const UserForm: FC<{
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting, isDirty },
         reset,
     } = useForm<ValidationSchema>({
         resolver: zodResolver(updateUserSchema),
@@ -160,7 +160,7 @@ const UserForm: FC<{
             </div>
 
             <div className="mb-6 text-center">
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting || !isDirty}>
                     Update User
                 </Button>
             </div>

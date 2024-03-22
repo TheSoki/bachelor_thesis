@@ -29,7 +29,7 @@ const DeviceCreatePage: NextPageWithLayout = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting, isDirty },
         reset,
     } = useForm<ValidationSchema>({
         resolver: zodResolver(schema),
@@ -131,7 +131,7 @@ const DeviceCreatePage: NextPageWithLayout = () => {
             </div>
 
             <div className="mb-6 text-center">
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting || !isDirty}>
                     Create Device
                 </Button>
             </div>
