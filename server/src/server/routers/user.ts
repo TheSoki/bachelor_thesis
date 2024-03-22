@@ -37,7 +37,7 @@ export const userRouter = router({
             return {
                 list,
                 page: input.page,
-                totalPages,
+                totalPages: totalPages === 0 ? 1 : totalPages,
                 totalCount,
             };
         } catch (e) {

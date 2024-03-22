@@ -37,12 +37,13 @@ export const deviceRouter = router({
 
             const totalCountQuery = await ctx.db.select({ value: count() }).from(devices);
             const totalCount = totalCountQuery[0]?.value ?? 0;
+
             const totalPages = Math.ceil(totalCount / limit);
 
             return {
                 list,
                 page: input.page,
-                totalPages,
+                totalPages: totalPages === 0 ? 1 : totalPages,
                 totalCount,
             };
         } catch (e) {

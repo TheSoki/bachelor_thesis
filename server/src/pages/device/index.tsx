@@ -87,9 +87,9 @@ const DevicePage: NextPageWithLayout = () => {
                         <TableHead>ID</TableHead>
                         <TableHead>Room</TableHead>
                         <TableHead>Size</TableHead>
-                        <TableHead>Last Seen At</TableHead>
+                        <TableHead>Last Seen</TableHead>
                         <TableHead>Token</TableHead>
-                        <TableHead>Created By</TableHead>
+                        <TableHead>Author</TableHead>
                         <TableHead>Created At</TableHead>
                         <TableHead className="w-[150px] text-right">Action</TableHead>
                     </TableRow>
