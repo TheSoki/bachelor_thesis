@@ -2,7 +2,7 @@ Dockerfile
 .dockerignore
 .git
 .gitignore
-dist
+.next
 node_modules
 README.md
 .prettierrc
@@ -10,3 +10,4 @@ README.md
 docker-compose.yaml
 docker-compose.local.yaml
 docker-compose.prod.yaml
+tsconfig.tsbuildinfo
