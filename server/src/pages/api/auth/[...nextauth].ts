@@ -31,19 +31,17 @@ export const authOptions: AuthOptions = {
                 }
 
                 // Any object returned will be saved in `user` property of the JWT
-                const dbUser = await db.query.users
-                    .findFirst({
-                        columns: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            password: true,
-                        },
-                        where(users, { eq }) {
-                            return eq(users.email, user.email);
-                        },
-                    })
-                    .execute();
+                const dbUser = await db.query.users.findFirst({
+                    columns: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        password: true,
+                    },
+                    where(users, { eq }) {
+                        return eq(users.email, user.email);
+                    },
+                });
 
                 if (!dbUser) {
                     return null;

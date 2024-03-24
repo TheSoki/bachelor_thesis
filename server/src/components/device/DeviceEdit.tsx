@@ -42,12 +42,12 @@ const schema = updateDeviceSchema.merge(
 
 type ValidationSchema = z.infer<typeof schema>;
 
-type DeviceByIdOutput = RouterOutput["device"]["byId"];
+type DeviceByIdOutput = RouterOutput["device"]["getById"];
 
 export const DeviceEdit: FC<{
     id: string;
 }> = ({ id }) => {
-    const deviceQuery = trpc.device.byId.useQuery({ id });
+    const deviceQuery = trpc.device.getById.useQuery({ id });
 
     if (deviceQuery.error) {
         return <Error title={deviceQuery.error.message} statusCode={deviceQuery.error.data?.httpStatus ?? 500} />;
@@ -74,7 +74,7 @@ const DeviceEditForm: FC<{
     const updateDeviceMutation = trpc.device.update.useMutation({
         async onSuccess() {
             // refetches device after a device is added
-            await utils.device.byId.invalidate({
+            await utils.device.getById.invalidate({
                 id: device.id,
             });
         },

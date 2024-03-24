@@ -19,14 +19,11 @@ const run = async () => {
 
     const password = await hash("default@example.com", serverEnv.BCRYPT_SALT_ROUNDS);
 
-    await db
-        .insert(schema.users)
-        .values({
-            name: "Default",
-            email: "default@example.com",
-            password: password,
-        })
-        .returning();
+    await db.insert(schema.users).values({
+        name: "Default",
+        email: "default@example.com",
+        password: password,
+    });
 };
 
 run()

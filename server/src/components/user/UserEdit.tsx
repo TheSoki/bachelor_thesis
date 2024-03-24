@@ -14,12 +14,12 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 type ValidationSchema = z.infer<typeof updateUserSchema>;
 
-type UserByIdOutput = RouterOutput["user"]["byId"];
+type UserByIdOutput = RouterOutput["user"]["getById"];
 
 export const UserEdit: FC<{
     id: string;
 }> = ({ id }) => {
-    const userQuery = trpc.user.byId.useQuery({ id });
+    const userQuery = trpc.user.getById.useQuery({ id });
 
     if (userQuery.error) {
         return <Error title={userQuery.error.message} statusCode={userQuery.error.data?.httpStatus ?? 500} />;
@@ -47,7 +47,7 @@ const UserEditForm: FC<{
     const updateUserMutation = trpc.user.update.useMutation({
         async onSuccess() {
             // refetches user after a user is added
-            await utils.user.byId.invalidate({
+            await utils.user.getById.invalidate({
                 id: user.id,
             });
         },

@@ -15,7 +15,7 @@ type ValidationSchema = z.infer<typeof createUserSchema>;
 export const UserCreate = () => {
     const router = useRouter();
 
-    const createUserMutation = trpc.user.add.useMutation();
+    const createUserMutation = trpc.user.create.useMutation();
 
     const {
         register,

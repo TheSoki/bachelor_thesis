@@ -44,7 +44,7 @@ type ValidationSchema = z.infer<typeof schema>;
 export const DeviceCreate = () => {
     const router = useRouter();
 
-    const createDeviceMutation = trpc.device.add.useMutation();
+    const createDeviceMutation = trpc.device.create.useMutation();
 
     const {
         register,

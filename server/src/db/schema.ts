@@ -1,5 +1,11 @@
 import { uuid, pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
-import { relations, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
+import {
+    relations,
+    type DBQueryConfig,
+    type ExtractTablesWithRelations,
+    type InferInsertModel,
+    type InferSelectModel,
+} from "drizzle-orm";
 
 //! Users
 export const users = pgTable("users", {
@@ -37,5 +43,19 @@ export const devicesRelations = relations(devices, ({ one }) => ({
 //! Types
 export type SelectUser = InferSelectModel<typeof users>;
 export type InsertUser = InferInsertModel<typeof users>;
+export type UserWith = {
+    devices?: true | DBQueryConfig<"many", false, ExtractTablesWithRelations<typeof schema>>;
+};
+
 export type SelectDevice = InferSelectModel<typeof devices>;
 export type InsertDevice = InferInsertModel<typeof devices>;
+export type DeviceWith = {
+    author?: true | DBQueryConfig<"one", false, ExtractTablesWithRelations<typeof schema>>;
+};
+
+const schema = {
+    users,
+    usersRelations,
+    devices,
+    devicesRelations,
+};
