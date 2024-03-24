@@ -42,7 +42,6 @@ export const deviceRouter = router({
 
             return {
                 list,
-                page: input.page,
                 totalPages: totalPages === 0 ? 1 : totalPages,
                 totalCount,
             };

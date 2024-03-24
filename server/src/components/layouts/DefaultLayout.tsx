@@ -6,7 +6,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import type { FC, ReactNode } from "react";
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,20 +34,20 @@ export const DefaultLayout: FC<{
                     {match(session)
                         .with(
                             {
-                                status: P.when((status) => status === "loading"),
+                                status: "loading",
                             },
                             () => <Skeleton className="h-10" />,
                         )
                         .with(
                             {
-                                data: P.when((data) => !!data?.user),
+                                status: "authenticated",
                             },
                             ({ data }) => (
                                 <div className="flex flex-col items-center space-x-4 lg:flex-row">
                                     <Link href="/user">Users</Link>
                                     <Link href="/device">Devices</Link>
 
-                                    <Link href={`/user/${data?.user.id}`}>({data?.user.name})</Link>
+                                    <Link href={`/user/${data.user.id}`}>({data.user.name})</Link>
                                     <Button onClick={() => signOut()}>Sign Out</Button>
                                 </div>
                             ),

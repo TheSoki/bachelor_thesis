@@ -1,6 +1,6 @@
 import { DefaultLayout } from "./DefaultLayout";
 import { useSession } from "next-auth/react";
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 import { Skeleton } from "@/shadcn/ui/skeleton";
 import type { FC, ReactNode } from "react";
 import { Error } from "../Error";
@@ -15,7 +15,7 @@ export const AuthLayout: FC<{
             {match(session)
                 .with(
                     {
-                        status: P.when((status) => status === "loading"),
+                        status: "loading",
                     },
                     () => (
                         <>
@@ -27,7 +27,7 @@ export const AuthLayout: FC<{
                 )
                 .with(
                     {
-                        status: P.when((status) => status === "authenticated"),
+                        status: "authenticated",
                     },
                     () => <>{children}</>,
                 )
