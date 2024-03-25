@@ -23,11 +23,15 @@ const logger = createLogger({
 const serverSchema = z.object({
     DATABASE_URL: z.string().url(),
     BCRYPT_SALT_ROUNDS: z.number().int().positive(),
+    NEXTAUTH_SECRET: z.string(),
+    NEXTAUTH_URL: z.string().url(),
 });
 
 const serverEnv = {
     DATABASE_URL: process.env.DATABASE_URL,
     BCRYPT_SALT_ROUNDS: process.env.BCRYPT_SALT_ROUNDS ? parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) : undefined,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
 };
 
 const _serverEnv = serverSchema.safeParse(serverEnv);

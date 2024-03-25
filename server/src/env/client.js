@@ -20,8 +20,12 @@ const logger = createLogger({
           ],
 });
 
-const clientSchema = z.object({});
-const clientEnv = {};
+const clientSchema = z.object({
+    NEXT_PUBLIC_API_URL: z.string().url(),
+});
+const clientEnv = {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+};
 
 const _clientEnv = clientSchema.safeParse(clientEnv);
 
