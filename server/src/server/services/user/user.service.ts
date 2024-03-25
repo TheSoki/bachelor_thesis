@@ -57,10 +57,7 @@ export class UserService extends BaseService {
                 totalCount,
             };
         } catch (e) {
-            this.logger.error({
-                message: "Error fetching users",
-                error: e,
-            });
+            this.logger.error(`Error fetching users: ${e}`);
 
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -84,10 +81,7 @@ export class UserService extends BaseService {
 
             return user;
         } catch (e) {
-            this.logger.error({
-                message: `No user with id '${id}'`,
-                error: e,
-            });
+            this.logger.error(`Error fetching user with id '${id}': ${e}`);
 
             throw new TRPCError({
                 code: "NOT_FOUND",
@@ -108,10 +102,7 @@ export class UserService extends BaseService {
                 password: hashedPassword,
             });
         } catch (e) {
-            this.logger.error({
-                message: "Error adding user",
-                error: e,
-            });
+            this.logger.error(`Error adding user: ${e}`);
 
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -132,10 +123,7 @@ export class UserService extends BaseService {
 
             await this.userRepository.update(id, data);
         } catch (e) {
-            this.logger.error({
-                message: `Error updating user with id '${id}'`,
-                error: e,
-            });
+            this.logger.error(`Error updating user with id '${id}': ${e}`);
 
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -153,10 +141,7 @@ export class UserService extends BaseService {
                 this.userRepository.delete(id, trx);
             });
         } catch (e) {
-            this.logger.error({
-                message: `Error deleting user with id '${id}'`,
-                error: e,
-            });
+            this.logger.error(`Error deleting user with id '${id}': ${e}`);
 
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",

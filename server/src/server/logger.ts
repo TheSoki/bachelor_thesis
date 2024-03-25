@@ -15,7 +15,7 @@ export const initLogger = () => {
               ]
             : [
                   new transports.Console({
-                      format: format.cli(),
+                      format: format.simple(),
                   }),
               ],
     });

@@ -59,10 +59,7 @@ export class DeviceService extends BaseService {
                 totalCount,
             };
         } catch (e) {
-            this.logger.error({
-                message: "Error fetching devices",
-                error: e,
-            });
+            this.logger.error(`Error fetching devices: ${e}`);
 
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -86,10 +83,7 @@ export class DeviceService extends BaseService {
 
             return device;
         } catch (e) {
-            this.logger.error({
-                message: `No device with id '${id}'`,
-                error: e,
-            });
+            this.logger.error(`Error fetching device with id '${id}': ${e}`);
 
             throw new TRPCError({
                 code: "NOT_FOUND",
@@ -110,10 +104,7 @@ export class DeviceService extends BaseService {
                 authorId: userId,
             });
         } catch (e) {
-            this.logger.error({
-                message: "Error adding device",
-                error: e,
-            });
+            this.logger.error(`Error adding device: ${e}`);
 
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -135,10 +126,7 @@ export class DeviceService extends BaseService {
 
             await this.deviceRepository.update(id, data);
         } catch (e) {
-            this.logger.error({
-                message: `Error updating device with id '${id}'`,
-                error: e,
-            });
+            this.logger.error(`Error updating device with id '${id}': ${e}`);
 
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -153,10 +141,7 @@ export class DeviceService extends BaseService {
         try {
             await this.deviceRepository.delete(id);
         } catch (e) {
-            this.logger.error({
-                message: `Error deleting device with id '${id}'`,
-                error: e,
-            });
+            this.logger.error(`Error deleting device with id '${id}': ${e}`);
 
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -183,10 +168,7 @@ export class DeviceService extends BaseService {
 
             return device;
         } catch (e) {
-            this.logger.error({
-                message: `No device with id '${id}'`,
-                error: e,
-            });
+            this.logger.error(`Error fetching device with id '${id}': ${e}`);
 
             throw new TRPCError({
                 code: "NOT_FOUND",
