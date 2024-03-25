@@ -2,7 +2,6 @@ import type { UserRepository } from "@/server/repositories/user/user.repository"
 import { BaseService, type BaseServiceDependencies } from "../base/base.service";
 import type { z } from "zod";
 import type { paginationSchema } from "@/server/schema/general";
-import { TRPCError } from "@trpc/server";
 import type { createUserSchema, updateUserSchema, userSchema } from "@/server/schema/user";
 import { hash } from "bcrypt";
 import { serverEnv } from "@/env/server";
@@ -59,10 +58,7 @@ export class UserService extends BaseService {
         } catch (e) {
             this.logger.error(`Error fetching users: ${e}`);
 
-            throw new TRPCError({
-                code: "INTERNAL_SERVER_ERROR",
-                message: "Error fetching users",
-            });
+            throw new Error("Error fetching users");
         }
     }
 
@@ -83,10 +79,7 @@ export class UserService extends BaseService {
         } catch (e) {
             this.logger.error(`Error fetching user with id '${id}': ${e}`);
 
-            throw new TRPCError({
-                code: "NOT_FOUND",
-                message: `No user with id '${id}'`,
-            });
+            throw new Error(`No user with id '${id}'`);
         }
     }
 
@@ -104,10 +97,7 @@ export class UserService extends BaseService {
         } catch (e) {
             this.logger.error(`Error adding user: ${e}`);
 
-            throw new TRPCError({
-                code: "INTERNAL_SERVER_ERROR",
-                message: "Error adding user",
-            });
+            throw new Error("Error adding user");
         }
     }
 
@@ -125,10 +115,7 @@ export class UserService extends BaseService {
         } catch (e) {
             this.logger.error(`Error updating user with id '${id}': ${e}`);
 
-            throw new TRPCError({
-                code: "INTERNAL_SERVER_ERROR",
-                message: `Error updating user with id '${id}'`,
-            });
+            throw new Error(`Error updating user with id '${id}'`);
         }
     }
 
@@ -143,10 +130,7 @@ export class UserService extends BaseService {
         } catch (e) {
             this.logger.error(`Error deleting user with id '${id}': ${e}`);
 
-            throw new TRPCError({
-                code: "INTERNAL_SERVER_ERROR",
-                message: `Error deleting user with id '${id}'`,
-            });
+            throw new Error(`Error deleting user with id '${id}'`);
         }
     }
 }

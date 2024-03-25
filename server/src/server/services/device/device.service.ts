@@ -1,7 +1,6 @@
 import { BaseService, type BaseServiceDependencies } from "../base/base.service";
 import type { z } from "zod";
 import type { paginationSchema } from "@/server/schema/general";
-import { TRPCError } from "@trpc/server";
 import type { createDeviceSchema, updateDeviceSchema, deviceSchema } from "@/server/schema/device";
 import type { InsertDevice, SelectDevice } from "@/db/schema";
 import type { DeviceRepository } from "@/server/repositories/device/device.repository";
@@ -61,10 +60,7 @@ export class DeviceService extends BaseService {
         } catch (e) {
             this.logger.error(`Error fetching devices: ${e}`);
 
-            throw new TRPCError({
-                code: "INTERNAL_SERVER_ERROR",
-                message: "Error fetching devices",
-            });
+            throw new Error("Error fetching devices");
         }
     }
 
@@ -85,10 +81,7 @@ export class DeviceService extends BaseService {
         } catch (e) {
             this.logger.error(`Error fetching device with id '${id}': ${e}`);
 
-            throw new TRPCError({
-                code: "NOT_FOUND",
-                message: `No device with id '${id}'`,
-            });
+            throw new Error(`No device with id '${id}'`);
         }
     }
 
@@ -106,10 +99,7 @@ export class DeviceService extends BaseService {
         } catch (e) {
             this.logger.error(`Error adding device: ${e}`);
 
-            throw new TRPCError({
-                code: "INTERNAL_SERVER_ERROR",
-                message: "Error adding device",
-            });
+            throw new Error("Error adding device");
         }
     }
 
@@ -128,10 +118,7 @@ export class DeviceService extends BaseService {
         } catch (e) {
             this.logger.error(`Error updating device with id '${id}': ${e}`);
 
-            throw new TRPCError({
-                code: "INTERNAL_SERVER_ERROR",
-                message: `Error updating device with id '${id}'`,
-            });
+            throw new Error(`Error updating device with id '${id}'`);
         }
     }
 
@@ -143,10 +130,7 @@ export class DeviceService extends BaseService {
         } catch (e) {
             this.logger.error(`Error deleting device with id '${id}': ${e}`);
 
-            throw new TRPCError({
-                code: "INTERNAL_SERVER_ERROR",
-                message: `Error deleting device with id '${id}'`,
-            });
+            throw new Error(`Error deleting device with id '${id}'`);
         }
     }
 
@@ -170,10 +154,7 @@ export class DeviceService extends BaseService {
         } catch (e) {
             this.logger.error(`Error fetching device with id '${id}': ${e}`);
 
-            throw new TRPCError({
-                code: "NOT_FOUND",
-                message: `No device with id '${id}'`,
-            });
+            throw new Error(`No device with id '${id}'`);
         }
     }
 }
