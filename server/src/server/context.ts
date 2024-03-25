@@ -8,6 +8,7 @@ import { UserService } from "./services/user/user.service";
 import { DeviceService } from "./services/device/device.service";
 import type { Session } from "next-auth";
 import { initLogger, type Logger } from "./logger";
+import { ScheduleService } from "./services/schedule/schedule.service";
 
 export const createInnerContext = (): InnerContext => {
     const logger = initLogger();
@@ -17,14 +18,16 @@ export const createInnerContext = (): InnerContext => {
 
     const userService = new UserService({ logger, userRepository, deviceRepository });
     const deviceService = new DeviceService({ logger, deviceRepository });
+    const scheduleService = new ScheduleService({ logger, deviceRepository });
 
-    return { logger, userService, deviceService };
+    return { logger, userService, deviceService, scheduleService };
 };
 
 export type InnerContext = {
     logger: Logger;
     userService: UserService;
     deviceService: DeviceService;
+    scheduleService: ScheduleService;
 };
 
 export const createContext = async (opts: CreateNextContextOptions): Promise<Context> => {
@@ -35,13 +38,14 @@ export const createContext = async (opts: CreateNextContextOptions): Promise<Con
         globalThis.innerCtx = innerCtx;
     }
 
-    const { logger, userService, deviceService } = innerCtx;
+    const { logger, userService, deviceService, scheduleService } = innerCtx;
     const session = await getServerSession(opts.req, opts.res, authOptions);
 
     return {
         logger,
         userService,
         deviceService,
+        scheduleService,
         session,
     };
 };
