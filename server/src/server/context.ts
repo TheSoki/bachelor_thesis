@@ -7,25 +7,26 @@ import { DeviceRepository } from "./repositories/device/device.repository";
 import { UserService } from "./services/user/user.service";
 import { DeviceService } from "./services/device/device.service";
 import type { Session } from "next-auth";
+import { initLogger, type Logger } from "./logger";
 
 const globalContext = globalThis as unknown as {
     innerCtx: InnerContext | undefined;
 };
 
 export const createInnerContext = (): InnerContext => {
-    const userRepository = new UserRepository({ db });
-    const deviceRepository = new DeviceRepository({ db });
+    const logger = initLogger();
 
-    const userService = new UserService({ userRepository, deviceRepository });
-    const deviceService = new DeviceService({ deviceRepository });
+    const userRepository = new UserRepository({ db, logger });
+    const deviceRepository = new DeviceRepository({ db, logger });
 
-    return {
-        userService,
-        deviceService,
-    };
+    const userService = new UserService({ logger, userRepository, deviceRepository });
+    const deviceService = new DeviceService({ logger, deviceRepository });
+
+    return { logger, userService, deviceService };
 };
 
 export type InnerContext = {
+    logger: Logger;
     userService: UserService;
     deviceService: DeviceService;
 };
@@ -42,12 +43,11 @@ export const createContext = async (opts: CreateNextContextOptions): Promise<Con
         globalContext.innerCtx = innerCtx;
     }
 
-    const { userService, deviceService } = innerCtx;
+    const { logger, userService, deviceService } = innerCtx;
     const session = await getServerSession(opts.req, opts.res, authOptions);
 
-    // console.log("createContext for", session?.user?.name ?? "unknown user");
-
     return {
+        logger,
         session,
         userService,
         deviceService,
@@ -55,6 +55,7 @@ export const createContext = async (opts: CreateNextContextOptions): Promise<Con
 };
 
 export type Context = {
+    logger: Logger;
     session: Session | null;
     userService: UserService;
     deviceService: DeviceService;

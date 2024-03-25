@@ -57,6 +57,11 @@ export class UserService extends BaseService {
                 totalCount,
             };
         } catch (e) {
+            this.logger.error({
+                message: "Error fetching users",
+                error: e,
+            });
+
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "Error fetching users",
@@ -74,14 +79,16 @@ export class UserService extends BaseService {
             });
 
             if (!user) {
-                throw new TRPCError({
-                    code: "NOT_FOUND",
-                    message: `No user with id '${id}'`,
-                });
+                throw new Error("User not found");
             }
 
             return user;
         } catch (e) {
+            this.logger.error({
+                message: `No user with id '${id}'`,
+                error: e,
+            });
+
             throw new TRPCError({
                 code: "NOT_FOUND",
                 message: `No user with id '${id}'`,
@@ -101,6 +108,11 @@ export class UserService extends BaseService {
                 password: hashedPassword,
             });
         } catch (e) {
+            this.logger.error({
+                message: "Error adding user",
+                error: e,
+            });
+
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "Error adding user",
@@ -120,6 +132,11 @@ export class UserService extends BaseService {
 
             await this.userRepository.update(id, data);
         } catch (e) {
+            this.logger.error({
+                message: `Error updating user with id '${id}'`,
+                error: e,
+            });
+
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: `Error updating user with id '${id}'`,
@@ -136,6 +153,11 @@ export class UserService extends BaseService {
                 this.userRepository.delete(id, trx);
             });
         } catch (e) {
+            this.logger.error({
+                message: `Error deleting user with id '${id}'`,
+                error: e,
+            });
+
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: `Error deleting user with id '${id}'`,

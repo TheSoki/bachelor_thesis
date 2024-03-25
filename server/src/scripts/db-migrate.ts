@@ -4,6 +4,7 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { Client } from "pg";
 import { serverEnv } from "@/env/server";
 import * as schema from "../db/schema";
+import { initLogger } from "@/server/logger";
 
 const client = new Client({
     connectionString: serverEnv.DATABASE_URL,
@@ -24,7 +25,8 @@ const run = async () => {
 
 run()
     .catch((error) => {
-        console.error(error);
+        const logger = initLogger();
+        logger.error(error);
         process.exit(1);
     })
     .finally(() => {

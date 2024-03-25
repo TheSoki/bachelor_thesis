@@ -56,6 +56,8 @@ export const authedProcedure = t.procedure.use(function isAuthed(opts) {
     const user = opts.ctx.session?.user;
 
     if (!user) {
+        opts.ctx.logger.error("Unauthorized access");
+
         throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
