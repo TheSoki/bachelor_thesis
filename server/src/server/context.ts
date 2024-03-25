@@ -9,10 +9,6 @@ import { DeviceService } from "./services/device/device.service";
 import type { Session } from "next-auth";
 import { initLogger, type Logger } from "./logger";
 
-const globalContext = globalThis as unknown as {
-    innerCtx: InnerContext | undefined;
-};
-
 export const createInnerContext = (): InnerContext => {
     const logger = initLogger();
 
@@ -32,11 +28,11 @@ export type InnerContext = {
 };
 
 export const createContext = async (opts: CreateNextContextOptions): Promise<Context> => {
-    let innerCtx = globalContext.innerCtx;
+    let innerCtx = globalThis.innerCtx;
 
-    if (!innerCtx) {
+    if (!innerCtx || process.env.NODE_ENV === "development") {
         innerCtx = createInnerContext();
-        globalContext.innerCtx = innerCtx;
+        globalThis.innerCtx = innerCtx;
     }
 
     const { logger, userService, deviceService } = innerCtx;
@@ -44,15 +40,12 @@ export const createContext = async (opts: CreateNextContextOptions): Promise<Con
 
     return {
         logger,
-        session,
         userService,
         deviceService,
+        session,
     };
 };
 
-export type Context = {
-    logger: Logger;
+export type Context = InnerContext & {
     session: Session | null;
-    userService: UserService;
-    deviceService: DeviceService;
 };
