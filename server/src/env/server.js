@@ -1,24 +1,6 @@
 // @ts-check
 const { z } = require("zod");
-const { createLogger, format, transports } = require("winston");
 const { formatErrors } = require("./helpers");
-
-const isProd = process.env.NODE_ENV === "production";
-
-const logger = createLogger({
-    level: "info",
-    format: format.json(),
-    transports: isProd
-        ? [
-              new transports.File({ filename: "error.log", level: "error" }),
-              new transports.File({ filename: "combined.log" }),
-          ]
-        : [
-              new transports.Console({
-                  format: format.cli(),
-              }),
-          ],
-});
 
 const serverSchema = z.object({
     DATABASE_URL: z.string().url(),
@@ -37,7 +19,7 @@ const serverEnv = {
 const _serverEnv = serverSchema.safeParse(serverEnv);
 
 if (_serverEnv.success === false) {
-    logger.error("❌ Invalid environment variables:\n", ...formatErrors(_serverEnv.error.format()));
+    console.error("❌ Invalid environment variables:\n", ...formatErrors(_serverEnv.error.format()));
     throw new Error("Invalid environment variables");
 }
 
