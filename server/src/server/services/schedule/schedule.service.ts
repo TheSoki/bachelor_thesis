@@ -1,6 +1,8 @@
 import { BaseService, type BaseServiceDependencies } from "../base/base.service";
 import type { DeviceRepository } from "@/server/repositories/device/device.repository";
 import puppeteer from "puppeteer";
+import { parseString } from "xml2js";
+import { z } from "zod";
 
 export type ScheduleServiceDependencies = {
     deviceRepository: DeviceRepository;
@@ -25,9 +27,15 @@ export class ScheduleService extends BaseService {
         try {
             const { buildingId, roomId, displayWidth, displayHeight } = await this.getDeviceById(id);
             const roomName = `${buildingId}${roomId}`;
-            const scheduleEvents = await this.getScheduleEvents();
+            const scheduleEvents = await this.getScheduleEvents({
+                buildingId,
+                roomId,
+            });
             const scheduleHtml = this.generateScheduleHtml(roomName, displayWidth, displayHeight, scheduleEvents);
             const pngBuffer = await this.generatePngFromHtml(displayWidth, displayHeight, scheduleHtml);
+            await this.deviceRepository.update(id, {
+                lastSeen: new Date(),
+            });
 
             return pngBuffer;
         } catch (e) {
@@ -62,14 +70,103 @@ export class ScheduleService extends BaseService {
         }
     }
 
-    private async getScheduleEvents(): Promise<ScheduleEvent[]> {
-        const scheduleEvents: ScheduleEvent[] = [
-            { name: "Meeting", from: "08:00", to: "10:00" },
-            { name: "Lunch", from: "12:00", to: "13:00" },
-            { name: "Presentation", from: "14:00", to: "16:00" },
-            { name: "Meeting 1", from: "16:00", to: "18:00" },
-            { name: "Meeting 2", from: "15:00", to: "18:00" },
-        ];
+    private async getScheduleEvents({
+        buildingId,
+        roomId,
+    }: {
+        buildingId: string;
+        roomId: string;
+    }): Promise<ScheduleEvent[]> {
+        const response = await fetch(
+            `https://demostag.osu.cz/ws/services/rest2/rozvrhy/getRozvrhByMistnost?budova=${buildingId}&mistnost=${roomId}`,
+        );
+
+        if (!response.ok) {
+            this.logger.error(`Failed to fetch schedule events: ${response.statusText}`);
+            return [];
+        }
+
+        const data = await response.text();
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const xml: Record<string, any> = await new Promise((resolve, reject) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            parseString(data, (err: any, result: unknown) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    resolve(result as any);
+                }
+            });
+        });
+
+        const scheduleEvents: ScheduleEvent[] = [];
+
+        const now = new Date();
+        const dayOfWeek = now.getDay();
+
+        const czechDays = ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"];
+        const day = czechDays[dayOfWeek];
+
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            xml?.["ns2:rozvrh"]["rozvrhovaAkce"].forEach((akce: any) => {
+                const eventTimeSchema = z.object({
+                    name: z.string(),
+                    // hh:mm
+                    fromTime: z.string().regex(/^\d{2}:\d{2}$/),
+                    toTime: z.string().regex(/^\d{2}:\d{2}$/),
+                    // dd.mm.yyyy or d.m.yyyy or d.mm.yyyy or dd.m.yyyy
+                    startDate: z.string().regex(/^\d{1,2}\.\d{1,2}\.\d{4}$/),
+                    endDate: z.string().regex(/^\d{1,2}\.\d{1,2}\.\d{4}$/),
+                    dayOfWeek: z.string().regex(/^(Ne|Po|Út|St|Čt|Pá|So)$/),
+                });
+
+                const event = {
+                    name: akce["nazev"][0],
+                    fromTime: akce["hodinaSkutOd"][0],
+                    toTime: akce["hodinaSkutDo"][0],
+                    startDate: akce["datumOd"][0],
+                    endDate: akce["datumDo"][0],
+                    dayOfWeek: akce["denZkr"][0],
+                };
+
+                const parsedEvent = eventTimeSchema.safeParse(event);
+
+                if (parsedEvent.success) {
+                    const splitStart = event.startDate.split(".");
+                    const validStartDate = new Date();
+                    validStartDate.setDate(parseInt(splitStart[0]));
+                    validStartDate.setMonth(parseInt(splitStart[1]) - 1);
+                    validStartDate.setFullYear(parseInt(splitStart[2]));
+
+                    const splitEnd = event.endDate.split(".");
+                    const validEndDate = new Date();
+                    validEndDate.setDate(parseInt(splitEnd[0]));
+                    validEndDate.setMonth(parseInt(splitEnd[1]) - 1);
+                    validEndDate.setFullYear(parseInt(splitEnd[2]));
+
+                    const isTodayBetweenTimelines = now >= validStartDate && now <= validEndDate;
+                    const isToday = day === event.dayOfWeek;
+
+                    if (isTodayBetweenTimelines && isToday) {
+                        scheduleEvents.push({
+                            name: event.name,
+                            from: event.fromTime,
+                            to: event.toTime,
+                        });
+                    }
+                } else {
+                    this.logger.error(`Failed to parse event: ${JSON.stringify(event)}`);
+                    this.logger.error(`Error: ${parsedEvent.error}`);
+                }
+            });
+        } catch (e) {
+            this.logger.error(`Error parsing schedule events: ${e}`);
+        }
+
+        this.logger.info(`Schedule events: ${JSON.stringify(scheduleEvents)}`);
 
         return scheduleEvents;
     }
@@ -98,6 +195,8 @@ export class ScheduleService extends BaseService {
         const paddingX = 10;
         const cellWidth = (width - paddingX * 2) / learningHours.length;
         const cellHeight = 45;
+
+        const usableWidth = width - paddingX * 2;
 
         let html = `
         <html>
@@ -136,7 +235,7 @@ export class ScheduleService extends BaseService {
             <body>
                 <div class="header">
                 <span>${roomName}</span>
-                    <span>Last updated: ${new Date().toLocaleTimeString("cs-CZ")}</span>
+                    <span>Updated: ${new Date().toLocaleString("cs-CZ")}</span>
                 </div>
                 <table class="schedule">
                     <tr>
