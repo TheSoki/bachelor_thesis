@@ -44,10 +44,10 @@ export const DefaultLayout: FC<{
                             },
                             ({ data }) => (
                                 <div className="flex flex-col items-center space-x-4 lg:flex-row">
-                                    <Link href="/user">Users</Link>
-                                    <Link href="/device">Devices</Link>
+                                    <Link href="/users">Users</Link>
+                                    <Link href="/devices">Devices</Link>
 
-                                    <Link href={`/user/${data.user.id}`}>({data.user.name})</Link>
+                                    <Link href={`/users/${data.user.id}`}>({data.user.name})</Link>
                                     <Button onClick={() => signOut()}>Sign Out</Button>
                                 </div>
                             ),

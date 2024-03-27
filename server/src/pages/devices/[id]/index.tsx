@@ -1,10 +1,10 @@
 import { Error } from "@/components/Error";
 import { useRouter } from "next/router";
-import type { NextPageWithLayout } from "../_app";
+import type { NextPageWithLayout } from "../../_app";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
-import { UserEdit } from "@/components/user/UserEdit";
+import { DeviceEdit } from "@/components/device/DeviceEdit";
 
-const UserDetailPage: NextPageWithLayout = () => {
+const DevicesDetailPage: NextPageWithLayout = () => {
     const router = useRouter();
     const id = router.query.id as string | undefined;
 
@@ -12,9 +12,9 @@ const UserDetailPage: NextPageWithLayout = () => {
         return <Error statusCode={404} title="Page not found" />;
     }
 
-    return <UserEdit id={id} />;
+    return <DeviceEdit id={id} />;
 };
 
-UserDetailPage.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
+DevicesDetailPage.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
 
-export default UserDetailPage;
+export default DevicesDetailPage;

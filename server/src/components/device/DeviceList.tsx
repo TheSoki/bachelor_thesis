@@ -58,7 +58,7 @@ export const DeviceList: FC<{
         <div className="py-8">
             <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-3xl font-semibold">Devices</h2>
-                <Link href="/device/create">Create Device</Link>
+                <Link href="/devices/create">Create Device</Link>
             </div>
 
             <Table>
@@ -90,7 +90,7 @@ export const DeviceList: FC<{
                     {list.map((device) => (
                         <TableRow key={device.id}>
                             <TableCell className="font-medium">
-                                <Link href={`/device/${device.id}`}>{device.id}</Link>
+                                <Link href={`/devices/${device.id}`}>{device.id}</Link>
                             </TableCell>
                             <TableCell>{`${device.buildingId}${device.roomId}`}</TableCell>
                             <TableCell>{`${device.displayWidth}x${device.displayHeight}`}</TableCell>
@@ -119,7 +119,7 @@ export const DeviceList: FC<{
                             <TableCell>{device.author?.name ?? <i>Deleted</i>}</TableCell>
                             <TableCell>{device.createdAt.toLocaleString("cs-CZ")}</TableCell>
                             <TableCell className="text-right">
-                                <Link href={`/device/${device.id}`} className="mr-2">
+                                <Link href={`/devices/${device.id}`} className="mr-2">
                                     Detail
                                 </Link>
 

@@ -37,7 +37,7 @@ export const UserCreate = () => {
                 await createUserMutation.mutateAsync(data);
 
                 reset();
-                router.push("/user");
+                router.push("/users");
             } catch (error) {
                 console.error({ error }, "Failed to create user");
             }

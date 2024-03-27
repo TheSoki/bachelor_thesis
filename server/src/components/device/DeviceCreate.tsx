@@ -74,7 +74,7 @@ export const DeviceCreate = () => {
                 });
 
                 reset();
-                router.push("/device");
+                router.push("/devices");
             } catch (error) {
                 console.error({ error }, "Failed to create device");
             }

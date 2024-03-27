@@ -235,71 +235,63 @@ export class ScheduleService extends BaseService {
 
         const html = `
         <html>
-            <head>
-                <style>
-                    body {
-                        padding: ${padding}px;
-                        margin: 0;
-                        background-color: #f0f0f0;
-                        font-size: ${fontSize}px;
-                    }
-                    .content {
-                        width: ${usableWidth}px;
-                        height: ${contentHeight}px;
-                        display: flex;
-                    }
-                    table {
-                        border: none;
-                        table-layout: fixed;
-                        border-collapse: collapse;
-                        font-size: ${tableFontSize}px;
-                    }
-                    td {
-                        text-align: center;
-                        width: ${infoCellWidth}px;
-                        height: ${cellHeight}px;
-                        position: relative;
-                    }
-                    .header {
-                        border-bottom: 1px solid #000;
-                        height: ${headerHeight}px;
-                        font-weight: bold;
-                        line-height: ${headerHeight}px;
-                        display: flex;
-                        justify-content: space-between;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <span>${roomName}</span>
-                    <span>Updated: ${new Date().toLocaleString("cs-CZ")}</span>
+        <head>
+            <style>
+                body {
+                    padding: ${padding}px;
+                    margin: 0;
+                    background-color: #f0f0f0;
+                    font-size: ${fontSize}px;
+                }
+                .content {
+                    width: ${usableWidth}px;
+                    height: ${contentHeight}px;
+                    display: flex;
+                }
+                table {
+                    border: none;
+                    table-layout: fixed;
+                    border-collapse: collapse;
+                    font-size: ${tableFontSize}px;
+                }
+                td {
+                    text-align: center;
+                    width: ${infoCellWidth}px;
+                    height: ${cellHeight}px;
+                    position: relative;
+                }
+                .header {
+                    border-bottom: 1px solid #000;
+                    height: ${headerHeight}px;
+                    font-weight: bold;
+                    line-height: ${headerHeight}px;
+                    display: flex;
+                    justify-content: space-between;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <span>${roomName}</span>
+                <span>Updated: ${new Date().toLocaleString("cs-CZ")}</span>
+            </div>
+            <div class="content">
+                <table>
+                    ${LEARNING_HOURS.map((hour, index) => `<tr><td>${index}</td><td>${hour.from} - ${hour.to}</td></tr>`).join("")}
+                </table>
+                <div style="width: 100%; height: ${contentHeight}px; position: relative;">
+                    ${eventsWithOffset
+                        .map(
+                            (event) => `
+                            <div style="position: absolute; top: ${event.offset}px; height: ${event.height}px; width: 100%; background-color: #D3D3D3; flex-direction: column; display: flex; justify-content: center; align-items: center;">
+                                <div>${event.name}</div>
+                                <div>${event.from} - ${event.to}</div>
+                            </div>`,
+                        )
+                        .join("")}
                 </div>
-                <div class="content">
-                    <table>
-                        ${LEARNING_HOURS.map(
-                            (hour, index) => `
-                                <tr>
-                                    <td>${index}</td>
-                                    <td>${hour.from} - ${hour.to}</td>
-                                </tr>
-                            `,
-                        ).join("")}
-                    </table>
-                    <div style="width: 100%; height: ${contentHeight}px; position: relative;">
-                        ${eventsWithOffset
-                            .map(
-                                (event) => `
-                                <div style="position: absolute; top: ${event.offset}px; height: ${event.height}px; width: 100%; background-color: #D3D3D3; flex-direction: column; display: flex; justify-content: center; align-items: center;">
-                                    <div>${event.name}</div>
-                                    <div>${event.from} - ${event.to}</div>
-                                </div>
-                            `,
-                            )
-                            .join("")}
-                    </div>
-                </div>
-            </body>
+            </div>
+        </body>
         </html>
     `;
 

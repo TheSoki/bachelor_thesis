@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useRouter } from "next/router";
 import { DeviceList } from "@/components/device/DeviceList";
 
-const DevicePage: NextPageWithLayout = () => {
+const DevicesPage: NextPageWithLayout = () => {
     const router = useRouter();
 
     const page = useMemo(() => {
@@ -17,6 +17,6 @@ const DevicePage: NextPageWithLayout = () => {
     return <DeviceList page={page} />;
 };
 
-DevicePage.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
+DevicesPage.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
 
-export default DevicePage;
+export default DevicesPage;

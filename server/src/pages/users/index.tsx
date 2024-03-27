@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useRouter } from "next/router";
 import { UserList } from "@/components/user/UserList";
 
-const UserPage: NextPageWithLayout = () => {
+const UsersPage: NextPageWithLayout = () => {
     const router = useRouter();
 
     const page = useMemo(() => {
@@ -17,6 +17,6 @@ const UserPage: NextPageWithLayout = () => {
     return <UserList page={page} />;
 };
 
-UserPage.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
+UsersPage.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
 
-export default UserPage;
+export default UsersPage;

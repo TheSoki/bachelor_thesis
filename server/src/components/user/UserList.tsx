@@ -41,7 +41,7 @@ export const UserList: FC<{
         <div className="py-8">
             <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-3xl font-semibold">Users</h2>
-                <Link href="/user/create">Create User</Link>
+                <Link href="/users/create">Create User</Link>
             </div>
             <Table>
                 <TableCaption>
@@ -69,13 +69,13 @@ export const UserList: FC<{
                     {list.map((user) => (
                         <TableRow key={user.id}>
                             <TableCell className="font-medium">
-                                <Link href={`/user/${user.id}`}>{user.id}</Link>
+                                <Link href={`/users/${user.id}`}>{user.id}</Link>
                             </TableCell>
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.createdAt.toLocaleString("cs-CZ")}</TableCell>
                             <TableCell className="text-right">
-                                <Link href={`/user/${user.id}`} className="mr-2">
+                                <Link href={`/users/${user.id}`} className="mr-2">
                                     Detail
                                 </Link>
 
