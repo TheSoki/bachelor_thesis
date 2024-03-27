@@ -1,3 +1,4 @@
+import { serverEnv } from "@/env/server";
 import { BaseService, type BaseServiceDependencies } from "../base/base.service";
 import type { DeviceRepository } from "@/server/repositories/device/device.repository";
 import puppeteer from "puppeteer";
@@ -125,8 +126,14 @@ export class ScheduleService extends BaseService {
 
         const scheduleEvents: ScheduleEvent[] = [];
 
-        const now = new Date();
-        const dayOfWeek = now.getDay();
+        let now: Date, dayOfWeek: number;
+        if (serverEnv.USE_MOCKED_SCHEDULE_DATE) {
+            now = new Date("2023-10-02T08:00:00");
+            dayOfWeek = 4;
+        } else {
+            now = new Date();
+            dayOfWeek = now.getDay();
+        }
 
         const day = CZECH_WEEK_DAYS[dayOfWeek];
 
