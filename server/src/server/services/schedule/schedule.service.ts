@@ -14,6 +14,28 @@ interface ScheduleEvent {
     to: string;
 }
 
+const LEARNING_HOURS = [
+    { from: "06:30", to: "07:15" },
+    { from: "07:30", to: "08:15" },
+    { from: "08:20", to: "09:05" },
+    { from: "09:10", to: "09:55" },
+    { from: "10:00", to: "10:45" },
+    { from: "10:50", to: "11:35" },
+    { from: "11:40", to: "12:25" },
+    { from: "12:30", to: "13:15" },
+    { from: "13:20", to: "14:05" },
+    { from: "14:10", to: "14:55" },
+    { from: "15:00", to: "15:45" },
+    { from: "15:50", to: "16:35" },
+    { from: "16:40", to: "17:25" },
+    { from: "17:30", to: "18:15" },
+    { from: "18:20", to: "19:05" },
+    { from: "19:10", to: "19:55" },
+    { from: "20:00", to: "20:45" },
+] as const;
+
+const CZECH_WEEK_DAYS = ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"] as const;
+
 export class ScheduleService extends BaseService {
     private deviceRepository: DeviceRepository;
 
@@ -23,7 +45,7 @@ export class ScheduleService extends BaseService {
         this.deviceRepository = dependencies.deviceRepository;
     }
 
-    async getImage(id: string): Promise<Buffer | null> {
+    async getScheduleBuffer(id: string): Promise<Buffer | null> {
         try {
             const { buildingId, roomId, displayWidth, displayHeight } = await this.getDeviceById(id);
             const roomName = `${buildingId}${roomId}`;
@@ -106,8 +128,7 @@ export class ScheduleService extends BaseService {
         const now = new Date();
         const dayOfWeek = now.getDay();
 
-        const czechDays = ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"];
-        const day = czechDays[dayOfWeek];
+        const day = CZECH_WEEK_DAYS[dayOfWeek];
 
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -166,39 +187,35 @@ export class ScheduleService extends BaseService {
             this.logger.error(`Error parsing schedule events: ${e}`);
         }
 
-        this.logger.info(`Schedule events: ${JSON.stringify(scheduleEvents)}`);
-
         return scheduleEvents;
     }
 
     private generateScheduleHtml(roomName: string, width: number, height: number, events: ScheduleEvent[]): string {
-        const learningHours = [
-            { from: "06:30", to: "07:15" },
-            { from: "07:30", to: "08:15" },
-            { from: "08:20", to: "09:05" },
-            { from: "09:10", to: "09:55" },
-            { from: "10:00", to: "10:45" },
-            { from: "10:50", to: "11:35" },
-            { from: "11:40", to: "12:25" },
-            { from: "12:30", to: "13:15" },
-            { from: "13:20", to: "14:05" },
-            { from: "14:10", to: "14:55" },
-            { from: "15:00", to: "15:45" },
-            { from: "15:50", to: "16:35" },
-            { from: "16:40", to: "17:25" },
-            { from: "17:30", to: "18:15" },
-            { from: "18:20", to: "19:05" },
-            { from: "19:10", to: "19:55" },
-            { from: "20:00", to: "20:45" },
-        ];
-
         const paddingX = 10;
-        const cellWidth = (width - paddingX * 2) / learningHours.length;
-        const cellHeight = 45;
+        // width - padding from top and bottom - 1px border on each side
+        const usableWidth = width - paddingX * 2 - 2;
+        const cellWidth = usableWidth / LEARNING_HOURS.length;
+        const infoCellsHeight = 45;
+        // height - three info cells - two 1px borders - paddingX to look nice
+        const usableHeight = height - infoCellsHeight * 3 - 2 - paddingX;
+        const contentCellsHeight = 80;
 
-        const usableWidth = width - paddingX * 2;
+        const eventsWithOffset = events.map((event) => {
+            const startBlock = LEARNING_HOURS.findIndex((hour) => hour.from === event.from);
+            // const endBlock = LEARNING_HOURS.findIndex((hour) => hour.from === event.to);
+            const endBlock = LEARNING_HOURS.findIndex((hour) => hour.to === event.to) + 1;
 
-        let html = `
+            const offset = startBlock * cellWidth;
+            const width = (endBlock - startBlock) * cellWidth;
+
+            return {
+                ...event,
+                offset,
+                width,
+            };
+        });
+
+        const html = `
         <html>
             <head>
                 <style>
@@ -220,13 +237,13 @@ export class ScheduleService extends BaseService {
                         border: 1px solid black;
                         text-align: center;
                         width: ${cellWidth}px;
-                        height: ${cellHeight}px;
+                        height: ${infoCellsHeight}px;
                         position: relative;
                     }
                     .header {
-                        height: ${cellHeight}px;
+                        height: ${infoCellsHeight}px;
                         font-weight: bold;
-                        line-height: ${cellHeight}px;
+                        line-height: ${infoCellsHeight}px;
                         display: flex;
                         justify-content: space-between;
                     }
@@ -234,18 +251,31 @@ export class ScheduleService extends BaseService {
             </head>
             <body>
                 <div class="header">
-                <span>${roomName}</span>
+                    <span>${roomName}</span>
                     <span>Updated: ${new Date().toLocaleString("cs-CZ")}</span>
                 </div>
                 <table class="schedule">
                     <tr>
-                        ${learningHours.map((_, index) => `<td>${index}</td>`).join("")}
+                        ${LEARNING_HOURS.map((_, index) => `<td>${index}</td>`).join("")}
                     </tr>
                     <tr>
-                        ${learningHours.map((hour) => `<td><div>${hour.from}</div><div>${hour.to}</div></td>`).join("")}
+                        ${LEARNING_HOURS.map((hour) => `<td><div>${hour.from}</div><div>${hour.to}</div></td>`).join("")}
                     </tr>
                 </table>
-                
+
+                <div style="position: relative; height: ${usableHeight}px; width: ${usableWidth}px; border: 1px solid black; border-top: none;">
+                    ${eventsWithOffset
+                        .map(
+                            (event) => `
+                                <div style="position: absolute; left: ${event.offset}px; width: ${event.width}px; height: ${contentCellsHeight}px; background-color: #D3D3D3; text-wrap: none; word-wrap: break-word;">
+                                    <div>${event.name}</div>
+                                    <div>${event.from} - ${event.to}</div>
+                                </div>
+                            `,
+                        )
+                        .join("")}
+                </div>
+
             </body>
         </html>
     `;

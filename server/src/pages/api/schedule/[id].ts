@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 
-    const pngBuffer = await innerCtx.scheduleService.getImage(id);
+    const pngBuffer = await innerCtx.scheduleService.getScheduleBuffer(id);
 
     if (!pngBuffer) {
         res.status(500).end();
