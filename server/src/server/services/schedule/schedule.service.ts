@@ -191,27 +191,30 @@ export class ScheduleService extends BaseService {
     }
 
     private generateScheduleHtml(roomName: string, width: number, height: number, events: ScheduleEvent[]): string {
-        const paddingX = 10;
-        // width - padding from top and bottom - 1px border on each side
-        const usableWidth = width - paddingX * 2 - 2;
-        const cellWidth = usableWidth / LEARNING_HOURS.length;
-        const infoCellsHeight = 45;
-        // height - three info cells - two 1px borders - paddingX to look nice
-        const usableHeight = height - infoCellsHeight * 3 - 2 - paddingX;
-        const contentCellsHeight = 80;
+        const fontSize = 24 as const;
+        const tableFontSize = 20 as const;
+        const padding = 5 as const;
+        const headerHeight = 40 as const;
+        const infoCellWidth = 240 as const;
+
+        const usableHeight = height - padding * 2;
+        const usableWidth = width - padding * 2;
+
+        const contentHeight = usableHeight - headerHeight;
+
+        const cellHeight = contentHeight / LEARNING_HOURS.length;
 
         const eventsWithOffset = events.map((event) => {
             const startBlock = LEARNING_HOURS.findIndex((hour) => hour.from === event.from);
-            // const endBlock = LEARNING_HOURS.findIndex((hour) => hour.from === event.to);
             const endBlock = LEARNING_HOURS.findIndex((hour) => hour.to === event.to) + 1;
 
-            const offset = startBlock * cellWidth;
-            const width = (endBlock - startBlock) * cellWidth;
+            const offset = startBlock * cellHeight;
+            const height = (endBlock - startBlock) * cellHeight;
 
             return {
                 ...event,
                 offset,
-                width,
+                height,
             };
         });
 
@@ -220,30 +223,33 @@ export class ScheduleService extends BaseService {
             <head>
                 <style>
                     body {
-                        padding: 0;
-                        padding-left: ${paddingX}px;
-                        padding-right: ${paddingX}px;
+                        padding: ${padding}px;
                         margin: 0;
                         background-color: #f0f0f0;
+                        font-size: ${fontSize}px;
                     }
-                    .schedule {
-                        max-width: ${width}px;
-                        max-height: ${height}px;
+                    .content {
+                        width: ${usableWidth}px;
+                        height: ${contentHeight}px;
+                        display: flex;
+                    }
+                    table {
                         border: none;
                         table-layout: fixed;
                         border-collapse: collapse;
+                        font-size: ${tableFontSize}px;
                     }
-                    .schedule td {
-                        border: 1px solid black;
+                    td {
                         text-align: center;
-                        width: ${cellWidth}px;
-                        height: ${infoCellsHeight}px;
+                        width: ${infoCellWidth}px;
+                        height: ${cellHeight}px;
                         position: relative;
                     }
                     .header {
-                        height: ${infoCellsHeight}px;
+                        border-bottom: 1px solid #000;
+                        height: ${headerHeight}px;
                         font-weight: bold;
-                        line-height: ${infoCellsHeight}px;
+                        line-height: ${headerHeight}px;
                         display: flex;
                         justify-content: space-between;
                     }
@@ -254,28 +260,30 @@ export class ScheduleService extends BaseService {
                     <span>${roomName}</span>
                     <span>Updated: ${new Date().toLocaleString("cs-CZ")}</span>
                 </div>
-                <table class="schedule">
-                    <tr>
-                        ${LEARNING_HOURS.map((_, index) => `<td>${index}</td>`).join("")}
-                    </tr>
-                    <tr>
-                        ${LEARNING_HOURS.map((hour) => `<td><div>${hour.from}</div><div>${hour.to}</div></td>`).join("")}
-                    </tr>
-                </table>
-
-                <div style="position: relative; height: ${usableHeight}px; width: ${usableWidth}px; border: 1px solid black; border-top: none;">
-                    ${eventsWithOffset
-                        .map(
-                            (event) => `
-                                <div style="position: absolute; left: ${event.offset}px; width: ${event.width}px; height: ${contentCellsHeight}px; background-color: #D3D3D3; text-wrap: none; word-wrap: break-word;">
+                <div class="content">
+                    <table>
+                        ${LEARNING_HOURS.map(
+                            (hour, index) => `
+                                <tr>
+                                    <td>${index}</td>
+                                    <td>${hour.from} - ${hour.to}</td>
+                                </tr>
+                            `,
+                        ).join("")}
+                    </table>
+                    <div style="width: 100%; height: ${contentHeight}px; position: relative;">
+                        ${eventsWithOffset
+                            .map(
+                                (event) => `
+                                <div style="position: absolute; top: ${event.offset}px; height: ${event.height}px; width: 100%; background-color: #D3D3D3; flex-direction: column; display: flex; justify-content: center; align-items: center;">
                                     <div>${event.name}</div>
                                     <div>${event.from} - ${event.to}</div>
                                 </div>
                             `,
-                        )
-                        .join("")}
+                            )
+                            .join("")}
+                    </div>
                 </div>
-
             </body>
         </html>
     `;
