@@ -4,6 +4,7 @@ import type { DeviceRepository } from "@/server/repositories/device/device.repos
 import puppeteer from "puppeteer";
 import { parseString } from "xml2js";
 import { z } from "zod";
+import sharp from "sharp";
 
 export type ScheduleServiceDependencies = {
     deviceRepository: DeviceRepository;
@@ -62,8 +63,9 @@ export class ScheduleService extends BaseService {
             await this.deviceRepository.update(id, {
                 lastSeen: new Date(),
             });
+            const compressedPngBuffer = await sharp(pngBuffer).grayscale().toBuffer();
 
-            return pngBuffer;
+            return compressedPngBuffer;
         } catch (e) {
             this.logger.error(`Error generating schedule image: ${e}`);
 
