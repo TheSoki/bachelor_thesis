@@ -7,6 +7,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return;
     }
 
+    const deviceId = req.headers["x-device-id"] as string | undefined;
+    const secret = req.headers["x-device-secret"] as string | undefined;
+
+    if (!deviceId || !secret) {
+        res.status(400).end();
+        return;
+    }
+
     let innerCtx = globalThis.innerCtx;
 
     if (!innerCtx || process.env.NODE_ENV === "development") {
@@ -14,19 +22,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         globalThis.innerCtx = innerCtx;
     }
 
-    const id = req.query.id as string | undefined;
-
-    if (!id) {
-        res.status(400).end();
-        return;
-    }
-
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 
-    const pngBuffer = await innerCtx.scheduleService.getScheduleBuffer(id);
+    const pngBuffer = await innerCtx.scheduleService.getScheduleBuffer({
+        id: deviceId,
+        token: secret,
+    });
 
     if (!pngBuffer) {
-        res.status(500).end();
+        res.status(400).end();
         return;
     }
 

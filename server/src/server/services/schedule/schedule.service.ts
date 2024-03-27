@@ -46,9 +46,12 @@ export class ScheduleService extends BaseService {
         this.deviceRepository = dependencies.deviceRepository;
     }
 
-    async getScheduleBuffer(id: string): Promise<Buffer | null> {
+    async getScheduleBuffer({ id, token }: { id: string; token: string }): Promise<Buffer | null> {
         try {
-            const { buildingId, roomId, displayWidth, displayHeight } = await this.getDeviceById(id);
+            const { buildingId, roomId, displayWidth, displayHeight } = await this.getDeviceById({
+                id,
+                token,
+            });
             const roomName = `${buildingId}${roomId}`;
             const scheduleEvents = await this.getScheduleEvents({
                 buildingId,
@@ -68,7 +71,7 @@ export class ScheduleService extends BaseService {
         }
     }
 
-    private async getDeviceById(id: string) {
+    private async getDeviceById({ id, token }: { id: string; token: string }) {
         try {
             const device = await this.deviceRepository.getById({
                 id,
@@ -77,12 +80,17 @@ export class ScheduleService extends BaseService {
                     roomId: true,
                     displayHeight: true,
                     displayWidth: true,
+                    token: true,
                 },
                 include: {},
             });
 
             if (!device) {
                 throw new Error(`No device with id '${id}'`);
+            }
+
+            if (device.token !== token) {
+                throw new Error(`Invalid token for device with id '${id}'`);
             }
 
             return device;
