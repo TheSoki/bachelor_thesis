@@ -55,7 +55,7 @@ void EDP_send_byte(const char data)
         gpio_set_level(PIN_SPI_DIN_NUM, ((0x80 >> i) & data) == 0 ? 0 : 1);
         gpio_set_level(PIN_SPI_SCK_NUM, 1);
         gpio_set_level(PIN_SPI_SCK_NUM, 0);
-  }
+    }
 }
 
 /* Sending a byte as a command -----------------------------------------------*/
@@ -81,7 +81,7 @@ void EPD_SendData(const char *data, int data_len)
 {
     gpio_set_level(PIN_SPI_CS_NUM, 0);
     gpio_set_level(PIN_SPI_DC_NUM, 1);
-      for (int i = 0; i < data_len; i++)
+    for (int i = 0; i < data_len; i++)
     {
         EDP_send_byte(data[i]);
     }
@@ -114,7 +114,7 @@ int EPD_7in5__init()
     EPD_SendCommand(0x10, NULL, 0); //DATA_START_TRANSMISSION_1
     vTaskDelay(2 / portTICK_PERIOD_MS);
 
-      return 0;
+    return 0;
 }
 
 void EPD_display()
@@ -155,7 +155,7 @@ void EPD_loadImage(const uint8_t *image, const unsigned int width, const unsigne
             EPD_SendData(buffer, buffer_pos);
             buffer_pos = 0;
         }
-  }
+    }
 }
 
 void EPD_before_load()

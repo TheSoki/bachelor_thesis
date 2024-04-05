@@ -32,7 +32,6 @@ esp_err_t http_get_task(void)
     esp_err_t err = esp_http_client_perform(client);
     if (err == ESP_OK) {
         ESP_LOGI(DISPLAY_TAG, "HTTP GET Status = %d, content_length = %lld", esp_http_client_get_status_code(client), esp_http_client_get_content_length(client));
-        //! if was successful, render image
 
         // Allocate data
         size_t png_size = esp_http_client_get_content_length(client);
@@ -86,5 +85,6 @@ esp_err_t http_get_task(void)
     }
 
     esp_http_client_cleanup(client);
+    
     return err;
 }
