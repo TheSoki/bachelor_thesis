@@ -19,6 +19,12 @@ You need to have installed:
 
 Have server from [server](../server) running locally.
 
+Copy the `components/lodepng` folder to the `esp-idf/components` folder.
+
+```
+cp -r ./components/lodepng $HOME/esp/esp-idf/components
+```
+
 Then IN ONE TERMINAL run to setup the toolchain.
 
 ```
