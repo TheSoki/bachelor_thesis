@@ -63,7 +63,7 @@ export class ScheduleService extends BaseService {
             await this.deviceRepository.update(id, {
                 lastSeen: new Date(),
             });
-            const compressedPngBuffer = await sharp(pngBuffer).grayscale().toBuffer();
+            const compressedPngBuffer = await sharp(pngBuffer).grayscale().toColorspace("grey16").toBuffer();
 
             return compressedPngBuffer;
         } catch (e) {
