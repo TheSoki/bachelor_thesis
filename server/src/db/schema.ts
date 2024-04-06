@@ -1,4 +1,4 @@
-import { uuid, pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { uuid, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import {
     relations,
     type DBQueryConfig,
@@ -28,8 +28,6 @@ export const devices = pgTable("devices", {
     buildingId: text("building").notNull(),
     roomId: text("room").notNull(),
     lastSeen: timestamp("lastSeen"),
-    displayWidth: integer("displayWidth").notNull(),
-    displayHeight: integer("displayHeight").notNull(),
     authorId: uuid("authorId").references(() => users.id),
 });
 

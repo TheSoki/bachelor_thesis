@@ -47,9 +47,19 @@ export class ScheduleService extends BaseService {
         this.deviceRepository = dependencies.deviceRepository;
     }
 
-    async getScheduleBuffer({ id, token }: { id: string; token: string }): Promise<Buffer | null> {
+    async getScheduleBuffer({
+        id,
+        token,
+        displayHeight,
+        displayWidth,
+    }: {
+        id: string;
+        token: string;
+        displayHeight: number;
+        displayWidth: number;
+    }): Promise<Buffer | null> {
         try {
-            const { buildingId, roomId, displayWidth, displayHeight } = await this.getDeviceById({
+            const { buildingId, roomId } = await this.getDeviceById({
                 id,
                 token,
             });

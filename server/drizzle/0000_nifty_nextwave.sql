@@ -5,8 +5,6 @@ CREATE TABLE IF NOT EXISTS "devices" (
 	"building" text NOT NULL,
 	"room" text NOT NULL,
 	"lastSeen" timestamp,
-	"displayWidth" integer NOT NULL,
-	"displayHeight" integer NOT NULL,
 	"authorId" uuid
 );
 --> statement-breakpoint

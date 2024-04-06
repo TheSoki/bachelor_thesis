@@ -78,7 +78,6 @@ export const DeviceList: FC<{
                     <TableRow>
                         <TableHead>ID</TableHead>
                         <TableHead>Room</TableHead>
-                        <TableHead>Size</TableHead>
                         <TableHead>Last Seen</TableHead>
                         <TableHead>Token</TableHead>
                         <TableHead>Author</TableHead>
@@ -93,7 +92,6 @@ export const DeviceList: FC<{
                                 <Link href={`/devices/${device.id}`}>{device.id}</Link>
                             </TableCell>
                             <TableCell>{`${device.buildingId}${device.roomId}`}</TableCell>
-                            <TableCell>{`${device.displayWidth}x${device.displayHeight}`}</TableCell>
                             <TableCell>
                                 {device.lastSeen ? new Date(device.lastSeen).toLocaleString("cs-CZ") : <i>Never</i>}
                             </TableCell>

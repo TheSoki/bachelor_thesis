@@ -12,8 +12,6 @@ const defaultColumns = {
     createdAt: true,
     buildingId: true,
     roomId: true,
-    displayWidth: true,
-    displayHeight: true,
 } satisfies {
     [K in keyof SelectDevice]?: boolean;
 };
@@ -86,14 +84,12 @@ export class DeviceService extends BaseService {
     }
 
     async create(input: z.infer<typeof createDeviceSchema>, userId: string): Promise<void> {
-        const { buildingId, roomId, displayHeight, displayWidth } = input;
+        const { buildingId, roomId } = input;
 
         try {
             await this.deviceRepository.create({
                 buildingId,
                 roomId,
-                displayHeight,
-                displayWidth,
                 authorId: userId,
             });
         } catch (e) {
@@ -104,14 +100,12 @@ export class DeviceService extends BaseService {
     }
 
     async update(input: z.infer<typeof updateDeviceSchema>): Promise<void> {
-        const { id, buildingId, roomId, displayHeight, displayWidth } = input;
+        const { id, buildingId, roomId } = input;
 
         try {
             const data: Partial<InsertDevice> = {
                 buildingId,
                 roomId,
-                displayHeight,
-                displayWidth,
             };
 
             await this.deviceRepository.update(id, data);
