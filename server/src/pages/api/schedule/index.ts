@@ -18,7 +18,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const parsedData = await scheduleSchema.safeParseAsync(headers);
 
     if (!parsedData.success) {
-        console.log(parsedData.error);
         res.status(400).end();
         return;
     }
