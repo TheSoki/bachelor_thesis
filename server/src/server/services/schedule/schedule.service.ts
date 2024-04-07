@@ -13,6 +13,7 @@ interface ScheduleEvent {
     name: string;
     from: string;
     to: string;
+    teacher: string;
 }
 
 const LEARNING_HOURS = [
@@ -36,6 +37,18 @@ const LEARNING_HOURS = [
 ] as const;
 
 const CZECH_WEEK_DAYS = ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"] as const;
+
+const eventSchema = z.object({
+    name: z.string(),
+    teacher: z.string(),
+    // hh:mm
+    fromTime: z.string().regex(/^\d{2}:\d{2}$/),
+    toTime: z.string().regex(/^\d{2}:\d{2}$/),
+    // dd.mm.yyyy or d.m.yyyy or d.mm.yyyy or dd.m.yyyy
+    startDate: z.string().regex(/^\d{1,2}\.\d{1,2}\.\d{4}$/),
+    endDate: z.string().regex(/^\d{1,2}\.\d{1,2}\.\d{4}$/),
+    dayOfWeek: z.string().regex(/^(Ne|Po|Út|St|Čt|Pá|So)$/),
+});
 
 export class ScheduleService extends BaseService {
     private deviceRepository: DeviceRepository;
@@ -158,16 +171,17 @@ export class ScheduleService extends BaseService {
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             xml?.["ns2:rozvrh"]["rozvrhovaAkce"].forEach((akce: any) => {
-                const eventTimeSchema = z.object({
-                    name: z.string(),
-                    // hh:mm
-                    fromTime: z.string().regex(/^\d{2}:\d{2}$/),
-                    toTime: z.string().regex(/^\d{2}:\d{2}$/),
-                    // dd.mm.yyyy or d.m.yyyy or d.mm.yyyy or dd.m.yyyy
-                    startDate: z.string().regex(/^\d{1,2}\.\d{1,2}\.\d{4}$/),
-                    endDate: z.string().regex(/^\d{1,2}\.\d{1,2}\.\d{4}$/),
-                    dayOfWeek: z.string().regex(/^(Ne|Po|Út|St|Čt|Pá|So)$/),
-                });
+                const teacher =
+                    akce["ucitel"]
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        ?.map((ucitel: any) => {
+                            const jmeno = ucitel["jmeno"][0];
+                            const prijmeni = ucitel["prijmeni"][0];
+                            const titulPred = ucitel["titulPred"][0];
+                            const titulZa = ucitel["titulZa"][0];
+                            return `${titulPred} ${jmeno} ${prijmeni} ${titulZa}`;
+                        })
+                        ?.join(", ") ?? "N/A";
 
                 const event = {
                     name: akce["nazev"][0],
@@ -176,9 +190,10 @@ export class ScheduleService extends BaseService {
                     startDate: akce["datumOd"][0],
                     endDate: akce["datumDo"][0],
                     dayOfWeek: akce["denZkr"][0],
+                    teacher,
                 };
 
-                const parsedEvent = eventTimeSchema.safeParse(event);
+                const parsedEvent = eventSchema.safeParse(event);
 
                 if (parsedEvent.success) {
                     const splitStart = event.startDate.split(".");
@@ -201,6 +216,7 @@ export class ScheduleService extends BaseService {
                             name: event.name,
                             from: event.fromTime,
                             to: event.toTime,
+                            teacher: event.teacher,
                         });
                     }
                 } else {
@@ -294,8 +310,8 @@ export class ScheduleService extends BaseService {
                         .map(
                             (event) => `
                             <div style="position: absolute; top: ${event.offset}px; height: ${event.height}px; width: 100%; background-color: #D3D3D3; flex-direction: column; display: flex; justify-content: center; align-items: center;">
-                                <div>${event.name}</div>
-                                <div>${event.from} - ${event.to}</div>
+                                <div>${event.name} (${event.from} - ${event.to})</div>
+                                <div>${event.teacher}</div>
                             </div>`,
                         )
                         .join("")}
