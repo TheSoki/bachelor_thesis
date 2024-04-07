@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 
-int saveBitmap(const char *filename, int width, int height, png_bytep *rowPointers) {
+int saveBitmap(const char *filename, unsigned int width, unsigned int height, png_bytep *rowPointers) {
     FILE *fp;
     uint32_t fileSize, pixelArrayOffset, dibHeaderSize;
     uint16_t colorPlanes, bitsPerPixel;
@@ -71,7 +71,8 @@ int convertPNGtoBMP(void) {
     png_structp pngPtr;
     png_infop infoPtr;
     png_bytep *rowPointers;
-    int width, height, bitDepth, colorType;
+    unsigned int width, height;
+    int bitDepth, colorType;
     int bmpResult;
 
     // Open the PNG file
