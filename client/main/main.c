@@ -1,5 +1,6 @@
 #include "../lib/Config/DEV_Config.h"
 #include "example.h"
+#include "http_client.h"
 #include "../lib/GUI/GUI_BMPfile.h"
 
 #include <math.h>
@@ -121,8 +122,12 @@ int main(int argc, char *argv[])
     }
     UWORD HEIGHT = Panel_Height;
 
-  
-
+    // Perform HTTP request to get PNG image
+    int downloadResult = downloadImage(WIDTH, HEIGHT);
+    if (downloadResult != 0) {
+        Debug("Failed to download image from the server.\n");
+        exit(1);
+    }
 
 
     //Show a bmp file

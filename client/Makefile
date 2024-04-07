@@ -19,7 +19,7 @@ STD = -std=gnu99
 
 CFLAGS += $(MSG) $(DEBUG) $(STD)
 
-LIB_USE = -lm -lrt -lpthread
+LIB_USE = -lm -lrt -lpthread -lcurl
 
 LIB = BCM
 # LIB = LGPIO
