@@ -19,7 +19,8 @@ int epd_mode = 0;	//0: no rotate, no mirror
 					//1: no rotate, horizontal mirror, for 10.3inch
 					//2: no totate, horizontal mirror, for 5.17inch
 					//3: no rotate, no mirror, isColor, for 6inch color
-					
+bool Four_Byte_Align = false;
+
 void  Handler(int signo){
     Debug("\r\nHandler:exit\r\n");
     if(Refresh_Frame_Buf != NULL){
@@ -112,13 +113,23 @@ int main(int argc, char *argv[])
 
 	EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
 
+    UWORD WIDTH;
+    if(Four_Byte_Align == true){
+        WIDTH  = Panel_Width - (Panel_Width % 32);
+    }else{
+        WIDTH = Panel_Width;
+    }
+    UWORD HEIGHT = Panel_Height;
+
+  
+
 
 
     //Show a bmp file
     //1bp use A2 mode by default, before used it, refresh the screen with WHITE
-    Display_BMP(Panel_Width, Panel_Height, Init_Target_Memory_Addr, BitsPerPixel_1);
-    Display_BMP(Panel_Width, Panel_Height, Init_Target_Memory_Addr, BitsPerPixel_2);
-    Display_BMP(Panel_Width, Panel_Height, Init_Target_Memory_Addr, BitsPerPixel_4);
+    Display_BMP(WIDTH, HEIGHT, Init_Target_Memory_Addr, BitsPerPixel_1);
+    Display_BMP(WIDTH, HEIGHT, Init_Target_Memory_Addr, BitsPerPixel_2);
+    Display_BMP(WIDTH, HEIGHT, Init_Target_Memory_Addr, BitsPerPixel_4);
     EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
     
 

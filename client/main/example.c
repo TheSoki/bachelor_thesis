@@ -14,8 +14,6 @@
 
 UBYTE *Refresh_Frame_Buf = NULL;
 
-bool Four_Byte_Align = false;
-
 extern int epd_mode;
 extern UWORD VCOM;
 extern UBYTE isColor;
@@ -46,20 +44,12 @@ static void Epd_Mode(int mode)
 /******************************************************************************
 function: Display_BMP
 parameter:
-    Panel_Width: Width of the panel
-    Panel_Height: Height of the panel
+    Panel_Width: Usable width of the display
+    Panel_Height: Usable height of the display
     Init_Target_Memory_Addr: Memory address of IT8951 target memory address
     BitsPerPixel: Bits Per Pixel, 2^BitsPerPixel = grayscale
 ******************************************************************************/
-UBYTE Display_BMP(UWORD Panel_Width, UWORD Panel_Height, UDOUBLE Init_Target_Memory_Addr, UBYTE BitsPerPixel){
-    UWORD WIDTH;
-    if(Four_Byte_Align == true){
-        WIDTH  = Panel_Width - (Panel_Width % 32);
-    }else{
-        WIDTH = Panel_Width;
-    }
-    UWORD HEIGHT = Panel_Height;
-
+UBYTE Display_BMP(UWORD WIDTH, UWORD HEIGHT, UDOUBLE Init_Target_Memory_Addr, UBYTE BitsPerPixel){
     UDOUBLE Imagesize;
 
     Imagesize = ((WIDTH * BitsPerPixel % 8 == 0)? (WIDTH * BitsPerPixel / 8 ): (WIDTH * BitsPerPixel / 8 + 1)) * HEIGHT;

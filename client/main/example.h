@@ -18,8 +18,6 @@
 //For all refresh fram buf except touch panel
 extern UBYTE *Refresh_Frame_Buf;
 
-extern bool Four_Byte_Align;
-
-UBYTE Display_BMP(UWORD Panel_Width, UWORD Panel_Height, UDOUBLE Init_Target_Memory_Addr, UBYTE BitsPerPixel);
+UBYTE Display_BMP(UWORD WIDTH, UWORD HEIGHT, UDOUBLE Init_Target_Memory_Addr, UBYTE BitsPerPixel);
 
 #endif
