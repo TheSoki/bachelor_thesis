@@ -1,5 +1,5 @@
-#ifndef __EXAMPLE__
-#define __EXAMPLE__
+#ifndef __RENDERER__
+#define __RENDERER__
 
 #include "../lib/e-Paper/EPD_IT8951.h"
 #include "../lib/Config/DEV_Config.h"
