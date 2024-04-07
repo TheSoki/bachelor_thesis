@@ -1,6 +1,7 @@
 #include "../lib/Config/DEV_Config.h"
 #include "renderer.h"
 #include "http_client.h"
+#include "png_to_bmp.h"
 #include "../lib/GUI/GUI_BMPfile.h"
 
 #include <math.h>
@@ -129,17 +130,24 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    // Convert PNG to BMP
+    int conversionResult = convertPNGtoBMP();
+    if (conversionResult != 0) {
+        Debug("Failed to convert PNG to BMP.\n");
+        exit(1);
+    }
+
 
     //Show a bmp file
     //1bp use A2 mode by default, before used it, refresh the screen with WHITE
-    Display_BMP(WIDTH, HEIGHT, Init_Target_Memory_Addr, BitsPerPixel_1);
-    Display_BMP(WIDTH, HEIGHT, Init_Target_Memory_Addr, BitsPerPixel_2);
+    // Display_BMP(WIDTH, HEIGHT, Init_Target_Memory_Addr, BitsPerPixel_1);
+    // Display_BMP(WIDTH, HEIGHT, Init_Target_Memory_Addr, BitsPerPixel_2);
     Display_BMP(WIDTH, HEIGHT, Init_Target_Memory_Addr, BitsPerPixel_4);
-    EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
+    // EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
     
 
     //We recommended refresh the panel to white color before storing in the warehouse.
-    EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
+    // EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
 
     //EPD_IT8951_Standby();
     EPD_IT8951_Sleep();

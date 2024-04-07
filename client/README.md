@@ -48,7 +48,7 @@ And update them accordingly to your environment, `ESP_DEVICE_ID` and `ESP_DEVICE
 Install dependencies.
 
 ```
-sudo apt-get install libcurl4-openssl-dev
+sudo apt-get install libcurl4-openssl-dev libpng-dev
 ```
 
 Build and check if everything is working.
