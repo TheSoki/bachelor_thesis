@@ -1,11 +1,12 @@
 #include "../lib/Config/DEV_Config.h"
+
 #include "renderer.h"
 #include "http_client.h"
 #include "png_to_bmp.h"
+
 #include "../lib/GUI/GUI_BMPfile.h"
 
 #include <math.h>
-
 #include <stdlib.h>     //exit()
 #include <signal.h>     //signal()
 

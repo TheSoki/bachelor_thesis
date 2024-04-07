@@ -297,6 +297,7 @@ static void EPD_IT8951_SetVCOM(UWORD VCOM)
 function :	Cmd10 LD_IMG
 parameter:  
 ******************************************************************************/
+/*
 static void EPD_IT8951_LoadImgStart( IT8951_Load_Img_Info* Load_Img_Info )
 {
     UWORD Args;
@@ -308,7 +309,7 @@ static void EPD_IT8951_LoadImgStart( IT8951_Load_Img_Info* Load_Img_Info )
     EPD_IT8951_WriteCommand(IT8951_TCON_LD_IMG);
     EPD_IT8951_WriteData(Args);
 }
-
+*/
 
 /******************************************************************************
 function :	Cmd11 LD_IMG_Area

@@ -3,8 +3,8 @@
  * @brief File containing the environment variables.
  */
 
-#ifndef _ENVIRONMENT_
-#define _ENVIRONMENT_
+#ifndef __ENVIRONMENT_H_
+#define __ENVIRONMENT_H_
 
 #define RPI_ENV_DEVICE_ID           "device_id"
 #define RPI_ENV_DEVICE_SECRET       "device_secret"

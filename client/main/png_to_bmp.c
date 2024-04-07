@@ -1,3 +1,5 @@
+#include "../lib/Config/DEV_Config.h"
+
 #include "png_to_bmp.h"
 #include "environment.h"
 
@@ -17,7 +19,7 @@ int saveBitmap(const char *filename, int width, int height, png_bytep *rowPointe
     // Open BMP file for writing
     fp = fopen(filename, "wb");
     if (!fp) {
-        printf("Error: Failed to create BMP file.\n");
+        Debug("Error: Failed to create BMP file.\n");
         return 1;
     }
 
@@ -75,7 +77,7 @@ int convertPNGtoBMP(void) {
     // Open the PNG file
     fp = fopen(RPI_ENV_IMAGE_PNG_FILENAME, "rb");
     if (!fp) {
-        printf("Error: Failed to open PNG file.\n");
+        Debug("Error: Failed to open PNG file.\n");
         return 1;
     }
 
@@ -109,7 +111,7 @@ int convertPNGtoBMP(void) {
 
     // Ensure PNG image is in RGB format
     if (colorType != PNG_COLOR_TYPE_RGB && colorType != PNG_COLOR_TYPE_RGBA) {
-        printf("Error: PNG image must be in RGB format.\n");
+        Debug("Error: PNG image must be in RGB format.\n");
         png_destroy_read_struct(&pngPtr, &infoPtr, NULL);
         fclose(fp);
         return 1;
@@ -138,7 +140,7 @@ int convertPNGtoBMP(void) {
     free(rowPointers);
 
     if (bmpResult != 0) {
-        printf("Error: Failed to save BMP file.\n");
+        Debug("Error: Failed to save BMP file.\n");
         return 1;
     }
 

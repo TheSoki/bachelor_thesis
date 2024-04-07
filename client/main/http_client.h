@@ -1,5 +1,5 @@
-#ifndef HTTP_CLIENT_H
-#define HTTP_CLIENT_H
+#ifndef __HTTP_CLIENT_H_
+#define __HTTP_CLIENT_H_
 
 #include "../lib/Config/DEV_Config.h"
 
