@@ -286,8 +286,12 @@ export class ScheduleService extends BaseService {
                     height: ${cellHeight}px;
                     position: relative;
                 }
+                tr {
+                    border-bottom: 1px solid #000;
+                }
                 .header {
                     border-bottom: 1px solid #000;
+                    box-sizing: border-box;
                     height: ${headerHeight}px;
                     font-weight: bold;
                     line-height: ${headerHeight}px;
@@ -308,8 +312,8 @@ export class ScheduleService extends BaseService {
                 <div style="width: 100%; height: ${contentHeight}px; position: relative;">
                     ${eventsWithOffset
                         .map(
-                            (event) => `
-                            <div style="position: absolute; top: ${event.offset}px; height: ${event.height}px; width: 100%; background-color: #D3D3D3; flex-direction: column; display: flex; justify-content: center; align-items: center;">
+                            (event, index) => `
+                            <div style="position: absolute; top: ${event.offset}px; height: ${event.height}px; width: 100%; background-color: #D3D3D3; flex-direction: column; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #000; border-top: ${index === 0 ? "1px solid #000" : "none"}; box-sizing: border-box;">
                                 <div>${event.name} (${event.from} - ${event.to})</div>
                                 <div>${event.teacher}</div>
                             </div>`,
