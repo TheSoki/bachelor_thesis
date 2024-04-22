@@ -18,11 +18,13 @@ UBYTE *Refresh_Frame_Buf = NULL;
 extern int epd_mode;
 extern UWORD VCOM;
 extern UBYTE isColor;
-/******************************************************************************
-function: Change direction of display, Called after Paint_NewImage()
-parameter:
-    mode: display mode
-******************************************************************************/
+
+
+/**
+ * Change direction of display, Called after Paint_NewImage()
+ *
+ * @param mode Display mode.
+ */
 static void Epd_Mode(int mode)
 {
 	if(mode == 3) {
@@ -42,14 +44,16 @@ static void Epd_Mode(int mode)
 }
 
 
-/******************************************************************************
-function: Display_BMP
-parameter:
-    Panel_Width: Usable width of the display
-    Panel_Height: Usable height of the display
-    Init_Target_Memory_Addr: Memory address of IT8951 target memory address
-    BitsPerPixel: Bits Per Pixel, 2^BitsPerPixel = grayscale
-******************************************************************************/
+/**
+ * Display BMP image on the screen.
+ *
+ * @param WIDTH Usable width of the display.
+ * @param HEIGHT Usable height of the display.
+ * @param Init_Target_Memory_Addr Memory address of IT8951 target memory address.
+ * @param BitsPerPixel Bits Per Pixel, 2^BitsPerPixel = grayscale.
+ *
+ * @return 0 if successful. -1 if failed.
+ */
 UBYTE Display_BMP(UWORD WIDTH, UWORD HEIGHT, UDOUBLE Init_Target_Memory_Addr, UBYTE BitsPerPixel){
     UDOUBLE Imagesize;
 

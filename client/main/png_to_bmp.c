@@ -9,6 +9,16 @@
 #include <stdlib.h>
 
 
+/**
+ * Save BMP image to file.
+ *
+ * @param filename Output BMP filename.
+ * @param width Image width.
+ * @param height Image height.
+ * @param rowPointers Image data.
+ *
+ * @return 0 if successful. 1 if failed.
+ */
 int saveBitmap(const char *filename, unsigned int width, unsigned int height, png_bytep *rowPointers) {
     FILE *fp;
     uint32_t fileSize, pixelArrayOffset, dibHeaderSize;
@@ -66,6 +76,12 @@ int saveBitmap(const char *filename, unsigned int width, unsigned int height, pn
     return 0;
 }
 
+
+/**
+ * Convert PNG image to BMP format.
+ *
+ * @return 0 if successful. 1 if failed.
+ */
 int convertPNGtoBMP(void) {
     FILE *fp;
     png_structp pngPtr;
@@ -147,4 +163,3 @@ int convertPNGtoBMP(void) {
 
     return 0;
 }
-

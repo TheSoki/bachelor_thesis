@@ -5,11 +5,19 @@
 #include <stdlib.h>
 
 
+/**
+ * Download image from server.
+ *
+ * @param WIDTH Usable width of the display.
+ * @param HEIGHT Usable height of the display.
+ *
+ * @return 0 if successful. 1 if failed.
+ */
 int downloadImage(UWORD WIDTH, UWORD HEIGHT) {
     CURL *curl;
     FILE *fp;
     CURLcode res;
- 
+
     curl = curl_easy_init();
     if(curl) {
         fp = fopen(RPI_ENV_IMAGE_PNG_FILENAME, "wb");

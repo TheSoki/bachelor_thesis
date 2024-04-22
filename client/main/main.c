@@ -50,6 +50,14 @@ void  Handler(int signo){
 }
 
 
+/**
+ * Main function.
+ *
+ * @param argc VCOM value on FPC cable.
+ * @param argv e-Paper display mode.
+ *
+ * @return 0 if successful. 1 if failed.
+ */
 int main(int argc, char *argv[])
 {
     //Exception handling:ctrl + c
