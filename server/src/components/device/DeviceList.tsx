@@ -10,16 +10,18 @@ import {
     PaginationLink,
     PaginationNext,
 } from "@/shadcn/ui/pagination";
-import { useCallback, type FC } from "react";
+import { useCallback } from "react";
 import clsx from "clsx";
 import Link from "next/link";
 import { match, P } from "ts-pattern";
 import { DeleteDeviceModal } from "../modals/DeleteDeviceModal";
 import { Button } from "@/shadcn/ui/button";
 
-export const DeviceList: FC<{
+type DeviceListProps = {
     page: number;
-}> = ({ page }) => {
+};
+
+export const DeviceList = ({ page }: DeviceListProps) => {
     const utils = trpc.useUtils();
     const deviceQuery = trpc.device.list.useQuery({ page });
 

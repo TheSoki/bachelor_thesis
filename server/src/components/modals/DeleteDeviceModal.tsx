@@ -9,11 +9,13 @@ import {
     DialogTrigger,
 } from "@/shadcn/ui/dialog";
 import { trpc } from "@/utils/trpc";
-import { useCallback, type FC } from "react";
+import { useCallback } from "react";
 
-export const DeleteDeviceModal: FC<{
+type DeleteDeviceModalProps = {
     id: string;
-}> = ({ id }) => {
+};
+
+export const DeleteDeviceModal = ({ id }: DeleteDeviceModalProps) => {
     const utils = trpc.useUtils();
 
     const deleteDevice = trpc.device.delete.useMutation({

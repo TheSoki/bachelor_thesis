@@ -10,11 +10,13 @@ import {
 } from "@/shadcn/ui/dialog";
 import { trpc } from "@/utils/trpc";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useCallback, type FC } from "react";
+import { useCallback } from "react";
 
-export const DeleteUserModal: FC<{
+type DeleteUserModalProps = {
     id: string;
-}> = ({ id }) => {
+};
+
+export const DeleteUserModal = ({ id }: DeleteUserModalProps) => {
     const session = useSession();
     const utils = trpc.useUtils();
 

@@ -2,12 +2,14 @@ import { DefaultLayout } from "./DefaultLayout";
 import { useSession } from "next-auth/react";
 import { match } from "ts-pattern";
 import { Skeleton } from "@/shadcn/ui/skeleton";
-import type { FC, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Error } from "../Error";
 
-export const AuthLayout: FC<{
+type AuthLayoutProps = {
     children: ReactNode;
-}> = ({ children }) => {
+};
+
+export const AuthLayout = ({ children }: AuthLayoutProps) => {
     const session = useSession();
 
     return (

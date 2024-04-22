@@ -5,14 +5,16 @@ import { Inter } from "next/font/google";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import type { FC, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { match } from "ts-pattern";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const DefaultLayout: FC<{
+type DefaultLayoutProps = {
     children: ReactNode;
-}> = ({ children }) => {
+};
+
+export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
     const session = useSession();
 
     return (

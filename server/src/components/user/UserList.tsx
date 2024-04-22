@@ -10,15 +10,16 @@ import {
     PaginationLink,
     PaginationNext,
 } from "@/shadcn/ui/pagination";
-import { type FC } from "react";
 import clsx from "clsx";
 import Link from "next/link";
 import { match, P } from "ts-pattern";
 import { DeleteUserModal } from "@/components/modals/DeleteUserModal";
 
-export const UserList: FC<{
+type UserListProps = {
     page: number;
-}> = ({ page }) => {
+};
+
+export const UserList = ({ page }: UserListProps) => {
     const userQuery = trpc.user.list.useQuery({ page });
 
     if (userQuery.error) {
