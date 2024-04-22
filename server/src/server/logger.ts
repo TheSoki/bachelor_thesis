@@ -2,23 +2,18 @@ import { createLogger, format, transports } from "winston";
 
 export type { Logger } from "winston";
 
+const { combine, timestamp, json, prettyPrint } = format;
+
 export const initLogger = () => {
     const isProd = process.env.NODE_ENV === "production";
 
-    const logger = createLogger({
-        level: "info",
-        format: format.json(),
-        transports: isProd
-            ? [
-                  new transports.File({ filename: "error.log", level: "error" }),
-                  new transports.File({ filename: "combined.log" }),
-              ]
-            : [
-                  new transports.Console({
-                      format: format.simple(),
-                  }),
-              ],
-    });
+    const customFormat = isProd ? combine(timestamp(), json()) : combine(timestamp(), prettyPrint());
 
-    return logger;
+    const customTransports = isProd ? [new transports.File({ filename: "output.log" })] : [new transports.Console()];
+
+    return createLogger({
+        level: isProd ? "info" : "debug",
+        format: customFormat,
+        transports: customTransports,
+    });
 };
