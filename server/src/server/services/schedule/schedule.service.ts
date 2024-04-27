@@ -131,9 +131,7 @@ export class ScheduleService extends BaseService {
         buildingId: string;
         roomId: string;
     }): Promise<ScheduleEvent[]> {
-        const response = await fetch(
-            `https://demostag.osu.cz/ws/services/rest2/rozvrhy/getRozvrhByMistnost?budova=${buildingId}&mistnost=${roomId}`,
-        );
+        const response = await fetch(`${serverEnv.SCHEDULE_EVENTS_API_URL}?budova=${buildingId}&mistnost=${roomId}`);
 
         if (!response.ok) {
             this.logger.error(`Failed to fetch schedule events: ${response.statusText}`);
