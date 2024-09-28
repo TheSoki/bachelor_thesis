@@ -82,8 +82,11 @@ export class ScheduleService extends BaseService {
             });
             const scheduleHtml = this.generateScheduleHtml(roomName, displayWidth, displayHeight, scheduleEvents);
             const pngBuffer = await this.generatePngFromHtml(displayWidth, displayHeight, scheduleHtml);
-            await this.deviceRepository.update(id, {
-                lastSeen: new Date(),
+            await this.deviceRepository.update({
+                where: { id },
+                data: {
+                    lastSeen: new Date(),
+                },
             });
 
             return pngBuffer;
@@ -96,16 +99,15 @@ export class ScheduleService extends BaseService {
 
     private async getDeviceById({ id, token }: { id: string; token: string }) {
         try {
-            const device = await this.deviceRepository.getById({
-                id,
-                columns: {
+            const device = await this.deviceRepository.findFirst({
+                where: { id },
+                select: {
                     buildingId: true,
                     roomId: true,
                     displayHeight: true,
                     displayWidth: true,
                     token: true,
                 },
-                include: {},
             });
 
             if (!device) {

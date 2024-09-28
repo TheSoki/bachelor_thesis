@@ -5,10 +5,8 @@ import type { paginationSchema } from "@/server/schema/general";
 import type { createUserSchema, updateUserSchema, userSchema } from "@/server/schema/user";
 import { hash } from "bcrypt";
 import { serverEnv } from "@/env/server";
-import type { InsertUser, SelectUser } from "@/db/schema";
 import type { DeviceRepository } from "@/server/repositories/device/device.repository";
-import { db } from "@/db/connection";
-import { createId } from "@paralleldrive/cuid2";
+import { prisma, type User } from "@/database";
 
 const limit = 10 as const;
 
@@ -18,7 +16,7 @@ export const defaultColumns = {
     name: true,
     email: true,
 } satisfies {
-    [K in keyof SelectUser]?: boolean;
+    [K in keyof User]?: boolean;
 };
 
 export type UserServiceDependencies = {
@@ -28,27 +26,23 @@ export type UserServiceDependencies = {
 
 export class UserService extends BaseService {
     private userRepository: UserRepository;
-    private deviceRepository: DeviceRepository;
 
     constructor(dependencies: UserServiceDependencies) {
         super(dependencies);
 
         this.userRepository = dependencies.userRepository;
-        this.deviceRepository = dependencies.deviceRepository;
     }
 
     async list(input: z.infer<typeof paginationSchema>) {
-        const offset = (input.page - 1) * limit;
+        const skip = (input.page - 1) * limit;
 
         try {
-            const list = await this.userRepository.list({
-                limit,
-                offset,
-                columns: defaultColumns,
-                include: {},
+            const list = await this.userRepository.findMany({
+                take: limit,
+                skip,
+                select: defaultColumns,
             });
-            const totalCountQuery = await this.userRepository.totalCount();
-            const totalCount = totalCountQuery[0]?.value ?? 0;
+            const totalCount = await this.userRepository.count();
             const totalPages = Math.ceil(totalCount / limit);
 
             return {
@@ -66,10 +60,9 @@ export class UserService extends BaseService {
     async getById(input: z.infer<typeof userSchema>) {
         const { id } = input;
         try {
-            const user = await this.userRepository.getById({
-                id,
-                columns: defaultColumns,
-                include: {},
+            const user = await this.userRepository.findFirst({
+                where: { id },
+                select: defaultColumns,
             });
 
             if (!user) {
@@ -91,10 +84,7 @@ export class UserService extends BaseService {
             const hashedPassword = await hash(password, serverEnv.BCRYPT_SALT_ROUNDS);
 
             await this.userRepository.create({
-                id: createId(),
-                name,
-                email,
-                password: hashedPassword,
+                data: { name, email, password: hashedPassword },
             });
         } catch (e) {
             this.logger.error(`Error adding user: ${e}`);
@@ -107,13 +97,16 @@ export class UserService extends BaseService {
         const { id, email, name, password } = input;
 
         try {
-            const data: Partial<InsertUser> = {
+            const data: Partial<User> = {
                 email,
                 name,
             };
             if (!!password) data.password = await hash(password, serverEnv.BCRYPT_SALT_ROUNDS);
 
-            await this.userRepository.update(id, data);
+            await this.userRepository.update({
+                where: { id },
+                data,
+            });
         } catch (e) {
             this.logger.error(`Error updating user with id '${id}': ${e}`);
 
@@ -125,9 +118,9 @@ export class UserService extends BaseService {
         const { id } = input;
 
         try {
-            await db.transaction(async (trx) => {
-                this.deviceRepository.update(id, { authorId: null }, trx);
-                this.userRepository.delete(id, trx);
+            await prisma.$transaction(async (trx) => {
+                await trx.device.deleteMany({ where: { authorId: id } });
+                await trx.user.delete({ where: { id } });
             });
         } catch (e) {
             this.logger.error(`Error deleting user with id '${id}': ${e}`);

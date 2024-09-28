@@ -1,17 +1,17 @@
-import type { Db } from "@/db/connection";
+import type { PrismaClient } from "@/database";
 import type { Logger } from "@/server/logger";
 
 export interface BaseRepositoryDependencies {
-    db: Db;
+    prisma: PrismaClient;
     logger: Logger;
 }
 
 export abstract class BaseRepository {
-    readonly db: Db;
+    readonly prisma: PrismaClient;
     readonly logger: Logger;
 
     constructor(dependencies: BaseRepositoryDependencies) {
-        this.db = dependencies.db;
+        this.prisma = dependencies.prisma;
         this.logger = dependencies.logger;
     }
 }

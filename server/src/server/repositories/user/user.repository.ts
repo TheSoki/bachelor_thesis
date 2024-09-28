@@ -1,74 +1,32 @@
-import { users, type InsertUser, type UserWith } from "@/db/schema";
-import { BaseRepository, type BaseRepositoryDependencies } from "../base/base.repository";
-import { count, eq } from "drizzle-orm";
-import type { TransactionScope } from "@/db/connection";
-
-export type UserRepositoryDependencies = BaseRepositoryDependencies;
-
-type SelectColumns = {
-    [K in keyof InsertUser]?: boolean;
-};
+import { Prisma, prisma } from "@/database";
+import { BaseRepository } from "../base/base.repository";
 
 export class UserRepository extends BaseRepository {
-    constructor(dependencies: UserRepositoryDependencies) {
-        super(dependencies);
+    findMany<T extends Prisma.UserFindManyArgs, Result extends Array<Prisma.UserGetPayload<T>>>(args?: T) {
+        return prisma.user.findMany(args) as Promise<Result>;
     }
 
-    async list<C extends SelectColumns, I extends UserWith>({
-        limit,
-        offset,
-        columns,
-        include,
-    }: {
-        limit: number;
-        offset: number;
-        columns: C;
-        include: I;
-    }) {
-        return this.db.query.users.findMany({
-            columns,
-            with: include,
-            limit,
-            offset,
-            orderBy: (users, { desc }) => [desc(users.createdAt)],
-        });
+    findFirst<T extends Prisma.UserFindFirstArgs, Result extends Prisma.UserGetPayload<T> | null>(args?: T) {
+        return prisma.user.findFirst(args) as Promise<Result | null>;
     }
 
-    async getById<C extends SelectColumns, I extends UserWith>({
-        id,
-        columns,
-        include,
-    }: {
-        id: string;
-        columns: C;
-        include: I;
-    }) {
-        return this.db.query.users.findFirst({
-            columns,
-            with: include,
-            where: (users, { eq }) => eq(users.id, id),
-        });
+    findUnique<T extends Prisma.UserFindUniqueArgs, Result extends Prisma.UserGetPayload<T> | null>(args: T) {
+        return prisma.user.findUnique(args) as Promise<Result | null>;
     }
 
-    async create(data: Omit<InsertUser, "createdAt">) {
-        return this.db.insert(users).values(data);
+    count<T extends Prisma.UserCountArgs>(args?: T): Promise<number> {
+        return prisma.user.count(args);
     }
 
-    async update(id: string, data: Partial<InsertUser>, transactionScope?: TransactionScope) {
-        if (transactionScope) {
-            return transactionScope.update(users).set(data).where(eq(users.id, id));
-        }
-        return this.db.update(users).set(data).where(eq(users.id, id));
+    update<T extends Prisma.UserUpdateArgs, Result extends Prisma.UserGetPayload<T>>(args: T) {
+        return prisma.user.update(args) as Promise<Result>;
     }
 
-    async delete(id: string, transactionScope?: TransactionScope) {
-        if (transactionScope) {
-            return transactionScope.delete(users).where(eq(users.id, id));
-        }
-        return this.db.delete(users).where(eq(users.id, id));
+    create<T extends Prisma.UserCreateArgs, Result extends Prisma.UserGetPayload<T>>(args: T) {
+        return prisma.user.create(args) as Promise<Result>;
     }
 
-    async totalCount() {
-        return this.db.select({ value: count() }).from(users);
+    delete<T extends Prisma.UserDeleteArgs, Result extends Prisma.UserGetPayload<T>>(args: T) {
+        return prisma.user.delete(args) as Promise<Result>;
     }
 }

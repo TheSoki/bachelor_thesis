@@ -1,74 +1,32 @@
-import { devices, type DeviceWith, type InsertDevice, type SelectDevice } from "@/db/schema";
-import { BaseRepository, type BaseRepositoryDependencies } from "../base/base.repository";
-import { count, eq } from "drizzle-orm";
-import type { TransactionScope } from "@/db/connection";
-
-export type DeviceRepositoryDependencies = BaseRepositoryDependencies;
-
-type SelectColumns = {
-    [K in keyof SelectDevice]?: boolean;
-};
+import { Prisma, prisma } from "@/database";
+import { BaseRepository } from "../base/base.repository";
 
 export class DeviceRepository extends BaseRepository {
-    constructor(dependencies: DeviceRepositoryDependencies) {
-        super(dependencies);
+    findMany<T extends Prisma.DeviceFindManyArgs, Result extends Array<Prisma.DeviceGetPayload<T>>>(args?: T) {
+        return prisma.device.findMany(args) as Promise<Result>;
     }
 
-    async list<C extends SelectColumns, I extends DeviceWith>({
-        limit,
-        offset,
-        columns,
-        include,
-    }: {
-        limit: number;
-        offset: number;
-        columns: C;
-        include: I;
-    }) {
-        return this.db.query.devices.findMany({
-            columns,
-            with: include,
-            limit,
-            offset,
-            orderBy: (devices, { desc }) => [desc(devices.createdAt)],
-        });
+    findFirst<T extends Prisma.DeviceFindFirstArgs, Result extends Prisma.DeviceGetPayload<T> | null>(args?: T) {
+        return prisma.device.findFirst(args) as Promise<Result | null>;
     }
 
-    async getById<C extends SelectColumns, I extends DeviceWith>({
-        id,
-        columns,
-        include,
-    }: {
-        id: string;
-        columns: C;
-        include: I;
-    }) {
-        return this.db.query.devices.findFirst({
-            columns,
-            with: include,
-            where: (devices, { eq }) => eq(devices.id, id),
-        });
+    findUnique<T extends Prisma.DeviceFindUniqueArgs, Result extends Prisma.DeviceGetPayload<T> | null>(args: T) {
+        return prisma.device.findUnique(args) as Promise<Result | null>;
     }
 
-    async create(data: Omit<InsertDevice, "createdAt">) {
-        return this.db.insert(devices).values(data);
+    count<T extends Prisma.DeviceCountArgs>(args?: T): Promise<number> {
+        return prisma.device.count(args);
     }
 
-    async update(id: string, data: Partial<InsertDevice>, transactionScope?: TransactionScope) {
-        if (transactionScope) {
-            return transactionScope.update(devices).set(data).where(eq(devices.id, id));
-        }
-        return this.db.update(devices).set(data).where(eq(devices.id, id));
+    update<T extends Prisma.DeviceUpdateArgs, Result extends Prisma.DeviceGetPayload<T>>(args: T) {
+        return prisma.device.update(args) as Promise<Result>;
     }
 
-    async delete(id: string, transactionScope?: TransactionScope) {
-        if (transactionScope) {
-            return transactionScope.delete(devices).where(eq(devices.id, id));
-        }
-        return this.db.delete(devices).where(eq(devices.id, id));
+    create<T extends Prisma.DeviceCreateArgs, Result extends Prisma.DeviceGetPayload<T>>(args: T) {
+        return prisma.device.create(args) as Promise<Result>;
     }
 
-    async totalCount() {
-        return this.db.select({ value: count() }).from(devices);
+    delete<T extends Prisma.DeviceDeleteArgs, Result extends Prisma.DeviceGetPayload<T>>(args: T) {
+        return prisma.device.delete(args) as Promise<Result>;
     }
 }

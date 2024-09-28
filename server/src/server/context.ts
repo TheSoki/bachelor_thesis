@@ -1,4 +1,3 @@
-import { db } from "@/db/connection";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { getServerSession } from "next-auth/next";
@@ -9,12 +8,13 @@ import { DeviceService } from "./services/device/device.service";
 import type { Session } from "next-auth";
 import { initLogger, type Logger } from "./logger";
 import { ScheduleService } from "./services/schedule/schedule.service";
+import { prisma } from "@/database";
 
 export const createInnerContext = (): InnerContext => {
     const logger = initLogger();
 
-    const userRepository = new UserRepository({ db, logger });
-    const deviceRepository = new DeviceRepository({ db, logger });
+    const userRepository = new UserRepository({ prisma, logger });
+    const deviceRepository = new DeviceRepository({ prisma, logger });
 
     const userService = new UserService({ logger, userRepository, deviceRepository });
     const deviceService = new DeviceService({ logger, deviceRepository });

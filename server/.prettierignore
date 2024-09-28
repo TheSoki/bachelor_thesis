@@ -34,5 +34,5 @@ Dockerfile
 docker-compose.yaml
 docker-compose.dev.yaml
 
-# Drizzle
-drizzle/
+# Prisma
+prisma/

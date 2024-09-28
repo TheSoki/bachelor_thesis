@@ -1,8 +1,8 @@
-import { db } from "@/db/connection";
 import NextAuth, { type AuthOptions, type User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
 import { registerSchema } from "@/server/schema/user";
+import { prisma } from "@/database";
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -31,15 +31,9 @@ export const authOptions: AuthOptions = {
                 }
 
                 // Any object returned will be saved in `user` property of the JWT
-                const dbUser = await db.query.users.findFirst({
-                    columns: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        password: true,
-                    },
-                    where(users, { eq }) {
-                        return eq(users.email, user.email);
+                const dbUser = await prisma.user.findFirst({
+                    where: {
+                        email: user.email,
                     },
                 });
 

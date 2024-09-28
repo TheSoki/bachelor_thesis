@@ -1,32 +1,21 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Client } from "pg";
 import { serverEnv } from "@/env/server";
-import * as schema from "../db/schema";
 import { hash } from "bcrypt";
-import { createId } from "@paralleldrive/cuid2";
+import { PrismaClient } from "@prisma/client";
 
-const client = new Client({
-    connectionString: serverEnv.DATABASE_URL,
-});
+const prisma = new PrismaClient();
 
 const run = async () => {
-    await client.connect();
-
-    const db = drizzle(client, {
-        logger: true,
-        schema,
-    });
-
     const email = "sokoma25@osu.cz";
 
     const password = await hash(email, serverEnv.BCRYPT_SALT_ROUNDS);
 
-    await db.insert(schema.users).values({
-        id: createId(),
-        name: "Marek Sokol",
-        email,
-        password: password,
+    await prisma.user.create({
+        data: {
+            name: "Marek Sokol",
+            email,
+            password: password,
+        },
     });
 };
 
@@ -36,5 +25,5 @@ run()
         process.exit(1);
     })
     .finally(() => {
-        client.end();
+        prisma.$disconnect();
     });

@@ -2,9 +2,8 @@ import { BaseService, type BaseServiceDependencies } from "../base/base.service"
 import type { z } from "zod";
 import type { paginationSchema } from "@/server/schema/general";
 import type { createDeviceSchema, updateDeviceSchema, deviceSchema } from "@/server/schema/device";
-import type { InsertDevice, SelectDevice } from "@/db/schema";
 import type { DeviceRepository } from "@/server/repositories/device/device.repository";
-import { createId } from "@paralleldrive/cuid2";
+import type { Device } from "@/database";
 
 const limit = 10 as const;
 
@@ -14,7 +13,7 @@ const defaultColumns = {
     buildingId: true,
     roomId: true,
 } satisfies {
-    [K in keyof SelectDevice]?: boolean;
+    [K in keyof Device]?: boolean;
 };
 
 export type DeviceServiceDependencies = {
@@ -31,24 +30,19 @@ export class DeviceService extends BaseService {
     }
 
     async list(input: z.infer<typeof paginationSchema>) {
-        const offset = (input.page - 1) * limit;
+        const skip = (input.page - 1) * limit;
 
         try {
-            const list = await this.deviceRepository.list({
-                limit,
-                offset,
-                columns: {
+            const list = await this.deviceRepository.findMany({
+                take: limit,
+                skip,
+                select: {
                     ...defaultColumns,
                     lastSeen: true,
-                },
-                include: {
-                    author: {
-                        columns: { id: true, name: true },
-                    },
+                    author: { select: { name: true } },
                 },
             });
-            const totalCountQuery = await this.deviceRepository.totalCount();
-            const totalCount = totalCountQuery[0]?.value ?? 0;
+            const totalCount = await this.deviceRepository.count();
             const totalPages = Math.ceil(totalCount / limit);
 
             return {
@@ -66,10 +60,9 @@ export class DeviceService extends BaseService {
     async getById(input: z.infer<typeof deviceSchema>) {
         const { id } = input;
         try {
-            const device = await this.deviceRepository.getById({
+            const device = await this.deviceRepository.findFirst({
                 id,
-                columns: defaultColumns,
-                include: {},
+                select: defaultColumns,
             });
 
             if (!device) {
@@ -89,11 +82,11 @@ export class DeviceService extends BaseService {
 
         try {
             await this.deviceRepository.create({
-                id: createId(),
-                token: createId(),
-                buildingId,
-                roomId,
-                authorId: userId,
+                data: {
+                    buildingId,
+                    roomId,
+                    authorId: userId,
+                },
             });
         } catch (e) {
             this.logger.error(`Error adding device: ${e}`);
@@ -106,12 +99,15 @@ export class DeviceService extends BaseService {
         const { id, buildingId, roomId } = input;
 
         try {
-            const data: Partial<InsertDevice> = {
+            const data: Partial<Device> = {
                 buildingId,
                 roomId,
             };
 
-            await this.deviceRepository.update(id, data);
+            await this.deviceRepository.update({
+                where: { id },
+                data,
+            });
         } catch (e) {
             this.logger.error(`Error updating device with id '${id}': ${e}`);
 
@@ -123,7 +119,7 @@ export class DeviceService extends BaseService {
         const { id } = input;
 
         try {
-            await this.deviceRepository.delete(id);
+            await this.deviceRepository.delete({ where: { id } });
         } catch (e) {
             this.logger.error(`Error deleting device with id '${id}': ${e}`);
 
@@ -134,13 +130,11 @@ export class DeviceService extends BaseService {
     async getDeviceToken(input: z.infer<typeof deviceSchema>) {
         const { id } = input;
         try {
-            const device = await this.deviceRepository.getById({
-                id,
-                columns: {
-                    id: true,
+            const device = await this.deviceRepository.findFirst({
+                where: { id },
+                select: {
                     token: true,
                 },
-                include: {},
             });
 
             if (!device) {
