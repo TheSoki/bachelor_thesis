@@ -1,11 +1,19 @@
-version: "3.8"
+name: timetable
 
 services:
-    local-database:
-        image: postgres:16
+    database:
+        container_name: timetable-database-local
+        restart: unless-stopped
+        image: postgres:17
         ports:
             - 5432:5432
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: postgres
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+            - /tmp:/backups
+
+volumes:
+    postgres_data:
