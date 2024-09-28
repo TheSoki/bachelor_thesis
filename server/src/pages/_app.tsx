@@ -1,9 +1,9 @@
-import "@/styles/globals.css";
+import "@/client/styles/globals.css";
 import type { NextPage } from "next";
 import type { AppType, AppProps } from "next/app";
 import type { ReactElement, ReactNode } from "react";
 import { trpc } from "@/utils/trpc";
-import { DefaultLayout } from "@/components/layouts/DefaultLayout";
+import { DefaultLayout } from "@/client/layouts/DefaultLayout";
 import { SessionProvider, getSession } from "next-auth/react";
 import type { Session } from "next-auth";
 

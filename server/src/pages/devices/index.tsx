@@ -1,20 +1,50 @@
 import type { NextPageWithLayout } from "../_app";
-import { AuthLayout } from "@/components/layouts/AuthLayout";
+import { AuthLayout } from "@/client/layouts/AuthLayout";
+import { useURLParams } from "@/client/hooks/useURLParams";
+import { z } from "zod";
+import { DeviceCreateModal } from "@/client/features/devices/components/DeviceCreateModal";
+import { DeviceDeleteModal } from "@/client/features/devices/components/DeviceDeleteModal";
+import { DeviceList } from "@/client/features/devices/components/DeviceList";
+import { DeviceUpdateModal } from "@/client/features/devices/components/DeviceUpdateModal";
+import { DevicesPageURLParams } from "@/client/features/users/types/usersPageURLParams";
 import { useMemo } from "react";
-import { useRouter } from "next/router";
-import { DeviceList } from "@/components/device/DeviceList";
+
+const schema = z.object({
+    [DevicesPageURLParams.PAGE]: z
+        .string()
+        .transform(Number)
+        .default("1")
+        .transform((value) => (value > 0 ? value : 1)),
+});
 
 const DevicesPage: NextPageWithLayout = () => {
-    const router = useRouter();
+    const { urlState } = useURLParams(schema);
 
-    const page = useMemo(() => {
-        const param = Number(router.query.page);
-        const parsed = isNaN(param) ? 1 : param;
+    const nextPageHref = useMemo(() => {
+        if (!urlState.value?.page) return "/devices";
+        return `/devices?page=${urlState.value.page + 1}`;
+    }, [urlState.value?.page]);
+    const prevPageHref = useMemo(() => {
+        if (!urlState.value?.page) return "/devices";
+        return `/devices?page=${urlState.value.page - 1}`;
+    }, [urlState.value?.page]);
 
-        return parsed < 1 ? 1 : parsed;
-    }, [router.query.page]);
+    if (urlState.loading) {
+        return <></>;
+    }
 
-    return <DeviceList page={page} />;
+    if (urlState.error !== null) {
+        return <></>;
+    }
+
+    return (
+        <>
+            <DeviceList page={urlState.value.page} nextPageHref={nextPageHref} prevPageHref={prevPageHref} />
+            <DeviceDeleteModal />
+            <DeviceCreateModal />
+            <DeviceUpdateModal />
+        </>
+    );
 };
 
 DevicesPage.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;

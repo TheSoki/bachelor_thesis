@@ -1,0 +1,1 @@
+export { FullscreenError } from "./FullscreenError";

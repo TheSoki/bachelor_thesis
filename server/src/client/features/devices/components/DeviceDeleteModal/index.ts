@@ -1,0 +1,1 @@
+export { DeviceDeleteModal } from "./DeviceDeleteModal";

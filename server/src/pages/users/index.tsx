@@ -1,20 +1,50 @@
 import type { NextPageWithLayout } from "../_app";
-import { AuthLayout } from "@/components/layouts/AuthLayout";
+import { AuthLayout } from "@/client/layouts/AuthLayout";
+import { useURLParams } from "@/client/hooks/useURLParams";
+import { z } from "zod";
+import { UserCreateModal } from "@/client/features/users/components/UserCreateModal";
+import { UserDeleteModal } from "@/client/features/users/components/UserDeleteModal";
+import { UserList } from "@/client/features/users/components/UserList";
+import { UserUpdateModal } from "@/client/features/users/components/UserUpdateModal";
+import { UsersPageURLParams } from "@/client/features/devices/types/devicesPageURLParams";
 import { useMemo } from "react";
-import { useRouter } from "next/router";
-import { UserList } from "@/components/user/UserList";
+
+const schema = z.object({
+    [UsersPageURLParams.PAGE]: z
+        .string()
+        .transform(Number)
+        .default("1")
+        .transform((value) => (value > 0 ? value : 1)),
+});
 
 const UsersPage: NextPageWithLayout = () => {
-    const router = useRouter();
+    const { urlState } = useURLParams(schema);
 
-    const page = useMemo(() => {
-        const param = Number(router.query.page);
-        const parsed = isNaN(param) ? 1 : param;
+    const nextPageHref = useMemo(() => {
+        if (!urlState.value?.page) return "/users";
+        return `/users?page=${urlState.value.page + 1}`;
+    }, [urlState.value?.page]);
+    const prevPageHref = useMemo(() => {
+        if (!urlState.value?.page) return "/users";
+        return `/users?page=${urlState.value.page - 1}`;
+    }, [urlState.value?.page]);
 
-        return parsed < 1 ? 1 : parsed;
-    }, [router.query.page]);
+    if (urlState.loading) {
+        return <></>;
+    }
 
-    return <UserList page={page} />;
+    if (urlState.error !== null) {
+        return <></>;
+    }
+
+    return (
+        <>
+            <UserList page={urlState.value.page} nextPageHref={nextPageHref} prevPageHref={prevPageHref} />
+            <UserDeleteModal />
+            <UserCreateModal />
+            <UserUpdateModal />
+        </>
+    );
 };
 
 UsersPage.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
