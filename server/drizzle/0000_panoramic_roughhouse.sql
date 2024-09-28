@@ -1,15 +1,15 @@
 CREATE TABLE IF NOT EXISTS "devices" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
-	"token" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"token" text NOT NULL,
 	"building" text NOT NULL,
 	"room" text NOT NULL,
 	"lastSeen" timestamp,
-	"authorId" uuid
+	"authorId" text
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,

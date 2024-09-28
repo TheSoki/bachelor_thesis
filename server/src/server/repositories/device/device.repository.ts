@@ -50,7 +50,7 @@ export class DeviceRepository extends BaseRepository {
         });
     }
 
-    async create(data: Omit<InsertDevice, "id" | "createdAt">) {
+    async create(data: Omit<InsertDevice, "createdAt">) {
         return this.db.insert(devices).values(data);
     }
 

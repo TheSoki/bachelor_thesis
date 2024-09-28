@@ -50,7 +50,7 @@ export class UserRepository extends BaseRepository {
         });
     }
 
-    async create(data: Omit<InsertUser, "id" | "createdAt">) {
+    async create(data: Omit<InsertUser, "createdAt">) {
         return this.db.insert(users).values(data);
     }
 

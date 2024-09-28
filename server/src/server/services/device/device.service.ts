@@ -4,6 +4,7 @@ import type { paginationSchema } from "@/server/schema/general";
 import type { createDeviceSchema, updateDeviceSchema, deviceSchema } from "@/server/schema/device";
 import type { InsertDevice, SelectDevice } from "@/db/schema";
 import type { DeviceRepository } from "@/server/repositories/device/device.repository";
+import { createId } from "@paralleldrive/cuid2";
 
 const limit = 10 as const;
 
@@ -88,6 +89,8 @@ export class DeviceService extends BaseService {
 
         try {
             await this.deviceRepository.create({
+                id: createId(),
+                token: createId(),
                 buildingId,
                 roomId,
                 authorId: userId,

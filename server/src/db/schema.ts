@@ -1,4 +1,4 @@
-import { uuid, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import {
     relations,
     type DBQueryConfig,
@@ -9,7 +9,7 @@ import {
 
 //! Users
 export const users = pgTable("users", {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: text("id").primaryKey(),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     name: text("name").notNull(),
     email: text("email").unique().notNull(),
@@ -22,13 +22,13 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 //! Devices
 export const devices = pgTable("devices", {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: text("id").primaryKey(),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
-    token: uuid("token").notNull().defaultRandom(),
+    token: text("token").notNull(),
     buildingId: text("building").notNull(),
     roomId: text("room").notNull(),
     lastSeen: timestamp("lastSeen"),
-    authorId: uuid("authorId").references(() => users.id),
+    authorId: text("authorId").references(() => users.id),
 });
 
 export const devicesRelations = relations(devices, ({ one }) => ({

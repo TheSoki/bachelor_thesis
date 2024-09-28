@@ -8,6 +8,7 @@ import { serverEnv } from "@/env/server";
 import type { InsertUser, SelectUser } from "@/db/schema";
 import type { DeviceRepository } from "@/server/repositories/device/device.repository";
 import { db } from "@/db/connection";
+import { createId } from "@paralleldrive/cuid2";
 
 const limit = 10 as const;
 
@@ -90,6 +91,7 @@ export class UserService extends BaseService {
             const hashedPassword = await hash(password, serverEnv.BCRYPT_SALT_ROUNDS);
 
             await this.userRepository.create({
+                id: createId(),
                 name,
                 email,
                 password: hashedPassword,
