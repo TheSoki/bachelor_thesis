@@ -1,14 +1,16 @@
 import { format, createLogger, transports } from "winston";
 import type { Logger } from "winston";
+import { Service } from "typedi";
 
 const { combine, timestamp, json, prettyPrint } = format;
 
 export type LoggerType = Logger;
 
-export class LoggerService {
+@Service()
+export class LoggerRepository {
     readonly logger: LoggerType;
 
-    constructor(requestId: string | null) {
+    constructor(requestId: string) {
         const isProd = process.env.NODE_ENV === "production";
 
         const customFormat = isProd ? combine(timestamp(), json()) : combine(timestamp(), prettyPrint());

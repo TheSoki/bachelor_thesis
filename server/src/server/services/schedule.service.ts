@@ -1,14 +1,10 @@
 import { serverEnv } from "@/env/server";
-import type { DeviceRepository } from "@/server/repositories/device/device.repository";
 import puppeteer from "puppeteer";
 import { parseString } from "xml2js";
 import { z } from "zod";
-import type { LoggerService } from "./logger.service";
-
-export type ScheduleServiceDependencies = {
-    logger: LoggerService;
-    deviceRepository: DeviceRepository;
-};
+import { Service } from "typedi";
+import { LoggerRepository } from "../repositories/logger.repository";
+import { DeviceRepository } from "../repositories/device.repository";
 
 interface ScheduleEvent {
     name: string;
@@ -51,14 +47,12 @@ const eventSchema = z.object({
     dayOfWeek: z.string().regex(/^(Ne|Po|Út|St|Čt|Pá|So)$/),
 });
 
+@Service()
 export class ScheduleService {
-    private logger: LoggerService;
-    private deviceRepository: DeviceRepository;
-
-    constructor(dependencies: ScheduleServiceDependencies) {
-        this.logger = dependencies.logger;
-        this.deviceRepository = dependencies.deviceRepository;
-    }
+    constructor(
+        private readonly logger: LoggerRepository,
+        private readonly deviceRepository: DeviceRepository,
+    ) {}
 
     async getScheduleBuffer({
         id,

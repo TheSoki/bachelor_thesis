@@ -1,11 +1,12 @@
 import { router, authedProcedure } from "../trpc";
 import { userSchema, userCreateSchema, userUpdateSchema, userListSchema } from "../schema/user";
 import { TRPCError } from "@trpc/server";
+import { UserService } from "../services/user.service";
 
 export const userRouter = router({
     list: authedProcedure.input(userListSchema).query(async ({ ctx, input }) => {
         try {
-            return ctx.userService.list(input);
+            return ctx.container.get(UserService).list(input);
         } catch (e) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -15,7 +16,7 @@ export const userRouter = router({
     }),
     getById: authedProcedure.input(userSchema).query(async ({ ctx, input }) => {
         try {
-            return ctx.userService.getById(input);
+            return ctx.container.get(UserService).getById(input);
         } catch (e) {
             throw new TRPCError({
                 code: "NOT_FOUND",
@@ -25,7 +26,7 @@ export const userRouter = router({
     }),
     create: authedProcedure.input(userCreateSchema).mutation(async ({ ctx, input }) => {
         try {
-            return ctx.userService.create(input);
+            return ctx.container.get(UserService).create(input);
         } catch (e) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -35,7 +36,7 @@ export const userRouter = router({
     }),
     update: authedProcedure.input(userUpdateSchema).mutation(async ({ ctx, input }) => {
         try {
-            return ctx.userService.update(input);
+            return ctx.container.get(UserService).update(input);
         } catch (e) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -45,7 +46,7 @@ export const userRouter = router({
     }),
     delete: authedProcedure.input(userSchema).mutation(async ({ ctx, input }) => {
         try {
-            return ctx.userService.delete(input);
+            return ctx.container.get(UserService).delete(input);
         } catch (e) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",

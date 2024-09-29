@@ -1,51 +1,24 @@
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { getServerSession } from "next-auth/next";
-import { UserRepository } from "./repositories/user/user.repository";
-import { DeviceRepository } from "./repositories/device/device.repository";
-import { UserService } from "./services/user.service";
-import { DeviceService } from "./services/device.service";
 import type { Session } from "next-auth";
-import { ScheduleService } from "./services/schedule.service";
-import { LoggerService } from "./services/logger.service";
-
-export const createInnerContext = (logger: LoggerService): InnerContext => {
-    const userRepository = new UserRepository();
-    const deviceRepository = new DeviceRepository();
-
-    const userService = new UserService({ logger, userRepository });
-    const deviceService = new DeviceService({ logger, deviceRepository });
-    const scheduleService = new ScheduleService({ logger, deviceRepository });
-
-    return { userService, deviceService, scheduleService };
-};
-
-export type InnerContext = {
-    userService: UserService;
-    deviceService: DeviceService;
-    scheduleService: ScheduleService;
-};
+import { Container, ContainerInstance } from "typedi";
+import { LoggerRepository } from "./repositories/logger.repository";
 
 export const createContext = async (opts: CreateNextContextOptions): Promise<Context> => {
     const session = await getServerSession(opts.req, opts.res, authOptions);
 
-    const sessionId = session?.user.id ? `user:${session.user.id}` : "anonymous";
-    const loggerService = new LoggerService(sessionId);
-
-    const ctx = createInnerContext(loggerService);
-
-    const { userService, deviceService, scheduleService } = ctx;
+    const requestId = session?.user.id ? `user:${session.user.id}` : "anonymous";
+    const container = Container.of(requestId);
+    container.set(LoggerRepository, new LoggerRepository(requestId));
 
     return {
-        logger: loggerService,
-        userService,
-        deviceService,
-        scheduleService,
         session,
+        container,
     };
 };
 
-export type Context = InnerContext & {
-    logger: LoggerService;
+export type Context = {
     session: Session | null;
+    container: ContainerInstance;
 };

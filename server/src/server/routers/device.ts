@@ -1,11 +1,12 @@
 import { router, authedProcedure } from "../trpc";
 import { deviceSchema, deviceCreateSchema, deviceUpdateSchema, deviceListSchema } from "../schema/device";
 import { TRPCError } from "@trpc/server";
+import { DeviceService } from "../services/device.service";
 
 export const deviceRouter = router({
     list: authedProcedure.input(deviceListSchema).query(async ({ ctx, input }) => {
         try {
-            return ctx.deviceService.list(input);
+            return ctx.container.get(DeviceService).list(input);
         } catch (e) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -15,7 +16,7 @@ export const deviceRouter = router({
     }),
     getById: authedProcedure.input(deviceSchema).query(async ({ ctx, input }) => {
         try {
-            return ctx.deviceService.getById(input);
+            return ctx.container.get(DeviceService).getById(input);
         } catch (e) {
             throw new TRPCError({
                 code: "NOT_FOUND",
@@ -25,7 +26,7 @@ export const deviceRouter = router({
     }),
     create: authedProcedure.input(deviceCreateSchema).mutation(async ({ ctx, input }) => {
         try {
-            return ctx.deviceService.create(input, ctx.user.id);
+            return ctx.container.get(DeviceService).create(input, ctx.user.id);
         } catch (e) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -35,7 +36,7 @@ export const deviceRouter = router({
     }),
     update: authedProcedure.input(deviceUpdateSchema).mutation(async ({ ctx, input }) => {
         try {
-            return ctx.deviceService.update(input);
+            return ctx.container.get(DeviceService).update(input);
         } catch (e) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -45,7 +46,7 @@ export const deviceRouter = router({
     }),
     delete: authedProcedure.input(deviceSchema).mutation(async ({ ctx, input }) => {
         try {
-            return ctx.deviceService.delete(input);
+            return ctx.container.get(DeviceService).delete(input);
         } catch (e) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -55,7 +56,7 @@ export const deviceRouter = router({
     }),
     getDeviceToken: authedProcedure.input(deviceSchema).query(async ({ ctx, input }) => {
         try {
-            return ctx.deviceService.getDeviceToken(input);
+            return ctx.container.get(DeviceService).getDeviceToken(input);
         } catch (e) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",

@@ -1,7 +1,9 @@
-import { createInnerContext } from "@/server/context";
+import "reflect-metadata";
 import { scheduleSchema } from "@/server/schema/schedule";
-import { LoggerService } from "@/server/services/logger.service";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Container } from "typedi";
+import { ScheduleService } from "@/server/services/schedule.service";
+import { LoggerRepository } from "@/server/repositories/logger.repository";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Buffer>) {
     if (req.method !== "GET") {
@@ -24,13 +26,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     }
 
     const requestId = `device:${parsedData.data.id}`;
-    const loggerService = new LoggerService(requestId);
+    const container = Container.of(requestId);
+    container.set(LoggerRepository, new LoggerRepository(requestId));
 
-    const ctx = createInnerContext(loggerService);
+    const scheduleService = container.get(ScheduleService);
 
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 
-    const pngBuffer = await ctx.scheduleService.getScheduleBuffer(parsedData.data);
+    const pngBuffer = await scheduleService.getScheduleBuffer(parsedData.data);
 
     if (!pngBuffer) {
         res.status(400).end();

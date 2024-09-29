@@ -1,5 +1,7 @@
 import { type Prisma, prisma } from "@/database";
+import { Service } from "typedi";
 
+@Service()
 export class UserRepository {
     findMany<T extends Prisma.UserFindManyArgs, Result extends Array<Prisma.UserGetPayload<T>>>(args?: T) {
         return prisma.user.findMany(args) as Promise<Result>;

@@ -1,8 +1,9 @@
 import type { z } from "zod";
 import type { deviceSchema, deviceCreateSchema, deviceUpdateSchema, deviceListSchema } from "@/server/schema/device";
-import type { DeviceRepository } from "@/server/repositories/device/device.repository";
 import { type Device } from "@/database";
-import type { LoggerService } from "./logger.service";
+import { Service } from "typedi";
+import { DeviceRepository } from "../repositories/device.repository";
+import { LoggerRepository } from "../repositories/logger.repository";
 
 const defaultColumns = {
     id: true,
@@ -13,19 +14,12 @@ const defaultColumns = {
     [K in keyof Device]?: boolean;
 };
 
-export type DeviceServiceDependencies = {
-    logger: LoggerService;
-    deviceRepository: DeviceRepository;
-};
-
+@Service()
 export class DeviceService {
-    private logger: LoggerService;
-    private deviceRepository: DeviceRepository;
-
-    constructor(dependencies: DeviceServiceDependencies) {
-        this.logger = dependencies.logger;
-        this.deviceRepository = dependencies.deviceRepository;
-    }
+    constructor(
+        private readonly logger: LoggerRepository,
+        private readonly deviceRepository: DeviceRepository,
+    ) {}
 
     async list({ page, limit }: z.infer<typeof deviceListSchema>) {
         const skip = (page - 1) * limit;

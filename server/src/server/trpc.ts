@@ -1,6 +1,7 @@
 import { TRPCError, initTRPC } from "@trpc/server";
 import { transformer } from "@/utils/transformer";
 import type { Context } from "./context";
+import { LoggerRepository } from "./repositories/logger.repository";
 
 const t = initTRPC.context<Context>().create({
     transformer,
@@ -21,7 +22,7 @@ export const authedProcedure = t.procedure.use(function isAuthed(opts) {
     const user = opts.ctx.session?.user;
 
     if (!user) {
-        opts.ctx.logger.error("Unauthorized access");
+        opts.ctx.container.get(LoggerRepository).error("Unauthorized access");
 
         throw new TRPCError({ code: "UNAUTHORIZED" });
     }
