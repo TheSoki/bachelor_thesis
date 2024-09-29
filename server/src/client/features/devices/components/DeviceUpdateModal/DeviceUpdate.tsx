@@ -1,4 +1,3 @@
-import { FullscreenError } from "@/client/components/FullscreenError";
 import { trpc } from "@/utils/trpc";
 import { Skeleton } from "@/client/shadcn/ui/skeleton";
 import { DeviceUpdateForm } from "./DeviceUpdateForm";
@@ -13,7 +12,10 @@ export const DeviceUpdate = ({ id, onUpdate }: DeviceUpdateProps) => {
 
     if (deviceQuery.error) {
         return (
-            <FullscreenError title={deviceQuery.error.message} statusCode={deviceQuery.error.data?.httpStatus ?? 500} />
+            <div className="text-center">
+                <h2 className="text-5xl font-bold">{deviceQuery.error.data?.httpStatus ?? 500}</h2>
+                <h3 className="mb-4 text-xl font-bold">{deviceQuery.error.message}</h3>
+            </div>
         );
     }
 

@@ -65,7 +65,7 @@ export class DeviceService {
         const { id } = input;
         try {
             const device = await this.deviceRepository.findFirst({
-                id,
+                where: { id },
                 select: defaultColumns,
             });
 

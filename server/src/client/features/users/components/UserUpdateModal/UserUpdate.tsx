@@ -1,4 +1,3 @@
-import { FullscreenError } from "@/client/components/FullscreenError";
 import { trpc } from "@/utils/trpc";
 import { Skeleton } from "@/client/shadcn/ui/skeleton";
 import { UserUpdateForm } from "./UserUpdateForm";
@@ -12,7 +11,12 @@ export const UserUpdate = ({ id, onUpdate }: UserUpdateProps) => {
     const userQuery = trpc.user.getById.useQuery({ id });
 
     if (userQuery.error) {
-        return <FullscreenError title={userQuery.error.message} statusCode={userQuery.error.data?.httpStatus ?? 500} />;
+        return (
+            <div className="text-center">
+                <h2 className="text-5xl font-bold">{userQuery.error.data?.httpStatus ?? 500}</h2>
+                <h3 className="mb-4 text-xl font-bold">{userQuery.error.message}</h3>
+            </div>
+        );
     }
 
     if (userQuery.status !== "success") {

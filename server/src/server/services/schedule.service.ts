@@ -105,8 +105,6 @@ export class ScheduleService {
                 select: {
                     buildingId: true,
                     roomId: true,
-                    displayHeight: true,
-                    displayWidth: true,
                     token: true,
                 },
             });
