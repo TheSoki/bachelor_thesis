@@ -1,4 +1,4 @@
-import { Prisma, prisma } from "@/database";
+import { type Prisma, prisma } from "@/database";
 
 export class DeviceRepository {
     findMany<T extends Prisma.DeviceFindManyArgs, Result extends Array<Prisma.DeviceGetPayload<T>>>(args?: T) {
@@ -27,5 +27,9 @@ export class DeviceRepository {
 
     delete<T extends Prisma.DeviceDeleteArgs, Result extends Prisma.DeviceGetPayload<T>>(args: T) {
         return prisma.device.delete(args) as Promise<Result>;
+    }
+
+    searchList<T extends Prisma.DeviceFindManyArgs, Result extends Array<Prisma.DeviceGetPayload<T>>>(args: T) {
+        return prisma.$transaction([prisma.device.findMany(args), prisma.device.count()]) as Promise<[Result, number]>;
     }
 }

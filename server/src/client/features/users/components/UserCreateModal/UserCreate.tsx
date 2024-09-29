@@ -1,5 +1,5 @@
 import { trpc } from "@/utils/trpc";
-import { createUserSchema } from "@/server/schema/user";
+import { userCreateSchema } from "@/server/schema/user";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +9,7 @@ import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
 import { useCallback } from "react";
 
-type ValidationSchema = z.infer<typeof createUserSchema>;
+type ValidationSchema = z.infer<typeof userCreateSchema>;
 
 type UserCreateProps = {
     onCreate: () => void;
@@ -30,7 +30,7 @@ export const UserCreate = ({ onCreate }: UserCreateProps) => {
         formState: { errors, isSubmitting, isDirty },
         reset,
     } = useForm<ValidationSchema>({
-        resolver: zodResolver(createUserSchema),
+        resolver: zodResolver(userCreateSchema),
         defaultValues: {
             name: "",
             email: "",

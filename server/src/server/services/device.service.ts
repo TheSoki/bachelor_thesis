@@ -1,7 +1,7 @@
 import type { z } from "zod";
 import type { deviceSchema, deviceCreateSchema, deviceUpdateSchema, deviceListSchema } from "@/server/schema/device";
 import type { DeviceRepository } from "@/server/repositories/device/device.repository";
-import type { Device } from "@/database";
+import { type Device } from "@/database";
 import type { LoggerService } from "./logger.service";
 
 const limit = 10 as const;
@@ -33,16 +33,20 @@ export class DeviceService {
         const skip = (input.page - 1) * limit;
 
         try {
-            const list = await this.deviceRepository.findMany({
+            const [list, totalCount] = await this.deviceRepository.searchList({
                 take: limit,
                 skip,
                 select: {
                     ...defaultColumns,
                     lastSeen: true,
-                    author: { select: { name: true } },
+                    author: {
+                        select: {
+                            name: true,
+                        },
+                    },
                 },
             });
-            const totalCount = await this.deviceRepository.count();
+
             const totalPages = Math.ceil(totalCount / limit);
 
             return {

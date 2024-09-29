@@ -1,5 +1,5 @@
 import { trpc, type RouterOutput } from "@/utils/trpc";
-import { updateDeviceSchema } from "@/server/schema/device";
+import { deviceUpdateSchema } from "@/server/schema/device";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +9,7 @@ import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
 import { useCallback, useMemo } from "react";
 
-type ValidationSchema = z.infer<typeof updateDeviceSchema>;
+type ValidationSchema = z.infer<typeof deviceUpdateSchema>;
 
 type DeviceByIdOutput = RouterOutput["device"]["getById"];
 
@@ -32,7 +32,7 @@ export const DeviceUpdateForm = ({ device, onUpdate }: DeviceUpdateFormProps) =>
         handleSubmit,
         formState: { errors, isSubmitting, isDirty },
     } = useForm<ValidationSchema>({
-        resolver: zodResolver(updateDeviceSchema),
+        resolver: zodResolver(deviceUpdateSchema),
         defaultValues: useMemo(
             () => ({
                 id: device.id,

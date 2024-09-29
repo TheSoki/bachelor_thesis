@@ -35,12 +35,12 @@ export class UserService {
         const skip = (input.page - 1) * limit;
 
         try {
-            const list = await this.userRepository.findMany({
+            const [list, totalCount] = await this.userRepository.searchList({
                 take: limit,
                 skip,
                 select: defaultColumns,
             });
-            const totalCount = await this.userRepository.count();
+
             const totalPages = Math.ceil(totalCount / limit);
 
             return {
@@ -116,10 +116,10 @@ export class UserService {
         const { id } = input;
 
         try {
-            await prisma.$transaction(async (trx) => {
-                await trx.device.deleteMany({ where: { authorId: id } });
-                await trx.user.delete({ where: { id } });
-            });
+            await prisma.$transaction([
+                prisma.device.deleteMany({ where: { authorId: id } }),
+                prisma.user.delete({ where: { id } }),
+            ]);
         } catch (e) {
             this.logger.error(`Error deleting user with id '${id}': ${e}`);
 

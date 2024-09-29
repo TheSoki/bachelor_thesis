@@ -1,5 +1,5 @@
 import { trpc, type RouterOutput } from "@/utils/trpc";
-import { updateUserSchema } from "@/server/schema/user";
+import { userUpdateSchema } from "@/server/schema/user";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,7 @@ import clsx from "clsx";
 import { useCallback, useMemo } from "react";
 import { useAuth } from "@/client/hooks/useAuth";
 
-type ValidationSchema = z.infer<typeof updateUserSchema>;
+type ValidationSchema = z.infer<typeof userUpdateSchema>;
 
 type UserByIdOutput = RouterOutput["user"]["getById"];
 
@@ -34,7 +34,7 @@ export const UserUpdateForm = ({ user, onUpdate }: UserUpdateFormProps) => {
         handleSubmit,
         formState: { errors, isSubmitting, isDirty },
     } = useForm<ValidationSchema>({
-        resolver: zodResolver(updateUserSchema),
+        resolver: zodResolver(userUpdateSchema),
         defaultValues: useMemo(
             () => ({
                 id: user.id,

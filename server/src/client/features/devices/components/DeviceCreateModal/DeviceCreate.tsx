@@ -1,5 +1,5 @@
 import { trpc } from "@/utils/trpc";
-import { createDeviceSchema } from "@/server/schema/device";
+import { deviceCreateSchema } from "@/server/schema/device";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +9,7 @@ import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
 import { useCallback } from "react";
 
-type ValidationSchema = z.infer<typeof createDeviceSchema>;
+type ValidationSchema = z.infer<typeof deviceCreateSchema>;
 
 type DeviceCreateProps = {
     onCreate: () => void;
@@ -30,7 +30,7 @@ export const DeviceCreate = ({ onCreate }: DeviceCreateProps) => {
         formState: { errors, isSubmitting, isDirty },
         reset,
     } = useForm<ValidationSchema>({
-        resolver: zodResolver(createDeviceSchema),
+        resolver: zodResolver(deviceCreateSchema),
         defaultValues: {
             buildingId: "",
             roomId: "",

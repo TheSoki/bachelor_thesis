@@ -1,4 +1,4 @@
-import { Prisma, prisma } from "@/database";
+import { type Prisma, prisma } from "@/database";
 
 export class UserRepository {
     findMany<T extends Prisma.UserFindManyArgs, Result extends Array<Prisma.UserGetPayload<T>>>(args?: T) {
@@ -27,5 +27,9 @@ export class UserRepository {
 
     delete<T extends Prisma.UserDeleteArgs, Result extends Prisma.UserGetPayload<T>>(args: T) {
         return prisma.user.delete(args) as Promise<Result>;
+    }
+
+    searchList<T extends Prisma.UserFindManyArgs, Result extends Array<Prisma.UserGetPayload<T>>>(args: T) {
+        return prisma.$transaction([prisma.user.findMany(args), prisma.user.count()]) as Promise<[Result, number]>;
     }
 }
