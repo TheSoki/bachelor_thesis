@@ -1,9 +1,7 @@
-import type { InnerContext } from "@/server/context";
-import type { Prisma } from "@/database";
+import type { PrismaClient } from "@/database";
 
 export {};
 
 declare global {
-    var innerCtx: InnerContext | undefined;
-    var db: Prisma | undefined;
+    var prisma: PrismaClient | undefined;
 }

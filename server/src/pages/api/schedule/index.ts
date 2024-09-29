@@ -1,5 +1,6 @@
 import { createInnerContext } from "@/server/context";
 import { scheduleSchema } from "@/server/schema/schedule";
+import { LoggerService } from "@/server/services/logger.service";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Buffer>) {
@@ -22,16 +23,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return;
     }
 
-    let innerCtx = globalThis.innerCtx;
+    const requestId = `device:${parsedData.data.id}`;
+    const loggerService = new LoggerService(requestId);
 
-    if (!innerCtx || process.env.NODE_ENV === "development") {
-        innerCtx = createInnerContext();
-        globalThis.innerCtx = innerCtx;
-    }
+    const ctx = createInnerContext(loggerService);
 
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 
-    const pngBuffer = await innerCtx.scheduleService.getScheduleBuffer(parsedData.data);
+    const pngBuffer = await ctx.scheduleService.getScheduleBuffer(parsedData.data);
 
     if (!pngBuffer) {
         res.status(400).end();

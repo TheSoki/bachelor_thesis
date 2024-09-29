@@ -1,12 +1,10 @@
 import type { UserRepository } from "@/server/repositories/user/user.repository";
-import { BaseService, type BaseServiceDependencies } from "../base/base.service";
 import type { z } from "zod";
-import type { paginationSchema } from "@/server/schema/general";
-import type { createUserSchema, updateUserSchema, userSchema } from "@/server/schema/user";
+import type { userSchema, userCreateSchema, userUpdateSchema, userListSchema } from "@/server/schema/user";
 import { hash } from "bcrypt";
 import { serverEnv } from "@/env/server";
-import type { DeviceRepository } from "@/server/repositories/device/device.repository";
 import { prisma, type User } from "@/database";
+import type { LoggerService } from "./logger.service";
 
 const limit = 10 as const;
 
@@ -20,20 +18,20 @@ export const defaultColumns = {
 };
 
 export type UserServiceDependencies = {
+    logger: LoggerService;
     userRepository: UserRepository;
-    deviceRepository: DeviceRepository;
-} & BaseServiceDependencies;
+};
 
-export class UserService extends BaseService {
+export class UserService {
+    private logger: LoggerService;
     private userRepository: UserRepository;
 
     constructor(dependencies: UserServiceDependencies) {
-        super(dependencies);
-
+        this.logger = dependencies.logger;
         this.userRepository = dependencies.userRepository;
     }
 
-    async list(input: z.infer<typeof paginationSchema>) {
+    async list(input: z.infer<typeof userListSchema>) {
         const skip = (input.page - 1) * limit;
 
         try {
@@ -77,7 +75,7 @@ export class UserService extends BaseService {
         }
     }
 
-    async create(input: z.infer<typeof createUserSchema>) {
+    async create(input: z.infer<typeof userCreateSchema>) {
         const { email, name, password } = input;
 
         try {
@@ -93,7 +91,7 @@ export class UserService extends BaseService {
         }
     }
 
-    async update(input: z.infer<typeof updateUserSchema>) {
+    async update(input: z.infer<typeof userUpdateSchema>) {
         const { id, email, name, password } = input;
 
         try {

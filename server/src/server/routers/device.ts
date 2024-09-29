@@ -1,10 +1,9 @@
 import { router, authedProcedure } from "../trpc";
-import { paginationSchema } from "../schema/general";
-import { deviceSchema, createDeviceSchema, updateDeviceSchema } from "../schema/device";
+import { deviceSchema, deviceCreateSchema, deviceUpdateSchema, deviceListSchema } from "../schema/device";
 import { TRPCError } from "@trpc/server";
 
 export const deviceRouter = router({
-    list: authedProcedure.input(paginationSchema).query(async ({ ctx, input }) => {
+    list: authedProcedure.input(deviceListSchema).query(async ({ ctx, input }) => {
         try {
             return ctx.deviceService.list(input);
         } catch (e) {
@@ -24,7 +23,7 @@ export const deviceRouter = router({
             });
         }
     }),
-    create: authedProcedure.input(createDeviceSchema).mutation(async ({ ctx, input }) => {
+    create: authedProcedure.input(deviceCreateSchema).mutation(async ({ ctx, input }) => {
         try {
             return ctx.deviceService.create(input, ctx.user.id);
         } catch (e) {
@@ -34,7 +33,7 @@ export const deviceRouter = router({
             });
         }
     }),
-    update: authedProcedure.input(updateDeviceSchema).mutation(async ({ ctx, input }) => {
+    update: authedProcedure.input(deviceUpdateSchema).mutation(async ({ ctx, input }) => {
         try {
             return ctx.deviceService.update(input);
         } catch (e) {

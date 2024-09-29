@@ -1,9 +1,8 @@
-import { BaseService, type BaseServiceDependencies } from "../base/base.service";
 import type { z } from "zod";
-import type { paginationSchema } from "@/server/schema/general";
-import type { createDeviceSchema, updateDeviceSchema, deviceSchema } from "@/server/schema/device";
+import type { deviceSchema, deviceCreateSchema, deviceUpdateSchema, deviceListSchema } from "@/server/schema/device";
 import type { DeviceRepository } from "@/server/repositories/device/device.repository";
 import type { Device } from "@/database";
+import type { LoggerService } from "./logger.service";
 
 const limit = 10 as const;
 
@@ -17,19 +16,20 @@ const defaultColumns = {
 };
 
 export type DeviceServiceDependencies = {
+    logger: LoggerService;
     deviceRepository: DeviceRepository;
-} & BaseServiceDependencies;
+};
 
-export class DeviceService extends BaseService {
+export class DeviceService {
+    private logger: LoggerService;
     private deviceRepository: DeviceRepository;
 
     constructor(dependencies: DeviceServiceDependencies) {
-        super(dependencies);
-
+        this.logger = dependencies.logger;
         this.deviceRepository = dependencies.deviceRepository;
     }
 
-    async list(input: z.infer<typeof paginationSchema>) {
+    async list(input: z.infer<typeof deviceListSchema>) {
         const skip = (input.page - 1) * limit;
 
         try {
@@ -77,7 +77,7 @@ export class DeviceService extends BaseService {
         }
     }
 
-    async create(input: z.infer<typeof createDeviceSchema>, userId: string): Promise<void> {
+    async create(input: z.infer<typeof deviceCreateSchema>, userId: string): Promise<void> {
         const { buildingId, roomId } = input;
 
         try {
@@ -95,7 +95,7 @@ export class DeviceService extends BaseService {
         }
     }
 
-    async update(input: z.infer<typeof updateDeviceSchema>): Promise<void> {
+    async update(input: z.infer<typeof deviceUpdateSchema>): Promise<void> {
         const { id, buildingId, roomId } = input;
 
         try {

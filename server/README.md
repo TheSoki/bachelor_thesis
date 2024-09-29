@@ -58,6 +58,36 @@ Now you can run the app.
 pnpm run dev
 ```
 
+### Add Components
+
+We use [shadcn-ui](https://ui.shadcn.com) as our styling framework. This command will create a basic `button` that you can later edit at `/src/client/shadcn/ui/button.tsx`.
+
+```bash
+npx shadcn@latest add button
+```
+
+A list of all components can be found [here](https://ui.shadcn.com/docs/components/button).
+
+### Static Code Analysis
+
+Check by running:
+
+```bash
+pnpm run integrate
+```
+
+### Formatting
+
+To format, either set "Format on Save" in VSCode or run:
+
+```bash
+pnpm run format
+```
+
+### Environment Variables
+
+To add environment variables, add them to `.env.example` file with values that will work for local development.
+
 ## Production
 
 Run docker-compose.

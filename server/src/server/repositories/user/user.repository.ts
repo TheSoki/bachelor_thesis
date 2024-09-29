@@ -1,7 +1,6 @@
 import { Prisma, prisma } from "@/database";
-import { BaseRepository } from "../base/base.repository";
 
-export class UserRepository extends BaseRepository {
+export class UserRepository {
     findMany<T extends Prisma.UserFindManyArgs, Result extends Array<Prisma.UserGetPayload<T>>>(args?: T) {
         return prisma.user.findMany(args) as Promise<Result>;
     }

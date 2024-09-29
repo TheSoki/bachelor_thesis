@@ -1,16 +1,17 @@
 import { z } from "zod";
+import { paginationSchema } from "./general";
 
 export const userSchema = z.object({
     id: z.string(),
 });
 
-export const createUserSchema = z.object({
+export const userCreateSchema = z.object({
     name: z.string().min(3).max(255),
     email: z.string().email().min(3).max(255),
     password: z.string().min(3).max(255),
 });
 
-export const updateUserSchema = z.object({
+export const userUpdateSchema = z.object({
     id: z.string(),
     name: z.string().min(3).max(255),
     email: z.string().email().min(3).max(255),
@@ -32,6 +33,8 @@ export const updateUserSchema = z.object({
             },
         ),
 });
+
+export const userListSchema = paginationSchema;
 
 export const registerSchema = z.object({
     email: z.string().email().min(3).max(255),

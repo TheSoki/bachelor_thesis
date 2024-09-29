@@ -3,46 +3,41 @@ import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { getServerSession } from "next-auth/next";
 import { UserRepository } from "./repositories/user/user.repository";
 import { DeviceRepository } from "./repositories/device/device.repository";
-import { UserService } from "./services/user/user.service";
-import { DeviceService } from "./services/device/device.service";
+import { UserService } from "./services/user.service";
+import { DeviceService } from "./services/device.service";
 import type { Session } from "next-auth";
-import { initLogger, type Logger } from "./logger";
-import { ScheduleService } from "./services/schedule/schedule.service";
-import { prisma } from "@/database";
+import { ScheduleService } from "./services/schedule.service";
+import { LoggerService } from "./services/logger.service";
 
-export const createInnerContext = (): InnerContext => {
-    const logger = initLogger();
+export const createInnerContext = (logger: LoggerService): InnerContext => {
+    const userRepository = new UserRepository();
+    const deviceRepository = new DeviceRepository();
 
-    const userRepository = new UserRepository({ prisma, logger });
-    const deviceRepository = new DeviceRepository({ prisma, logger });
-
-    const userService = new UserService({ logger, userRepository, deviceRepository });
+    const userService = new UserService({ logger, userRepository });
     const deviceService = new DeviceService({ logger, deviceRepository });
     const scheduleService = new ScheduleService({ logger, deviceRepository });
 
-    return { logger, userService, deviceService, scheduleService };
+    return { userService, deviceService, scheduleService };
 };
 
 export type InnerContext = {
-    logger: Logger;
     userService: UserService;
     deviceService: DeviceService;
     scheduleService: ScheduleService;
 };
 
 export const createContext = async (opts: CreateNextContextOptions): Promise<Context> => {
-    let innerCtx = globalThis.innerCtx;
-
-    if (!innerCtx || process.env.NODE_ENV === "development") {
-        innerCtx = createInnerContext();
-        globalThis.innerCtx = innerCtx;
-    }
-
-    const { logger, userService, deviceService, scheduleService } = innerCtx;
     const session = await getServerSession(opts.req, opts.res, authOptions);
 
+    const sessionId = session?.user.id ? `user:${session.user.id}` : "anonymous";
+    const loggerService = new LoggerService(sessionId);
+
+    const ctx = createInnerContext(loggerService);
+
+    const { userService, deviceService, scheduleService } = ctx;
+
     return {
-        logger,
+        logger: loggerService,
         userService,
         deviceService,
         scheduleService,
@@ -51,5 +46,6 @@ export const createContext = async (opts: CreateNextContextOptions): Promise<Con
 };
 
 export type Context = InnerContext & {
+    logger: LoggerService;
     session: Session | null;
 };

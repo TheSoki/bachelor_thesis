@@ -1,7 +1,6 @@
 import { Prisma, prisma } from "@/database";
-import { BaseRepository } from "../base/base.repository";
 
-export class DeviceRepository extends BaseRepository {
+export class DeviceRepository {
     findMany<T extends Prisma.DeviceFindManyArgs, Result extends Array<Prisma.DeviceGetPayload<T>>>(args?: T) {
         return prisma.device.findMany(args) as Promise<Result>;
     }

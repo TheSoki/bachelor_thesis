@@ -1,13 +1,14 @@
 import { serverEnv } from "@/env/server";
-import { BaseService, type BaseServiceDependencies } from "../base/base.service";
 import type { DeviceRepository } from "@/server/repositories/device/device.repository";
 import puppeteer from "puppeteer";
 import { parseString } from "xml2js";
 import { z } from "zod";
+import type { LoggerService } from "./logger.service";
 
 export type ScheduleServiceDependencies = {
+    logger: LoggerService;
     deviceRepository: DeviceRepository;
-} & BaseServiceDependencies;
+};
 
 interface ScheduleEvent {
     name: string;
@@ -50,12 +51,12 @@ const eventSchema = z.object({
     dayOfWeek: z.string().regex(/^(Ne|Po|Út|St|Čt|Pá|So)$/),
 });
 
-export class ScheduleService extends BaseService {
+export class ScheduleService {
+    private logger: LoggerService;
     private deviceRepository: DeviceRepository;
 
     constructor(dependencies: ScheduleServiceDependencies) {
-        super(dependencies);
-
+        this.logger = dependencies.logger;
         this.deviceRepository = dependencies.deviceRepository;
     }
 
