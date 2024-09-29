@@ -7,7 +7,7 @@ import { UserDeleteModal } from "@/client/features/users/components/UserDeleteMo
 import { UserList } from "@/client/features/users/components/UserList";
 import { UserUpdateModal } from "@/client/features/users/components/UserUpdateModal";
 import { UsersPageURLParams } from "@/client/features/devices/types/devicesPageURLParams";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 const schema = z.object({
     [UsersPageURLParams.PAGE]: z
@@ -15,19 +15,35 @@ const schema = z.object({
         .transform(Number)
         .default("1")
         .transform((value) => (value > 0 ? value : 1)),
+    [UsersPageURLParams.LIMIT]: z
+        .string()
+        .transform(Number)
+        .default("10")
+        .transform((value) => (value > 0 ? value : 10)),
 });
 
 const UsersPage: NextPageWithLayout = () => {
-    const { urlState } = useURLParams(schema);
+    const { urlState, setURLParams } = useURLParams(schema);
 
     const nextPageHref = useMemo(() => {
         if (!urlState.value?.page) return "/users";
-        return `/users?page=${urlState.value.page + 1}`;
-    }, [urlState.value?.page]);
+        return `/users?${UsersPageURLParams.PAGE}=${urlState.value.page + 1}&${UsersPageURLParams.LIMIT}=${urlState.value.limit}`;
+    }, [urlState.value?.limit, urlState.value?.page]);
+
     const prevPageHref = useMemo(() => {
         if (!urlState.value?.page) return "/users";
-        return `/users?page=${urlState.value.page - 1}`;
-    }, [urlState.value?.page]);
+        return `/users?${UsersPageURLParams.PAGE}=${urlState.value.page - 1}&${UsersPageURLParams.LIMIT}=${urlState.value.limit}`;
+    }, [urlState.value?.limit, urlState.value?.page]);
+
+    const onSelectLimit = useCallback(
+        (limit: number) => {
+            setURLParams({
+                [UsersPageURLParams.LIMIT]: limit,
+                [UsersPageURLParams.PAGE]: 1,
+            });
+        },
+        [setURLParams],
+    );
 
     if (urlState.loading) {
         return <></>;
@@ -39,7 +55,14 @@ const UsersPage: NextPageWithLayout = () => {
 
     return (
         <>
-            <UserList page={urlState.value.page} nextPageHref={nextPageHref} prevPageHref={prevPageHref} />
+            <UserList
+                page={urlState.value.page}
+                limit={urlState.value.limit}
+                nextPageHref={nextPageHref}
+                prevPageHref={prevPageHref}
+                onSelectLimit={onSelectLimit}
+            />
+
             <UserDeleteModal />
             <UserCreateModal />
             <UserUpdateModal />

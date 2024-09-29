@@ -4,8 +4,6 @@ import type { DeviceRepository } from "@/server/repositories/device/device.repos
 import { type Device } from "@/database";
 import type { LoggerService } from "./logger.service";
 
-const limit = 10 as const;
-
 const defaultColumns = {
     id: true,
     createdAt: true,
@@ -29,8 +27,8 @@ export class DeviceService {
         this.deviceRepository = dependencies.deviceRepository;
     }
 
-    async list(input: z.infer<typeof deviceListSchema>) {
-        const skip = (input.page - 1) * limit;
+    async list({ page, limit }: z.infer<typeof deviceListSchema>) {
+        const skip = (page - 1) * limit;
 
         try {
             const [list, totalCount] = await this.deviceRepository.searchList({

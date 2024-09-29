@@ -18,16 +18,19 @@ import { useDeviceCreateModalStore } from "../../hooks/useDeviceCreateModalStore
 import { useDeviceDeleteModalStore } from "../../hooks/useDeviceDeleteModalStore";
 import { useDeviceUpdateModalStore } from "../../hooks/useDeviceUpdateModalStore";
 import { DeviceListCopyIcon } from "./DeviceListCopyIcon";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/client/shadcn/ui/select";
 
 type DeviceListProps = {
     page: number;
+    limit: number;
     nextPageHref: string;
     prevPageHref: string;
+    onSelectLimit: (limit: number) => void;
 };
 
-export const DeviceList = ({ page, nextPageHref, prevPageHref }: DeviceListProps) => {
+export const DeviceList = ({ page, limit, nextPageHref, prevPageHref, onSelectLimit }: DeviceListProps) => {
     const utils = trpc.useUtils();
-    const deviceQuery = trpc.device.list.useQuery({ page });
+    const deviceQuery = trpc.device.list.useQuery({ page, limit });
     const setDeviceIdToDelete = useDeviceDeleteModalStore((state) => state.setDeviceId);
     const setDeviceIdToUpdate = useDeviceUpdateModalStore((state) => state.setDeviceId);
     const openCreateDeviceModal = useDeviceCreateModalStore((state) => state.setIsOpen);
@@ -155,12 +158,25 @@ export const DeviceList = ({ page, nextPageHref, prevPageHref }: DeviceListProps
                     <PaginationItem>
                         <PaginationNext
                             href={nextPageHref}
-                            className={clsx({ "pointer-events-none opacity-50": page === totalPages })}
+                            className={clsx({ "pointer-events-none opacity-50": page >= totalPages })}
                             replace
                         />
                     </PaginationItem>
                 </PaginationContent>
             </Pagination>
+
+            <div className="mt-4 flex w-full items-center justify-end">
+                <Select onValueChange={(value: string) => onSelectLimit(Number(value))} value={limit.toString()}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Items per page" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="10">10 per page</SelectItem>
+                        <SelectItem value="25">25 per page</SelectItem>
+                        <SelectItem value="50">50 per page</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
     );
 };

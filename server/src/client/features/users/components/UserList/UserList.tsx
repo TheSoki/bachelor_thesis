@@ -16,15 +16,18 @@ import { Button } from "@/client/shadcn/ui/button";
 import { useUserCreateModalStore } from "../../hooks/useUserCreateModalStore";
 import { useUserDeleteModalStore } from "../../hooks/useUserDeleteModalStore";
 import { useUserUpdateModalStore } from "../../hooks/useUserUpdateModalStore";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/client/shadcn/ui/select";
 
 type UserListProps = {
     page: number;
+    limit: number;
     nextPageHref: string;
     prevPageHref: string;
+    onSelectLimit: (limit: number) => void;
 };
 
-export const UserList = ({ page, nextPageHref, prevPageHref }: UserListProps) => {
-    const userQuery = trpc.user.list.useQuery({ page });
+export const UserList = ({ page, limit, nextPageHref, prevPageHref, onSelectLimit }: UserListProps) => {
+    const userQuery = trpc.user.list.useQuery({ page, limit });
     const setUserIdToDelete = useUserDeleteModalStore((state) => state.setUserId);
     const setUserIdToUpdate = useUserUpdateModalStore((state) => state.setUserId);
     const openCreateUserModal = useUserCreateModalStore((state) => state.setIsOpen);
@@ -112,12 +115,25 @@ export const UserList = ({ page, nextPageHref, prevPageHref }: UserListProps) =>
                     <PaginationItem>
                         <PaginationNext
                             href={nextPageHref}
-                            className={clsx({ "pointer-events-none opacity-50": page === totalPages })}
+                            className={clsx({ "pointer-events-none opacity-50": page >= totalPages })}
                             replace
                         />
                     </PaginationItem>
                 </PaginationContent>
             </Pagination>
+
+            <div className="mt-4 flex w-full items-center justify-end">
+                <Select onValueChange={(value: string) => onSelectLimit(Number(value))} value={limit.toString()}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Items per page" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="10">10 per page</SelectItem>
+                        <SelectItem value="25">25 per page</SelectItem>
+                        <SelectItem value="50">50 per page</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
     );
 };

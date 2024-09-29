@@ -6,8 +6,6 @@ import { serverEnv } from "@/env/server";
 import { prisma, type User } from "@/database";
 import type { LoggerService } from "./logger.service";
 
-const limit = 10 as const;
-
 export const defaultColumns = {
     id: true,
     createdAt: true,
@@ -31,8 +29,8 @@ export class UserService {
         this.userRepository = dependencies.userRepository;
     }
 
-    async list(input: z.infer<typeof userListSchema>) {
-        const skip = (input.page - 1) * limit;
+    async list({ page, limit }: z.infer<typeof userListSchema>) {
+        const skip = (page - 1) * limit;
 
         try {
             const [list, totalCount] = await this.userRepository.searchList({

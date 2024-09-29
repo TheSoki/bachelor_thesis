@@ -7,7 +7,7 @@ import { DeviceDeleteModal } from "@/client/features/devices/components/DeviceDe
 import { DeviceList } from "@/client/features/devices/components/DeviceList";
 import { DeviceUpdateModal } from "@/client/features/devices/components/DeviceUpdateModal";
 import { DevicesPageURLParams } from "@/client/features/users/types/usersPageURLParams";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 const schema = z.object({
     [DevicesPageURLParams.PAGE]: z
@@ -15,19 +15,35 @@ const schema = z.object({
         .transform(Number)
         .default("1")
         .transform((value) => (value > 0 ? value : 1)),
+    [DevicesPageURLParams.LIMIT]: z
+        .string()
+        .transform(Number)
+        .default("10")
+        .transform((value) => (value > 0 ? value : 10)),
 });
 
 const DevicesPage: NextPageWithLayout = () => {
-    const { urlState } = useURLParams(schema);
+    const { urlState, setURLParams } = useURLParams(schema);
 
     const nextPageHref = useMemo(() => {
         if (!urlState.value?.page) return "/devices";
-        return `/devices?page=${urlState.value.page + 1}`;
-    }, [urlState.value?.page]);
+        return `/devices?${DevicesPageURLParams.PAGE}=${urlState.value.page + 1}&${DevicesPageURLParams.LIMIT}=${urlState.value.limit}`;
+    }, [urlState.value?.limit, urlState.value?.page]);
+
     const prevPageHref = useMemo(() => {
         if (!urlState.value?.page) return "/devices";
-        return `/devices?page=${urlState.value.page - 1}`;
-    }, [urlState.value?.page]);
+        return `/devices?${DevicesPageURLParams.PAGE}=${urlState.value.page - 1}&${DevicesPageURLParams.LIMIT}=${urlState.value.limit}`;
+    }, [urlState.value?.limit, urlState.value?.page]);
+
+    const onSelectLimit = useCallback(
+        (limit: number) => {
+            setURLParams({
+                [DevicesPageURLParams.LIMIT]: limit,
+                [DevicesPageURLParams.PAGE]: 1,
+            });
+        },
+        [setURLParams],
+    );
 
     if (urlState.loading) {
         return <></>;
@@ -39,7 +55,13 @@ const DevicesPage: NextPageWithLayout = () => {
 
     return (
         <>
-            <DeviceList page={urlState.value.page} nextPageHref={nextPageHref} prevPageHref={prevPageHref} />
+            <DeviceList
+                page={urlState.value.page}
+                limit={urlState.value.limit}
+                nextPageHref={nextPageHref}
+                prevPageHref={prevPageHref}
+                onSelectLimit={onSelectLimit}
+            />
             <DeviceDeleteModal />
             <DeviceCreateModal />
             <DeviceUpdateModal />
