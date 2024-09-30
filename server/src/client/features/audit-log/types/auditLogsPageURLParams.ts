@@ -1,4 +1,4 @@
-export enum DevicesPageURLParams {
+export enum AuditLogsPageURLParams {
     PAGE = "page",
     LIMIT = "limit",
 }

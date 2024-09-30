@@ -2,7 +2,7 @@ import type { z } from "zod";
 import type { userSchema, userCreateSchema, userUpdateSchema, userListSchema } from "@/server/schema/user";
 import { hash } from "bcrypt";
 import { serverEnv } from "@/env/server";
-import { prisma, type User } from "@/database";
+import { prisma, type User } from "@/server/database";
 import { Service } from "typedi";
 import { UserRepository } from "../repositories/user.repository";
 import { LoggerRepository } from "../repositories/logger.repository";

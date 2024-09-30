@@ -21,7 +21,7 @@ export const DeviceUpdateModal = () => {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Update User</DialogTitle>
+                    <DialogTitle>Update Device</DialogTitle>
                 </DialogHeader>
                 {deviceId && <DeviceUpdate id={deviceId} onUpdate={onUpdate} />}
             </DialogContent>

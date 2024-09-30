@@ -6,7 +6,7 @@ import { DeviceCreateModal } from "@/client/features/devices/components/DeviceCr
 import { DeviceDeleteModal } from "@/client/features/devices/components/DeviceDeleteModal";
 import { DeviceList } from "@/client/features/devices/components/DeviceList";
 import { DeviceUpdateModal } from "@/client/features/devices/components/DeviceUpdateModal";
-import { DevicesPageURLParams } from "@/client/features/users/types/usersPageURLParams";
+import { DevicesPageURLParams } from "@/client/features/devices/types/devicesPageURLParams";
 import { useCallback, useMemo } from "react";
 
 const schema = z.object({

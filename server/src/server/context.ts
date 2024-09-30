@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth/next";
 import type { Session } from "next-auth";
 import { Container, ContainerInstance } from "typedi";
 import { LoggerRepository } from "./repositories/logger.repository";
+import type { NextApiRequest, NextApiResponse } from "@trpc/server/adapters/next";
 
 export const createContext = async (opts: CreateNextContextOptions): Promise<Context> => {
     const session = await getServerSession(opts.req, opts.res, authOptions);
@@ -15,10 +16,14 @@ export const createContext = async (opts: CreateNextContextOptions): Promise<Con
     return {
         session,
         container,
+        req: opts.req,
+        res: opts.res,
     };
 };
 
 export type Context = {
     session: Session | null;
     container: ContainerInstance;
+    req: NextApiRequest;
+    res: NextApiResponse;
 };

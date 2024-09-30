@@ -1,4 +1,4 @@
-import { type Prisma, prisma } from "@/database";
+import { type Prisma, prisma } from "@/server/database";
 import { Service } from "typedi";
 
 @Service()

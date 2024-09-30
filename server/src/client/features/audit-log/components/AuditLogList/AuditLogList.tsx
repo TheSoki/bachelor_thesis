@@ -12,13 +12,9 @@ import {
 } from "@/client/shadcn/ui/pagination";
 import clsx from "clsx";
 import { match, P } from "ts-pattern";
-import { Button } from "@/client/shadcn/ui/button";
-import { useUserCreateModalStore } from "../../hooks/useUserCreateModalStore";
-import { useUserDeleteModalStore } from "../../hooks/useUserDeleteModalStore";
-import { useUserUpdateModalStore } from "../../hooks/useUserUpdateModalStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/client/shadcn/ui/select";
 
-type UserListProps = {
+type AuditLogListProps = {
     page: number;
     limit: number;
     nextPageHref: string;
@@ -26,71 +22,64 @@ type UserListProps = {
     onSelectLimit: (limit: number) => void;
 };
 
-export const UserList = ({ page, limit, nextPageHref, prevPageHref, onSelectLimit }: UserListProps) => {
-    const userQuery = trpc.user.list.useQuery({ page, limit });
-    const setUserIdToDelete = useUserDeleteModalStore((state) => state.setUserId);
-    const setUserIdToUpdate = useUserUpdateModalStore((state) => state.setUserId);
-    const openCreateUserModal = useUserCreateModalStore((state) => state.setIsOpen);
+export const AuditLogList = ({ page, limit, nextPageHref, prevPageHref, onSelectLimit }: AuditLogListProps) => {
+    const auditLogQuery = trpc.auditLog.list.useQuery({ page, limit });
 
-    if (userQuery.error) {
-        return <FullscreenError title={userQuery.error.message} statusCode={userQuery.error.data?.httpStatus ?? 500} />;
+    if (auditLogQuery.error) {
+        return (
+            <FullscreenError
+                title={auditLogQuery.error.message}
+                statusCode={auditLogQuery.error.data?.httpStatus ?? 500}
+            />
+        );
     }
 
-    if (userQuery.status === "pending") {
+    if (auditLogQuery.status === "pending") {
         return (
             <>
                 {[...Array(10)].map((_, i) => (
-                    <Skeleton className="mb-2 h-10" key={`user-table-skeleton-${i}`} />
+                    <Skeleton className="mb-2 h-10" key={`audit-log-table-skeleton-${i}`} />
                 ))}
             </>
         );
     }
 
-    const { list, totalPages, totalCount } = userQuery.data;
+    const { list, totalPages, totalCount } = auditLogQuery.data;
 
     return (
         <div className="py-8">
-            <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-3xl font-semibold">Users</h2>
-                <Button variant="secondary" onClick={() => openCreateUserModal(true)}>
-                    Create User
-                </Button>
-            </div>
             <Table>
                 <TableCaption>
                     {match(totalCount)
                         .with(
                             P.when((totalCount) => totalCount === 0),
-                            () => "No users",
+                            () => "No audit logs",
                         )
                         .with(
                             P.when((totalCount) => totalCount === 1),
-                            () => "One user",
+                            () => "One audit log",
                         )
-                        .otherwise(() => `${totalCount} users`)}
+                        .otherwise(() => `${totalCount} audit logs`)}
                 </TableCaption>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Created At</TableHead>
-                        <TableHead className="w-[150px] text-right">Action</TableHead>
+                        <TableHead>Index</TableHead>
+                        <TableHead>Timestamp</TableHead>
+                        <TableHead>Operation</TableHead>
+                        <TableHead>User ID</TableHead>
+                        <TableHead>User IP</TableHead>
+                        <TableHead>Error</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {list.map((user) => (
-                        <TableRow key={user.id}>
-                            <TableCell className="font-medium">{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.createdAt.toLocaleString("cs-CZ")}</TableCell>
-                            <TableCell className="flex items-center justify-end space-x-2">
-                                <Button variant="secondary" onClick={() => setUserIdToUpdate(user.id)}>
-                                    Update
-                                </Button>
-                                <Button variant="destructive" onClick={() => setUserIdToDelete(user.id)}>
-                                    Delete
-                                </Button>
-                            </TableCell>
+                    {list.map((auditLog) => (
+                        <TableRow key={auditLog.id}>
+                            <TableCell className="font-medium">{auditLog.index}</TableCell>
+                            <TableCell>{new Date(auditLog.timestamp).toLocaleString("cs-CZ")}</TableCell>
+                            <TableCell>{auditLog.operation}</TableCell>
+                            <TableCell>{auditLog.userId ?? "N/A"}</TableCell>
+                            <TableCell>{auditLog.userIp ?? "N/A"}</TableCell>
+                            <TableCell>{auditLog.error}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

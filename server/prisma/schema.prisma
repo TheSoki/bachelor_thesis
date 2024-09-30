@@ -32,3 +32,15 @@ model Device {
   author     User      @relation(fields: [authorId], references: [id])
   authorId   String
 }
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  index     Int      @unique @default(autoincrement())
+  userId    String?
+  operation String
+  timestamp DateTime @default(now())
+  userIp    String?
+  error     String?
+
+  @@index([timestamp(order: Desc)])
+}

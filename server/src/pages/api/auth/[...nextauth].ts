@@ -2,7 +2,7 @@ import NextAuth, { type AuthOptions, type User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
 import { registerSchema } from "@/server/schema/user";
-import { prisma } from "@/database";
+import { prisma } from "@/server/database";
 
 export const authOptions: AuthOptions = {
     providers: [

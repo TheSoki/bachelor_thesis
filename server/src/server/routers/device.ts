@@ -1,7 +1,8 @@
-import { router, authedProcedure } from "../trpc";
+import { router } from "../trpc";
 import { deviceSchema, deviceCreateSchema, deviceUpdateSchema, deviceListSchema } from "../schema/device";
 import { TRPCError } from "@trpc/server";
 import { DeviceService } from "../services/device.service";
+import { authedProcedure } from "../procedures/authed";
 
 export const deviceRouter = router({
     list: authedProcedure.input(deviceListSchema).query(async ({ ctx, input }) => {

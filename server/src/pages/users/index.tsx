@@ -6,7 +6,7 @@ import { UserCreateModal } from "@/client/features/users/components/UserCreateMo
 import { UserDeleteModal } from "@/client/features/users/components/UserDeleteModal";
 import { UserList } from "@/client/features/users/components/UserList";
 import { UserUpdateModal } from "@/client/features/users/components/UserUpdateModal";
-import { UsersPageURLParams } from "@/client/features/devices/types/devicesPageURLParams";
+import { UsersPageURLParams } from "@/client/features/users/types/usersPageURLParams";
 import { useCallback, useMemo } from "react";
 
 const schema = z.object({

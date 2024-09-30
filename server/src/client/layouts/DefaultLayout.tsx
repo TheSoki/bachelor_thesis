@@ -48,6 +48,7 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
                                 <div className="flex flex-col items-center space-x-4 lg:flex-row">
                                     <Link href="/users">Users</Link>
                                     <Link href="/devices">Devices</Link>
+                                    <Link href="/audit-logs">Audit Logs</Link>
 
                                     <Button variant="default" onClick={handleSignOut}>
                                         ({data.user.name}) Sign Out

@@ -1,6 +1,6 @@
 import type { z } from "zod";
 import type { deviceSchema, deviceCreateSchema, deviceUpdateSchema, deviceListSchema } from "@/server/schema/device";
-import { type Device } from "@/database";
+import { type Device } from "@/server/database";
 import { Service } from "typedi";
 import { DeviceRepository } from "../repositories/device.repository";
 import { LoggerRepository } from "../repositories/logger.repository";
