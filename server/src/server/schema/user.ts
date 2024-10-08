@@ -34,7 +34,9 @@ export const userUpdateSchema = z.object({
         ),
 });
 
-export const userListSchema = paginationSchema;
+export const userListSchema = paginationSchema.extend({
+    search: z.string().optional(),
+});
 
 export const registerSchema = z.object({
     email: z.string().email().min(3).max(255),

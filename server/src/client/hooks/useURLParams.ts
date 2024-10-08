@@ -58,12 +58,18 @@ export const useURLParams = <S extends z.ZodType>(schema: S) => {
 
     const setURLParams = useCallback(
         (params: Partial<z.infer<S>>) => {
-            router.replace({
-                query: {
-                    ...router.query,
-                    ...params,
+            router.replace(
+                {
+                    query: {
+                        ...router.query,
+                        ...params,
+                    },
                 },
-            });
+                undefined,
+                {
+                    shallow: true,
+                },
+            );
         },
         [router],
     );

@@ -28,7 +28,7 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
                 className={`${inter.className} flex flex-col items-center justify-between space-x-4 px-4 py-4 sm:px-6 lg:flex-row lg:px-8`}
             >
                 <Link href="/" className="flex items-center space-x-2">
-                    <Image src="/schedule.png" alt="Logo" className="h-8 w-8" width={32} height={32} />
+                    <Image src="/images/schedule.png" alt="Logo" className="h-8 w-8" width={32} height={32} />
                     <h1>OSU e-Schedule</h1>
                 </Link>
 

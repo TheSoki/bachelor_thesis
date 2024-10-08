@@ -20,6 +20,8 @@ model User {
   email     String   @unique
   password  String
   devices   Device[]
+
+  @@index([name(ops: raw("gin_trgm_ops")), email(ops: raw("gin_trgm_ops"))], type: Gin, name: "User_search_idx")
 }
 
 model Device {
@@ -31,6 +33,8 @@ model Device {
   lastSeen   DateTime?
   author     User      @relation(fields: [authorId], references: [id])
   authorId   String
+
+  @@index([buildingId(ops: raw("gin_trgm_ops")), roomId(ops: raw("gin_trgm_ops"))], type: Gin, name: "Device_search_idx")
 }
 
 model AuditLog {

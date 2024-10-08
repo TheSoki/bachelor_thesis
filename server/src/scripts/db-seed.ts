@@ -10,12 +10,15 @@ const run = async () => {
 
     const password = await hash(email, serverEnv.BCRYPT_SALT_ROUNDS);
 
-    await prisma.user.create({
-        data: {
-            name: "Marek Sokol",
-            email,
-            password: password,
-        },
+    await prisma.user.createMany({
+        data: [
+            {
+                name: "Marek Sokol",
+                email,
+                password: password,
+            },
+        ],
+        skipDuplicates: true,
     });
 };
 

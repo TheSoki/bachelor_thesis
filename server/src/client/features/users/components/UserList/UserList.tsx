@@ -17,17 +17,22 @@ import { useUserCreateModalStore } from "../../hooks/useUserCreateModalStore";
 import { useUserDeleteModalStore } from "../../hooks/useUserDeleteModalStore";
 import { useUserUpdateModalStore } from "../../hooks/useUserUpdateModalStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/client/shadcn/ui/select";
+import type { z } from "zod";
+import type { usersPageURLParamsSchema } from "../../types/usersPageURLParams";
+import { SearchBar } from "@/client/features/SearchBar";
 
 type UserListProps = {
-    page: number;
-    limit: number;
+    urlParams: z.infer<typeof usersPageURLParamsSchema>;
     nextPageHref: string;
     prevPageHref: string;
     onSelectLimit: (limit: number) => void;
+    onSearchSubmit: (search: string) => void;
 };
 
-export const UserList = ({ page, limit, nextPageHref, prevPageHref, onSelectLimit }: UserListProps) => {
-    const userQuery = trpc.user.list.useQuery({ page, limit });
+export const UserList = ({ urlParams, nextPageHref, prevPageHref, onSelectLimit, onSearchSubmit }: UserListProps) => {
+    const { page, limit, search } = urlParams;
+
+    const userQuery = trpc.user.list.useQuery({ page, limit, search });
     const setUserIdToDelete = useUserDeleteModalStore((state) => state.setUserId);
     const setUserIdToUpdate = useUserUpdateModalStore((state) => state.setUserId);
     const openCreateUserModal = useUserCreateModalStore((state) => state.setIsOpen);
@@ -56,6 +61,9 @@ export const UserList = ({ page, limit, nextPageHref, prevPageHref, onSelectLimi
                     Create User
                 </Button>
             </div>
+
+            <SearchBar defaultValue={search} onSubmit={onSearchSubmit} />
+
             <Table>
                 <TableCaption>
                     {match(totalCount)

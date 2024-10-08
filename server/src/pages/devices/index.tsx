@@ -1,29 +1,15 @@
 import type { NextPageWithLayout } from "../_app";
 import { AuthLayout } from "@/client/layouts/AuthLayout";
 import { useURLParams } from "@/client/hooks/useURLParams";
-import { z } from "zod";
 import { DeviceCreateModal } from "@/client/features/devices/components/DeviceCreateModal";
 import { DeviceDeleteModal } from "@/client/features/devices/components/DeviceDeleteModal";
 import { DeviceList } from "@/client/features/devices/components/DeviceList";
 import { DeviceUpdateModal } from "@/client/features/devices/components/DeviceUpdateModal";
-import { DevicesPageURLParams } from "@/client/features/devices/types/devicesPageURLParams";
+import { DevicesPageURLParams, devicesPageURLParamsSchema } from "@/client/features/devices/types/devicesPageURLParams";
 import { useCallback, useMemo } from "react";
 
-const schema = z.object({
-    [DevicesPageURLParams.PAGE]: z
-        .string()
-        .transform(Number)
-        .default("1")
-        .transform((value) => (value > 0 ? value : 1)),
-    [DevicesPageURLParams.LIMIT]: z
-        .string()
-        .transform(Number)
-        .default("10")
-        .transform((value) => (value > 0 ? value : 10)),
-});
-
 const DevicesPage: NextPageWithLayout = () => {
-    const { urlState, setURLParams } = useURLParams(schema);
+    const { urlState, setURLParams } = useURLParams(devicesPageURLParamsSchema);
 
     const nextPageHref = useMemo(() => {
         if (!urlState.value?.page) return "/devices";
@@ -45,6 +31,15 @@ const DevicesPage: NextPageWithLayout = () => {
         [setURLParams],
     );
 
+    const onSearchSubmit = useCallback(
+        (search: string) => {
+            setURLParams({
+                [DevicesPageURLParams.SEARCH]: search,
+            });
+        },
+        [setURLParams],
+    );
+
     if (urlState.loading) {
         return <></>;
     }
@@ -56,11 +51,11 @@ const DevicesPage: NextPageWithLayout = () => {
     return (
         <>
             <DeviceList
-                page={urlState.value.page}
-                limit={urlState.value.limit}
+                urlParams={urlState.value}
                 nextPageHref={nextPageHref}
                 prevPageHref={prevPageHref}
                 onSelectLimit={onSelectLimit}
+                onSearchSubmit={onSearchSubmit}
             />
             <DeviceDeleteModal />
             <DeviceCreateModal />

@@ -17,20 +17,32 @@ import { Button } from "@/client/shadcn/ui/button";
 import { useDeviceCreateModalStore } from "../../hooks/useDeviceCreateModalStore";
 import { useDeviceDeleteModalStore } from "../../hooks/useDeviceDeleteModalStore";
 import { useDeviceUpdateModalStore } from "../../hooks/useDeviceUpdateModalStore";
-import { DeviceListCopyIcon } from "./DeviceListCopyIcon";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/client/shadcn/ui/select";
+import type { devicesPageURLParamsSchema } from "../../types/devicesPageURLParams";
+import type { z } from "zod";
+import { copyToClipboard } from "@/client/utils/copyToClipboard";
+import { SearchBar } from "@/client/features/SearchBar";
+import CopyIcon from "@/client/icons/copy.svg";
 
 type DeviceListProps = {
-    page: number;
-    limit: number;
+    urlParams: z.infer<typeof devicesPageURLParamsSchema>;
     nextPageHref: string;
     prevPageHref: string;
     onSelectLimit: (limit: number) => void;
+    onSearchSubmit: (search: string) => void;
 };
 
-export const DeviceList = ({ page, limit, nextPageHref, prevPageHref, onSelectLimit }: DeviceListProps) => {
+export const DeviceList = ({
+    urlParams,
+    nextPageHref,
+    prevPageHref,
+    onSelectLimit,
+    onSearchSubmit,
+}: DeviceListProps) => {
+    const { page, limit, search } = urlParams;
+
     const utils = trpc.useUtils();
-    const deviceQuery = trpc.device.list.useQuery({ page, limit });
+    const deviceQuery = trpc.device.list.useQuery({ page, limit, search });
     const setDeviceIdToDelete = useDeviceDeleteModalStore((state) => state.setDeviceId);
     const setDeviceIdToUpdate = useDeviceUpdateModalStore((state) => state.setDeviceId);
     const openCreateDeviceModal = useDeviceCreateModalStore((state) => state.setIsOpen);
@@ -42,7 +54,7 @@ export const DeviceList = ({ page, limit, nextPageHref, prevPageHref, onSelectLi
                     id,
                 });
 
-                navigator.clipboard.writeText(data.token);
+                await copyToClipboard(data.token);
             } catch (error) {
                 console.error({ error }, "Failed to copy token");
             }
@@ -76,6 +88,8 @@ export const DeviceList = ({ page, limit, nextPageHref, prevPageHref, onSelectLi
                     Create Device
                 </Button>
             </div>
+
+            <SearchBar defaultValue={search} onSubmit={onSearchSubmit} />
 
             <Table>
                 <TableCaption>
@@ -114,13 +128,13 @@ export const DeviceList = ({ page, limit, nextPageHref, prevPageHref, onSelectLi
                                     variant="ghost"
                                     size="sm"
                                 >
-                                    <DeviceListCopyIcon />
+                                    <CopyIcon className="h-4 w-4" />
                                     <span className="ml-1">Copy</span>
                                 </Button>
                             </TableCell>
                             <TableCell>
                                 <Button onClick={() => onCopyTokenClick(device.id)} variant="ghost" size="sm">
-                                    <DeviceListCopyIcon />
+                                    <CopyIcon className="h-4 w-4" />
                                     <span className="ml-1">Copy</span>
                                 </Button>
                             </TableCell>

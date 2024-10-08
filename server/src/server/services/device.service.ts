@@ -1,6 +1,6 @@
 import type { z } from "zod";
 import type { deviceSchema, deviceCreateSchema, deviceUpdateSchema, deviceListSchema } from "@/server/schema/device";
-import { type Device } from "@/server/database";
+import { Prisma, type Device } from "@/server/database";
 import { Service } from "typedi";
 import { DeviceRepository } from "../repositories/device.repository";
 import { LoggerRepository } from "../repositories/logger.repository";
@@ -21,11 +21,28 @@ export class DeviceService {
         private readonly deviceRepository: DeviceRepository,
     ) {}
 
-    async list({ page, limit }: z.infer<typeof deviceListSchema>) {
+    async list({ page, limit, search }: z.infer<typeof deviceListSchema>) {
         const skip = (page - 1) * limit;
+
+        const letters = search?.replace(/[^a-zA-Z]/g, "") || undefined;
+        const numbers = search?.replace(/[^0-9]/g, "") || undefined;
+
+        let where: Prisma.DeviceWhereInput | undefined = !!search
+            ? {
+                  OR: [
+                      {
+                          buildingId: { contains: letters, mode: "insensitive" },
+                      },
+                      {
+                          roomId: { contains: numbers, mode: "insensitive" },
+                      },
+                  ],
+              }
+            : undefined;
 
         try {
             const [list, totalCount] = await this.deviceRepository.searchList({
+                where,
                 take: limit,
                 skip,
                 select: {

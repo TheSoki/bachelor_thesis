@@ -2,7 +2,7 @@ import type { z } from "zod";
 import type { userSchema, userCreateSchema, userUpdateSchema, userListSchema } from "@/server/schema/user";
 import { hash } from "bcrypt";
 import { serverEnv } from "@/env/server";
-import { prisma, type User } from "@/server/database";
+import { Prisma, prisma, type User } from "@/server/database";
 import { Service } from "typedi";
 import { UserRepository } from "../repositories/user.repository";
 import { LoggerRepository } from "../repositories/logger.repository";
@@ -23,11 +23,25 @@ export class UserService {
         private readonly userRepository: UserRepository,
     ) {}
 
-    async list({ page, limit }: z.infer<typeof userListSchema>) {
+    async list({ page, limit, search }: z.infer<typeof userListSchema>) {
         const skip = (page - 1) * limit;
+
+        const where: Prisma.UserWhereInput | undefined = !!search
+            ? {
+                  OR: [
+                      {
+                          name: { contains: search, mode: "insensitive" },
+                      },
+                      {
+                          email: { contains: search, mode: "insensitive" },
+                      },
+                  ],
+              }
+            : undefined;
 
         try {
             const [list, totalCount] = await this.userRepository.searchList({
+                where,
                 take: limit,
                 skip,
                 select: defaultColumns,

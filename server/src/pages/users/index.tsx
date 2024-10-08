@@ -1,29 +1,15 @@
 import type { NextPageWithLayout } from "../_app";
 import { AuthLayout } from "@/client/layouts/AuthLayout";
 import { useURLParams } from "@/client/hooks/useURLParams";
-import { z } from "zod";
 import { UserCreateModal } from "@/client/features/users/components/UserCreateModal";
 import { UserDeleteModal } from "@/client/features/users/components/UserDeleteModal";
 import { UserList } from "@/client/features/users/components/UserList";
 import { UserUpdateModal } from "@/client/features/users/components/UserUpdateModal";
-import { UsersPageURLParams } from "@/client/features/users/types/usersPageURLParams";
+import { UsersPageURLParams, usersPageURLParamsSchema } from "@/client/features/users/types/usersPageURLParams";
 import { useCallback, useMemo } from "react";
 
-const schema = z.object({
-    [UsersPageURLParams.PAGE]: z
-        .string()
-        .transform(Number)
-        .default("1")
-        .transform((value) => (value > 0 ? value : 1)),
-    [UsersPageURLParams.LIMIT]: z
-        .string()
-        .transform(Number)
-        .default("10")
-        .transform((value) => (value > 0 ? value : 10)),
-});
-
 const UsersPage: NextPageWithLayout = () => {
-    const { urlState, setURLParams } = useURLParams(schema);
+    const { urlState, setURLParams } = useURLParams(usersPageURLParamsSchema);
 
     const nextPageHref = useMemo(() => {
         if (!urlState.value?.page) return "/users";
@@ -45,6 +31,15 @@ const UsersPage: NextPageWithLayout = () => {
         [setURLParams],
     );
 
+    const onSearchSubmit = useCallback(
+        (search: string) => {
+            setURLParams({
+                [UsersPageURLParams.SEARCH]: search,
+            });
+        },
+        [setURLParams],
+    );
+
     if (urlState.loading) {
         return <></>;
     }
@@ -56,11 +51,11 @@ const UsersPage: NextPageWithLayout = () => {
     return (
         <>
             <UserList
-                page={urlState.value.page}
-                limit={urlState.value.limit}
+                urlParams={urlState.value}
                 nextPageHref={nextPageHref}
                 prevPageHref={prevPageHref}
                 onSelectLimit={onSelectLimit}
+                onSearchSubmit={onSearchSubmit}
             />
 
             <UserDeleteModal />
