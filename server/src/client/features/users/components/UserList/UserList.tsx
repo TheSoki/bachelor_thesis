@@ -19,7 +19,7 @@ import { useUserUpdateModalStore } from "../../hooks/useUserUpdateModalStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/client/shadcn/ui/select";
 import type { z } from "zod";
 import type { usersPageURLParamsSchema } from "../../types/usersPageURLParams";
-import { SearchBar } from "@/client/features/SearchBar";
+import { SearchBar } from "@/client/components/SearchBar";
 
 type UserListProps = {
     urlParams: z.infer<typeof usersPageURLParamsSchema>;

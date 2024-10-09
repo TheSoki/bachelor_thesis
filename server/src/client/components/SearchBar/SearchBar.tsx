@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import { Input } from "../shadcn/ui/input";
-import { Button } from "../shadcn/ui/button";
 import SearchIcon from "@/client/icons/search.svg";
+import { Input } from "@/client/shadcn/ui/input";
+import { Button } from "@/client/shadcn/ui/button";
 
 type SearchBarProps = {
     defaultValue: string | undefined;

@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { devicesPageURLParamsSchema } from "../../types/devicesPageURLParams";
 import type { z } from "zod";
 import { copyToClipboard } from "@/client/utils/copyToClipboard";
-import { SearchBar } from "@/client/features/SearchBar";
+import { SearchBar } from "@/client/components/SearchBar";
 import CopyIcon from "@/client/icons/copy.svg";
 
 type DeviceListProps = {
