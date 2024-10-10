@@ -124,7 +124,9 @@ export const DeviceList = ({
                             </TableCell>
                             <TableCell>
                                 <Button
-                                    onClick={() => navigator.clipboard.writeText(device.id)}
+                                    onClick={async () => {
+                                        await copyToClipboard(device.id);
+                                    }}
                                     variant="ghost"
                                     size="sm"
                                 >
