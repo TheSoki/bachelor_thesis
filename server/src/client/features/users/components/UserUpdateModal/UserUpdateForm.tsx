@@ -9,6 +9,7 @@ import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
 import { useCallback, useMemo } from "react";
 import { useAuth } from "@/client/hooks/useAuth";
+import { createToast } from "@/client/utils/createToast";
 
 type ValidationSchema = z.infer<typeof userUpdateSchema>;
 
@@ -26,6 +27,10 @@ export const UserUpdateForm = ({ user, onUpdate }: UserUpdateFormProps) => {
     const updateUserMutation = trpc.user.update.useMutation({
         async onSuccess() {
             await utils.user.list.invalidate();
+            createToast("User updated successfully", "success");
+        },
+        onError(error) {
+            createToast(`Failed to update user: ${error.message}`, "error");
         },
     });
 
@@ -118,8 +123,6 @@ export const UserUpdateForm = ({ user, onUpdate }: UserUpdateFormProps) => {
                     Confirm
                 </Button>
             </div>
-
-            {updateUserMutation.isError && <p className="text-md mt-2 text-center text-red-500">An error occurred</p>}
         </form>
     );
 };

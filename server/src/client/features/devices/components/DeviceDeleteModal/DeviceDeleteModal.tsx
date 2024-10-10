@@ -10,6 +10,7 @@ import {
 import { trpc } from "@/utils/trpc";
 import { useCallback, useMemo } from "react";
 import { useDeviceDeleteModalStore } from "../../hooks/useDeviceDeleteModalStore";
+import { createToast } from "@/client/utils/createToast";
 
 export const DeviceDeleteModal = () => {
     const utils = trpc.useUtils();
@@ -19,7 +20,11 @@ export const DeviceDeleteModal = () => {
     const deleteDevice = trpc.device.delete.useMutation({
         async onSuccess() {
             await utils.device.list.invalidate();
+            createToast("Device deleted successfully", "success");
             setDeviceId(null);
+        },
+        onError(error) {
+            createToast(`Failed to delete device: ${error.message}`, "error");
         },
     });
 

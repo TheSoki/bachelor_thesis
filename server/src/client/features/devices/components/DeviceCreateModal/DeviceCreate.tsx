@@ -8,6 +8,7 @@ import { Input } from "@/client/shadcn/ui/input";
 import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
 import { useCallback } from "react";
+import { createToast } from "@/client/utils/createToast";
 
 type ValidationSchema = z.infer<typeof deviceCreateSchema>;
 
@@ -21,6 +22,10 @@ export const DeviceCreate = ({ onCreate }: DeviceCreateProps) => {
     const createDeviceMutation = trpc.device.create.useMutation({
         async onSuccess() {
             await utils.device.list.invalidate();
+            createToast("Device created successfully", "success");
+        },
+        onError(error) {
+            createToast(`Failed to create device: ${error.message}`, "error");
         },
     });
 
@@ -41,7 +46,6 @@ export const DeviceCreate = ({ onCreate }: DeviceCreateProps) => {
         async (data: ValidationSchema) => {
             try {
                 await createDeviceMutation.mutateAsync(data);
-
                 reset();
                 onCreate();
             } catch (error) {
@@ -88,8 +92,6 @@ export const DeviceCreate = ({ onCreate }: DeviceCreateProps) => {
                     Confirm
                 </Button>
             </div>
-
-            {createDeviceMutation.isError && <p className="text-md mt-2 text-center text-red-500">An error occurred</p>}
         </form>
     );
 };

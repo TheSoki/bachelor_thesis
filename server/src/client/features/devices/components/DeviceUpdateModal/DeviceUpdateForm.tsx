@@ -8,6 +8,7 @@ import { Input } from "@/client/shadcn/ui/input";
 import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
 import { useCallback, useMemo } from "react";
+import { createToast } from "@/client/utils/createToast";
 
 type ValidationSchema = z.infer<typeof deviceUpdateSchema>;
 
@@ -24,6 +25,10 @@ export const DeviceUpdateForm = ({ device, onUpdate }: DeviceUpdateFormProps) =>
     const updateDeviceMutation = trpc.device.update.useMutation({
         async onSuccess() {
             await utils.device.list.invalidate();
+            createToast("Device updated successfully", "success");
+        },
+        onError(error) {
+            createToast(`Failed to update device: ${error.message}`, "error");
         },
     });
 
@@ -92,8 +97,6 @@ export const DeviceUpdateForm = ({ device, onUpdate }: DeviceUpdateFormProps) =>
                     Confirm
                 </Button>
             </div>
-
-            {updateDeviceMutation.isError && <p className="text-md mt-2 text-center text-red-500">An error occurred</p>}
         </form>
     );
 };

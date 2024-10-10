@@ -8,6 +8,7 @@ import { Input } from "@/client/shadcn/ui/input";
 import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
 import { useCallback } from "react";
+import { createToast } from "@/client/utils/createToast";
 
 type ValidationSchema = z.infer<typeof userCreateSchema>;
 
@@ -21,6 +22,10 @@ export const UserCreate = ({ onCreate }: UserCreateProps) => {
     const createUserMutation = trpc.user.create.useMutation({
         async onSuccess() {
             await utils.user.list.invalidate();
+            createToast("User created successfully", "success");
+        },
+        onError(error) {
+            createToast(`Failed to create user: ${error.message}`, "error");
         },
     });
 
@@ -104,8 +109,6 @@ export const UserCreate = ({ onCreate }: UserCreateProps) => {
                     Confirm
                 </Button>
             </div>
-
-            {createUserMutation.isError && <p className="text-md mt-2 text-center text-red-500">An error occurred</p>}
         </form>
     );
 };

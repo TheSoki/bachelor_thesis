@@ -11,6 +11,7 @@ import {
 import { trpc } from "@/utils/trpc";
 import { useCallback, useMemo } from "react";
 import { useUserDeleteModalStore } from "../../hooks/useUserDeleteModalStore";
+import { createToast } from "@/client/utils/createToast";
 
 export const UserDeleteModal = () => {
     const { session, handleSignOut } = useAuth();
@@ -21,7 +22,11 @@ export const UserDeleteModal = () => {
     const deleteUser = trpc.user.delete.useMutation({
         async onSuccess() {
             await utils.user.list.invalidate();
+            createToast("User deleted successfully", "success");
             setUserId(null);
+        },
+        onError(error) {
+            createToast(`Failed to delete user: ${error.message}`, "error");
         },
     });
 
@@ -54,7 +59,7 @@ export const UserDeleteModal = () => {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Delete Device</DialogTitle>
+                    <DialogTitle>Delete User</DialogTitle>
                     <DialogDescription>
                         Are you absolutely sure? This action cannot be undone. This will permanently delete this account
                         from our servers.

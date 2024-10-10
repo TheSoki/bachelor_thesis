@@ -6,6 +6,7 @@ import { trpc } from "@/utils/trpc";
 import { DefaultLayout } from "@/client/layouts/DefaultLayout";
 import { SessionProvider, getSession } from "next-auth/react";
 import type { Session } from "next-auth";
+import { Toaster } from "@/client/utils/createToast";
 
 export type NextPageWithLayout<TProps = Record<string, unknown>, TInitialProps = TProps> = NextPage<
     TProps,
@@ -24,7 +25,12 @@ const App: AppType<{ session: Session | null }> = ({
 }: AppPropsWithLayout) => {
     const getLayout = Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
 
-    return <SessionProvider session={session}>{getLayout(<Component {...pageProps} />)}</SessionProvider>;
+    return (
+        <SessionProvider session={session}>
+            <Toaster />
+            {getLayout(<Component {...pageProps} />)}
+        </SessionProvider>
+    );
 };
 
 App.getInitialProps = async ({ ctx }) => {
