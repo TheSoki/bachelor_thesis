@@ -82,17 +82,19 @@ export const UserList = ({ urlParams, nextPageHref, prevPageHref, onSelectLimit,
                         <TableHead>Name</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Created At</TableHead>
-                        <TableHead className="w-[150px] text-right">Action</TableHead>
+                        <TableHead className="w-[150px]">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {list.map((user) => (
                         <TableRow key={user.id}>
-                            <TableCell className="font-medium">{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.createdAt.toLocaleString("cs-CZ")}</TableCell>
+                            <TableCell className="whitespace-nowrap font-medium">{user.name}</TableCell>
+                            <TableCell className="whitespace-nowrap">{user.email}</TableCell>
+                            <TableCell className="whitespace-nowrap">
+                                {user.createdAt.toLocaleString("cs-CZ")}
+                            </TableCell>
                             <TableCell className="flex items-center justify-end space-x-2">
-                                <Button variant="secondary" onClick={() => setUserIdToUpdate(user.id)}>
+                                <Button variant="secondary" onClick={() => setUserIdToUpdate(user.id)} className="mr-2">
                                     Update
                                 </Button>
                                 <Button variant="destructive" onClick={() => setUserIdToDelete(user.id)}>

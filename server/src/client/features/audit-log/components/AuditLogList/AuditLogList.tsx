@@ -74,12 +74,14 @@ export const AuditLogList = ({ page, limit, nextPageHref, prevPageHref, onSelect
                 <TableBody>
                     {list.map((auditLog) => (
                         <TableRow key={auditLog.id}>
-                            <TableCell className="font-medium">{auditLog.index}</TableCell>
-                            <TableCell>{new Date(auditLog.timestamp).toLocaleString("cs-CZ")}</TableCell>
-                            <TableCell>{auditLog.operation}</TableCell>
-                            <TableCell>{auditLog.userId ?? "N/A"}</TableCell>
-                            <TableCell>{auditLog.userIp ?? "N/A"}</TableCell>
-                            <TableCell>{auditLog.error}</TableCell>
+                            <TableCell className="whitespace-nowrap font-medium">{auditLog.index}</TableCell>
+                            <TableCell className="whitespace-nowrap">
+                                {new Date(auditLog.timestamp).toLocaleString("cs-CZ")}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap">{auditLog.operation}</TableCell>
+                            <TableCell className="whitespace-nowrap">{auditLog.userId ?? "N/A"}</TableCell>
+                            <TableCell className="whitespace-nowrap">{auditLog.userIp ?? "N/A"}</TableCell>
+                            <TableCell className="whitespace-nowrap">{auditLog.error}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

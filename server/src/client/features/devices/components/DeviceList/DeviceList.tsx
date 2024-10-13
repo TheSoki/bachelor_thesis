@@ -112,14 +112,14 @@ export const DeviceList = ({
                         <TableHead>Token</TableHead>
                         <TableHead>Author</TableHead>
                         <TableHead>Created At</TableHead>
-                        <TableHead className="w-[150px] text-right">Action</TableHead>
+                        <TableHead className="w-[150px]">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {list.map((device) => (
                         <TableRow key={device.id}>
-                            <TableCell className="font-medium">{`${device.buildingId}${device.roomId}`}</TableCell>
-                            <TableCell>
+                            <TableCell className="whitespace-nowrap font-medium">{`${device.buildingId}${device.roomId}`}</TableCell>
+                            <TableCell className="whitespace-nowrap">
                                 {device.lastSeen ? new Date(device.lastSeen).toLocaleString("cs-CZ") : <i>Never</i>}
                             </TableCell>
                             <TableCell>
@@ -140,8 +140,10 @@ export const DeviceList = ({
                                     <span className="ml-1">Copy</span>
                                 </Button>
                             </TableCell>
-                            <TableCell>{device.author?.name ?? <i>Deleted</i>}</TableCell>
-                            <TableCell>{device.createdAt.toLocaleString("cs-CZ")}</TableCell>
+                            <TableCell className="whitespace-nowrap">{device.author?.name ?? <i>Deleted</i>}</TableCell>
+                            <TableCell className="whitespace-nowrap">
+                                {device.createdAt.toLocaleString("cs-CZ")}
+                            </TableCell>
                             <TableCell className="flex items-center justify-end space-x-2">
                                 <Button variant="secondary" onClick={() => setDeviceIdToUpdate(device.id)}>
                                     Update
