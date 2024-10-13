@@ -8,7 +8,6 @@ const serverSchema = z.object({
     NEXTAUTH_SECRET: z.string(),
     NEXTAUTH_URL: z.string().url(),
     SCHEDULE_EVENTS_API_URL: z.string().url(),
-    USE_MOCKED_SCHEDULE_DATE: z.boolean(),
 });
 
 const serverEnv = {
@@ -17,7 +16,6 @@ const serverEnv = {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     SCHEDULE_EVENTS_API_URL: process.env.SCHEDULE_EVENTS_API_URL,
-    USE_MOCKED_SCHEDULE_DATE: process.env.USE_MOCKED_SCHEDULE_DATE === "true",
 };
 
 const _serverEnv = serverSchema.safeParse(serverEnv);

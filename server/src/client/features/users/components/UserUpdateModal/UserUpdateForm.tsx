@@ -144,7 +144,7 @@ export const UserUpdateForm = ({ user, onUpdate, setHasUnsavedChanges }: UserUpd
                     disabled={isSubmitting || !isDirty}
                     className="dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
                 >
-                    Create
+                    Update
                 </Button>
             </div>
         </form>

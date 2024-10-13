@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { serverEnv } from "@/env/server";
 import puppeteer from "puppeteer";
 import { parseString } from "xml2js";
@@ -5,6 +6,8 @@ import { z } from "zod";
 import { Service } from "typedi";
 import { LoggerRepository } from "../repositories/logger.repository";
 import { DeviceRepository } from "../repositories/device.repository";
+import { format, parse, isWithinInterval, getDay } from "date-fns";
+import { cs } from "date-fns/locale";
 
 interface ScheduleEvent {
     name: string;
@@ -38,13 +41,11 @@ const CZECH_WEEK_DAYS = ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"] as const;
 const eventSchema = z.object({
     name: z.string(),
     teacher: z.string(),
-    // hh:mm
     fromTime: z.string().regex(/^\d{2}:\d{2}$/),
     toTime: z.string().regex(/^\d{2}:\d{2}$/),
-    // dd.mm.yyyy or d.m.yyyy or d.mm.yyyy or dd.m.yyyy
     startDate: z.string().regex(/^\d{1,2}\.\d{1,2}\.\d{4}$/),
     endDate: z.string().regex(/^\d{1,2}\.\d{1,2}\.\d{4}$/),
-    dayOfWeek: z.string().regex(/^(Ne|Po|Út|St|Čt|Pá|So)$/),
+    dayOfWeek: z.enum(CZECH_WEEK_DAYS),
 });
 
 @Service()
@@ -66,57 +67,35 @@ export class ScheduleService {
         displayWidth: number;
     }): Promise<Buffer | null> {
         try {
-            const { buildingId, roomId } = await this.getDeviceById({
-                id,
-                token,
-            });
+            const { buildingId, roomId } = await this.getDeviceById({ id, token });
             const roomName = `${buildingId}${roomId}`;
-            const scheduleEvents = await this.getScheduleEvents({
-                buildingId,
-                roomId,
-            });
+            const scheduleEvents = await this.getScheduleEvents({ buildingId, roomId });
             const scheduleHtml = this.generateScheduleHtml(roomName, displayWidth, displayHeight, scheduleEvents);
             const pngBuffer = await this.generatePngFromHtml(displayWidth, displayHeight, scheduleHtml);
+
             await this.deviceRepository.update({
                 where: { id },
-                data: {
-                    lastSeen: new Date(),
-                },
+                data: { lastSeen: new Date() },
             });
 
             return pngBuffer;
         } catch (e) {
             this.logger.error(`Error generating schedule image: ${e}`);
-
             return null;
         }
     }
 
     private async getDeviceById({ id, token }: { id: string; token: string }) {
-        try {
-            const device = await this.deviceRepository.findFirst({
-                where: { id },
-                select: {
-                    buildingId: true,
-                    roomId: true,
-                    token: true,
-                },
-            });
+        const device = await this.deviceRepository.findFirst({
+            where: { id },
+            select: { buildingId: true, roomId: true, token: true },
+        });
 
-            if (!device) {
-                throw new Error(`No device with id '${id}'`);
-            }
-
-            if (device.token !== token) {
-                throw new Error(`Invalid token for device with id '${id}'`);
-            }
-
-            return device;
-        } catch (e) {
-            this.logger.error(`Error fetching device with id '${id}': ${e}`);
-
-            throw new Error(`No device with id '${id}'`);
+        if (!device || device.token !== token) {
+            throw new Error(`Invalid device id or token: ${id}`);
         }
+
+        return device;
     }
 
     private async getScheduleEvents({
@@ -134,125 +113,97 @@ export class ScheduleService {
         }
 
         const data = await response.text();
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const xml: Record<string, any> = await new Promise((resolve, reject) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             parseString(data, (err: any, result: unknown) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    resolve(result as any);
-                }
+                err ? reject(err) : resolve(result as any);
             });
         });
 
-        const scheduleEvents: ScheduleEvent[] = [];
+        const now = new Date();
 
-        let now: Date, dayOfWeek: number;
-        if (serverEnv.USE_MOCKED_SCHEDULE_DATE) {
-            now = new Date("2023-10-02T08:00:00");
-            dayOfWeek = 4;
-        } else {
-            now = new Date();
-            dayOfWeek = now.getDay();
+        const day = CZECH_WEEK_DAYS[getDay(now)] ?? "Ne";
+
+        const actions = xml?.["ns2:rozvrh"]?.["rozvrhovaAkce"] || [];
+        if (actions.length === 0) {
+            this.logger.error(`No schedule events found`);
+            return [];
         }
 
-        const day = CZECH_WEEK_DAYS[dayOfWeek];
-
-        try {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            xml?.["ns2:rozvrh"]["rozvrhovaAkce"].forEach((akce: any) => {
-                const teacher =
-                    akce["ucitel"]
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        ?.map((ucitel: any) => {
-                            const jmeno = ucitel["jmeno"][0];
-                            const prijmeni = ucitel["prijmeni"][0];
-                            const titulPred = ucitel["titulPred"][0];
-                            const titulZa = ucitel["titulZa"][0];
-                            return `${titulPred} ${jmeno} ${prijmeni} ${titulZa}`;
-                        })
-                        ?.join(", ") ?? "N/A";
-
-                const event = {
-                    name: akce["nazev"][0],
-                    fromTime: akce["hodinaSkutOd"][0],
-                    toTime: akce["hodinaSkutDo"][0],
-                    startDate: akce["datumOd"][0],
-                    endDate: akce["datumDo"][0],
-                    dayOfWeek: akce["denZkr"][0],
-                    teacher,
+        return actions
+            .map((akce: any) => this.parseEvent(akce))
+            .filter((event: z.infer<typeof eventSchema> | null) => event && this.isEventToday(event, now, day))
+            .map((event: z.infer<typeof eventSchema>) => {
+                return {
+                    name: event.name,
+                    from: event.fromTime,
+                    to: event.toTime,
+                    teacher: event.teacher,
                 };
-
-                const parsedEvent = eventSchema.safeParse(event);
-
-                if (parsedEvent.success) {
-                    const splitStart = event.startDate.split(".");
-                    const validStartDate = new Date();
-                    validStartDate.setDate(parseInt(splitStart[0]));
-                    validStartDate.setMonth(parseInt(splitStart[1]) - 1);
-                    validStartDate.setFullYear(parseInt(splitStart[2]));
-
-                    const splitEnd = event.endDate.split(".");
-                    const validEndDate = new Date();
-                    validEndDate.setDate(parseInt(splitEnd[0]));
-                    validEndDate.setMonth(parseInt(splitEnd[1]) - 1);
-                    validEndDate.setFullYear(parseInt(splitEnd[2]));
-
-                    const isTodayBetweenTimelines = now >= validStartDate && now <= validEndDate;
-                    const isToday = day === event.dayOfWeek;
-
-                    if (isTodayBetweenTimelines && isToday) {
-                        scheduleEvents.push({
-                            name: event.name,
-                            from: event.fromTime,
-                            to: event.toTime,
-                            teacher: event.teacher,
-                        });
-                    }
-                } else {
-                    this.logger.error(`Failed to parse event: ${JSON.stringify(event)}`);
-                    this.logger.error(`Error: ${parsedEvent.error}`);
-                }
             });
-        } catch (e) {
-            this.logger.error(`Error parsing schedule events: ${e}`);
+    }
+
+    private parseEvent(akce: any): z.infer<typeof eventSchema> | null {
+        const teacher =
+            akce["ucitel"]
+                ?.map((ucitel: any) => {
+                    const { jmeno, prijmeni, titulPred, titulZa } = ucitel;
+
+                    return `${titulPred?.[0] ?? ""} ${jmeno?.[0] ?? ""} ${prijmeni?.[0] ?? ""} ${titulZa?.[0] ?? ""}`.trim();
+                })
+                ?.join(", ") ?? "N/A";
+
+        const event = {
+            name: akce["nazev"][0],
+            fromTime: akce["hodinaSkutOd"][0],
+            toTime: akce["hodinaSkutDo"][0],
+            startDate: akce["datumOd"][0],
+            endDate: akce["datumDo"][0],
+            dayOfWeek: akce["denZkr"][0],
+            teacher,
+        };
+
+        const parsedEvent = eventSchema.safeParse(event);
+
+        if (!parsedEvent.success) {
+            this.logger.error(`Failed to parse event: ${JSON.stringify(event)}`);
+            this.logger.error(`Error: ${parsedEvent.error}`);
+            return null;
         }
 
-        return scheduleEvents;
+        return parsedEvent.data;
+    }
+
+    private isEventToday(event: z.infer<typeof eventSchema>, now: Date, day: string): boolean {
+        const parseDate = (dateStr: string) => parse(dateStr, "d.M.yyyy", new Date());
+        const startDate = parseDate(event.startDate);
+        const endDate = parseDate(event.endDate);
+
+        return isWithinInterval(now, { start: startDate, end: endDate }) && day === event.dayOfWeek;
     }
 
     private generateScheduleHtml(roomName: string, width: number, height: number, events: ScheduleEvent[]): string {
-        const fontSize = 24 as const;
-        const tableFontSize = 20 as const;
-        const padding = 5 as const;
-        const headerHeight = 40 as const;
-        const infoCellWidth = 240 as const;
+        const fontSize = 24;
+        const tableFontSize = 20;
+        const padding = 5;
+        const headerHeight = 40;
+        const infoCellWidth = 240;
 
         const usableHeight = height - padding * 2;
         const usableWidth = width - padding * 2;
-
         const contentHeight = usableHeight - headerHeight;
-
         const cellHeight = contentHeight / LEARNING_HOURS.length;
 
         const eventsWithOffset = events.map((event) => {
             const startBlock = LEARNING_HOURS.findIndex((hour) => hour.from === event.from);
             const endBlock = LEARNING_HOURS.findIndex((hour) => hour.to === event.to) + 1;
-
-            const offset = startBlock * cellHeight;
-            const height = (endBlock - startBlock) * cellHeight;
-
             return {
                 ...event,
-                offset,
-                height,
+                offset: startBlock * cellHeight,
+                height: (endBlock - startBlock) * cellHeight,
             };
         });
 
-        const html = `
+        return `
         <html>
         <head>
             <style>
@@ -261,6 +212,7 @@ export class ScheduleService {
                     margin: 0;
                     background-color: #f0f0f0;
                     font-size: ${fontSize}px;
+                    font-family: Arial, sans-serif;
                 }
                 .content {
                     width: ${usableWidth}px;
@@ -291,25 +243,43 @@ export class ScheduleService {
                     display: flex;
                     justify-content: space-between;
                 }
+                .event {
+                    position: absolute;
+                    width: 100%;
+                    background-color: #D3D3D3;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    border-bottom: 1px solid #000;
+                    box-sizing: border-box;
+                    padding: 5px;
+                    overflow: hidden;
+                }
             </style>
         </head>
         <body>
             <div class="header">
                 <span>${roomName}</span>
-                <span>Updated: ${new Date().toLocaleString("cs-CZ")}</span>
+                <span>Updated: ${format(new Date(), "Pp", { locale: cs })}</span>
             </div>
             <div class="content">
                 <table>
-                    ${LEARNING_HOURS.map((hour, index) => `<tr><td>${index}</td><td>${hour.from} - ${hour.to}</td></tr>`).join("")}
+                    ${LEARNING_HOURS.map(
+                        (hour, index) => `
+                        <tr><td>${index}</td><td>${hour.from} - ${hour.to}</td></tr>
+                    `,
+                    ).join("")}
                 </table>
                 <div style="width: 100%; height: ${contentHeight}px; position: relative;">
                     ${eventsWithOffset
                         .map(
                             (event, index) => `
-                            <div style="position: absolute; top: ${event.offset}px; height: ${event.height}px; width: 100%; background-color: #D3D3D3; flex-direction: column; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #000; border-top: ${index === 0 ? "1px solid #000" : "none"}; box-sizing: border-box;">
-                                <div>${event.name} (${event.from} - ${event.to})</div>
-                                <div>${event.teacher}</div>
-                            </div>`,
+                        <div class="event" style="top: ${event.offset}px; height: ${event.height}px; border-top: ${index === 0 ? "1px solid #000" : "none"};">
+                            <div>${event.name} (${event.from} - ${event.to})</div>
+                            <div>${event.teacher}</div>
+                        </div>
+                    `,
                         )
                         .join("")}
                 </div>
@@ -317,21 +287,16 @@ export class ScheduleService {
         </body>
         </html>
     `;
-
-        return html;
     }
 
     private async generatePngFromHtml(width: number, height: number, html: string): Promise<Buffer> {
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
         const page = await browser.newPage();
         await page.setContent(html);
-
         await page.setViewport({ width, height });
-
         const pngBuffer = await page.screenshot({ type: "png" });
-
         await browser.close();
-
-        return pngBuffer;
+        const buffer = Buffer.from(pngBuffer);
+        return buffer;
     }
 }
