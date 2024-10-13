@@ -35,6 +35,16 @@ export const UserUpdateForm = ({ user, onUpdate, setHasUnsavedChanges }: UserUpd
         },
     });
 
+    const defaultValues = useMemo(
+        () => ({
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            password: "",
+        }),
+        [user],
+    );
+
     const {
         register,
         handleSubmit,
@@ -42,16 +52,13 @@ export const UserUpdateForm = ({ user, onUpdate, setHasUnsavedChanges }: UserUpd
         reset,
     } = useForm<ValidationSchema>({
         resolver: zodResolver(userUpdateSchema),
-        defaultValues: useMemo(
-            () => ({
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                password: "",
-            }),
-            [user],
-        ),
+        defaultValues,
     });
+
+    useEffect(() => {
+        reset(defaultValues);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
 
     useEffect(() => {
         setHasUnsavedChanges(isDirty);

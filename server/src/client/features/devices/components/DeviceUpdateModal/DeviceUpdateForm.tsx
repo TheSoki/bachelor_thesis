@@ -33,6 +33,15 @@ export const DeviceUpdateForm = ({ device, onUpdate, setHasUnsavedChanges }: Dev
         },
     });
 
+    const defaultValues = useMemo(
+        () => ({
+            id: device.id,
+            buildingId: device.buildingId,
+            roomId: device.roomId,
+        }),
+        [device],
+    );
+
     const {
         register,
         handleSubmit,
@@ -40,15 +49,13 @@ export const DeviceUpdateForm = ({ device, onUpdate, setHasUnsavedChanges }: Dev
         reset,
     } = useForm<ValidationSchema>({
         resolver: zodResolver(deviceUpdateSchema),
-        defaultValues: useMemo(
-            () => ({
-                id: device.id,
-                buildingId: device.buildingId,
-                roomId: device.roomId,
-            }),
-            [device],
-        ),
+        defaultValues,
     });
+
+    useEffect(() => {
+        reset(defaultValues);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [device]);
 
     useEffect(() => {
         setHasUnsavedChanges(isDirty);
