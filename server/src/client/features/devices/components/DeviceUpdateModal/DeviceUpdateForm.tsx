@@ -7,7 +7,7 @@ import { Label } from "@/client/shadcn/ui/label";
 import { Input } from "@/client/shadcn/ui/input";
 import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { createToast } from "@/client/utils/createToast";
 
 type ValidationSchema = z.infer<typeof deviceUpdateSchema>;
@@ -17,9 +17,10 @@ type DeviceByIdOutput = RouterOutput["device"]["getById"];
 type DeviceUpdateFormProps = {
     device: DeviceByIdOutput;
     onUpdate: () => void;
+    setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 };
 
-export const DeviceUpdateForm = ({ device, onUpdate }: DeviceUpdateFormProps) => {
+export const DeviceUpdateForm = ({ device, onUpdate, setHasUnsavedChanges }: DeviceUpdateFormProps) => {
     const utils = trpc.useUtils();
 
     const updateDeviceMutation = trpc.device.update.useMutation({
@@ -36,6 +37,7 @@ export const DeviceUpdateForm = ({ device, onUpdate }: DeviceUpdateFormProps) =>
         register,
         handleSubmit,
         formState: { errors, isSubmitting, isDirty },
+        reset,
     } = useForm<ValidationSchema>({
         resolver: zodResolver(deviceUpdateSchema),
         defaultValues: useMemo(
@@ -48,16 +50,21 @@ export const DeviceUpdateForm = ({ device, onUpdate }: DeviceUpdateFormProps) =>
         ),
     });
 
+    useEffect(() => {
+        setHasUnsavedChanges(isDirty);
+    }, [isDirty, setHasUnsavedChanges]);
+
     const onSubmit = useCallback(
         async (data: ValidationSchema) => {
             try {
                 await updateDeviceMutation.mutateAsync(data);
                 onUpdate();
+                reset(data);
             } catch (error) {
                 console.error({ error }, "Failed to update device");
             }
         },
-        [onUpdate, updateDeviceMutation],
+        [onUpdate, reset, updateDeviceMutation],
     );
 
     return (

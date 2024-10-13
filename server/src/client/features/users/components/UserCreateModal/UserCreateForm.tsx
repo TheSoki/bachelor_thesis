@@ -7,16 +7,17 @@ import { Label } from "@/client/shadcn/ui/label";
 import { Input } from "@/client/shadcn/ui/input";
 import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { createToast } from "@/client/utils/createToast";
 
 type ValidationSchema = z.infer<typeof userCreateSchema>;
 
 type UserCreateProps = {
     onCreate: () => void;
+    setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 };
 
-export const UserCreate = ({ onCreate }: UserCreateProps) => {
+export const UserCreateForm = ({ onCreate, setHasUnsavedChanges }: UserCreateProps) => {
     const utils = trpc.useUtils();
 
     const createUserMutation = trpc.user.create.useMutation({
@@ -43,13 +44,16 @@ export const UserCreate = ({ onCreate }: UserCreateProps) => {
         },
     });
 
+    useEffect(() => {
+        setHasUnsavedChanges(isDirty);
+    }, [isDirty, setHasUnsavedChanges]);
+
     const onSubmit = useCallback(
         async (data: ValidationSchema) => {
             try {
                 await createUserMutation.mutateAsync(data);
-
-                reset();
                 onCreate();
+                reset();
             } catch (error) {
                 console.error({ error }, "Failed to create user");
             }

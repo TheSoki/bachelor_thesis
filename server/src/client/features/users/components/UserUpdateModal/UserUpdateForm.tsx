@@ -7,7 +7,7 @@ import { Label } from "@/client/shadcn/ui/label";
 import { Input } from "@/client/shadcn/ui/input";
 import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useEffect } from "react";
 import { useAuth } from "@/client/hooks/useAuth";
 import { createToast } from "@/client/utils/createToast";
 
@@ -18,9 +18,10 @@ type UserByIdOutput = RouterOutput["user"]["getById"];
 type UserUpdateFormProps = {
     user: UserByIdOutput;
     onUpdate: () => void;
+    setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 };
 
-export const UserUpdateForm = ({ user, onUpdate }: UserUpdateFormProps) => {
+export const UserUpdateForm = ({ user, onUpdate, setHasUnsavedChanges }: UserUpdateFormProps) => {
     const utils = trpc.useUtils();
     const { session, handleSignOut } = useAuth();
 
@@ -38,6 +39,7 @@ export const UserUpdateForm = ({ user, onUpdate }: UserUpdateFormProps) => {
         register,
         handleSubmit,
         formState: { errors, isSubmitting, isDirty },
+        reset,
     } = useForm<ValidationSchema>({
         resolver: zodResolver(userUpdateSchema),
         defaultValues: useMemo(
@@ -51,6 +53,10 @@ export const UserUpdateForm = ({ user, onUpdate }: UserUpdateFormProps) => {
         ),
     });
 
+    useEffect(() => {
+        setHasUnsavedChanges(isDirty);
+    }, [isDirty, setHasUnsavedChanges]);
+
     const onSubmit = useCallback(
         async (data: ValidationSchema) => {
             try {
@@ -60,6 +66,7 @@ export const UserUpdateForm = ({ user, onUpdate }: UserUpdateFormProps) => {
                     password: !!data.password ? data.password : undefined,
                 });
                 onUpdate();
+                reset(data);
 
                 if (isUpdatedCurrentUser) {
                     await handleSignOut();
@@ -68,7 +75,7 @@ export const UserUpdateForm = ({ user, onUpdate }: UserUpdateFormProps) => {
                 console.error({ error }, "Failed to update user");
             }
         },
-        [handleSignOut, onUpdate, session.data?.user.id, updateUserMutation, user.id],
+        [handleSignOut, onUpdate, reset, session.data?.user.id, updateUserMutation, user.id],
     );
 
     return (

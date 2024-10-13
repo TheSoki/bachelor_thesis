@@ -7,16 +7,17 @@ import { Label } from "@/client/shadcn/ui/label";
 import { Input } from "@/client/shadcn/ui/input";
 import { Button } from "@/client/shadcn/ui/button";
 import clsx from "clsx";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { createToast } from "@/client/utils/createToast";
 
 type ValidationSchema = z.infer<typeof deviceCreateSchema>;
 
 type DeviceCreateProps = {
     onCreate: () => void;
+    setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 };
 
-export const DeviceCreate = ({ onCreate }: DeviceCreateProps) => {
+export const DeviceCreateForm = ({ onCreate, setHasUnsavedChanges }: DeviceCreateProps) => {
     const utils = trpc.useUtils();
 
     const createDeviceMutation = trpc.device.create.useMutation({
@@ -42,12 +43,16 @@ export const DeviceCreate = ({ onCreate }: DeviceCreateProps) => {
         },
     });
 
+    useEffect(() => {
+        setHasUnsavedChanges(isDirty);
+    }, [isDirty, setHasUnsavedChanges]);
+
     const onSubmit = useCallback(
         async (data: ValidationSchema) => {
             try {
                 await createDeviceMutation.mutateAsync(data);
-                reset();
                 onCreate();
+                reset();
             } catch (error) {
                 console.error({ error }, "Failed to create device");
             }
