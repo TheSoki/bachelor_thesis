@@ -68,13 +68,15 @@ export const DeviceCreateForm = ({ onCreate, setHasUnsavedChanges }: DeviceCreat
                 </Label>
                 <Input
                     className={clsx({
-                        "border-red-500": errors.buildingId,
+                        "border-red-500 dark:border-red-400": errors.buildingId,
                     })}
                     id="buildingId"
                     type="text"
                     {...register("buildingId")}
                 />
-                {errors.buildingId && <p className="mt-2 text-xs italic text-red-500">{errors.buildingId?.message}</p>}
+                {errors.buildingId && (
+                    <p className="mt-2 text-xs italic text-red-500 dark:text-red-400">{errors.buildingId?.message}</p>
+                )}
             </div>
 
             <div className="mb-4">
@@ -83,18 +85,24 @@ export const DeviceCreateForm = ({ onCreate, setHasUnsavedChanges }: DeviceCreat
                 </Label>
                 <Input
                     className={clsx({
-                        "border-red-500": errors.roomId,
+                        "border-red-500 dark:border-red-400": errors.roomId,
                     })}
                     id="roomId"
                     type="text"
                     {...register("roomId")}
                 />
-                {errors.roomId && <p className="mt-2 text-xs italic text-red-500">{errors.roomId?.message}</p>}
+                {errors.roomId && (
+                    <p className="mt-2 text-xs italic text-red-500 dark:text-red-400">{errors.roomId?.message}</p>
+                )}
             </div>
 
             <div className="mb-6 text-center">
-                <Button type="submit" disabled={isSubmitting || !isDirty}>
-                    Confirm
+                <Button
+                    type="submit"
+                    disabled={isSubmitting || !isDirty}
+                    className="dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+                >
+                    Create
                 </Button>
             </div>
         </form>

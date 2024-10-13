@@ -25,6 +25,17 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
             <Head>
                 <title>OSU e-Schedule</title>
                 <link rel="icon" href="/favicon.ico" />
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                            document.documentElement.classList.add('dark')
+                        } else {
+                            document.documentElement.classList.remove('dark')
+                        }
+                        `,
+                    }}
+                />
             </Head>
 
             <header className={`${inter.className} flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8`}>

@@ -113,8 +113,6 @@ export const authOptions: AuthOptions = {
     },
     theme: {
         logo: "/favicon.ico",
-        brandColor: "#4C51BF",
-        colorScheme: "light",
     },
 };
 

@@ -20,7 +20,7 @@ export const FullscreenError = ({ statusCode, title }: ErrorProps) => {
             <div className="text-center">
                 <h2 className="text-9xl font-bold">{statusCode}</h2>
                 <h3 className="mb-4 text-4xl font-bold">{title}</h3>
-                <Link href="/" className="text-gray-800 underline">
+                <Link href="/" className="text-gray-800 underline dark:text-gray-300">
                     Home
                 </Link>
             </div>

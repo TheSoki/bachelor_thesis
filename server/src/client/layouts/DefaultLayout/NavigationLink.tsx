@@ -17,8 +17,8 @@ export const NavigationLink = ({ href, children, onLinkClick }: NavigationLinkPr
     return (
         <Link
             href={href}
-            className={clsx("block py-2 lg:inline-block lg:py-0", {
-                "pointer-events-none text-gray-500 opacity-60": isActive,
+            className={clsx("block py-2 dark:text-gray-300 lg:inline-block lg:py-0", {
+                "pointer-events-none text-gray-500 opacity-60 dark:text-gray-600": isActive,
             })}
             onClick={onLinkClick}
             aria-disabled={isActive}

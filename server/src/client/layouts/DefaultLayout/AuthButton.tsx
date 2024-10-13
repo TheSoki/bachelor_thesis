@@ -24,12 +24,20 @@ export const AuthButton = ({ onCloseMenu }: AuthButtonProps) => {
     return match(session)
         .with({ status: "loading" }, () => <Skeleton className="h-10 w-20" />)
         .with({ status: "authenticated" }, ({ data }) => (
-            <Button variant="default" onClick={onSignoutClick}>
+            <Button
+                variant="default"
+                className="dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+                onClick={onSignoutClick}
+            >
                 ({data.user.name}) Sign Out
             </Button>
         ))
         .otherwise(() => (
-            <Button variant="outline" onClick={onSigninClick}>
+            <Button
+                variant="default"
+                className="dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+                onClick={onSigninClick}
+            >
                 Sign In
             </Button>
         ));

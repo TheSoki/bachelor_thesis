@@ -93,13 +93,15 @@ export const UserUpdateForm = ({ user, onUpdate, setHasUnsavedChanges }: UserUpd
                 </Label>
                 <Input
                     className={clsx({
-                        "border-red-500": errors.name,
+                        "border-red-500 dark:border-red-400": errors.name,
                     })}
                     id="name"
                     type="text"
                     {...register("name")}
                 />
-                {errors.name && <p className="mt-2 text-xs italic text-red-500">{errors.name?.message}</p>}
+                {errors.name && (
+                    <p className="mt-2 text-xs italic text-red-500 dark:text-red-400">{errors.name?.message}</p>
+                )}
             </div>
 
             <div className="mb-4">
@@ -108,13 +110,15 @@ export const UserUpdateForm = ({ user, onUpdate, setHasUnsavedChanges }: UserUpd
                 </Label>
                 <Input
                     className={clsx({
-                        "border-red-500": errors.email,
+                        "border-red-500 dark:border-red-400": errors.email,
                     })}
                     id="email"
                     type="email"
                     {...register("email")}
                 />
-                {errors.email && <p className="mt-2 text-xs italic text-red-500">{errors.email?.message}</p>}
+                {errors.email && (
+                    <p className="mt-2 text-xs italic text-red-500 dark:text-red-400">{errors.email?.message}</p>
+                )}
             </div>
 
             <div className="mb-4">
@@ -123,18 +127,24 @@ export const UserUpdateForm = ({ user, onUpdate, setHasUnsavedChanges }: UserUpd
                 </Label>
                 <Input
                     className={clsx({
-                        "border-red-500": errors.password,
+                        "border-red-500 dark:border-red-400": errors.password,
                     })}
                     id="password"
                     type="password"
                     {...register("password")}
                 />
-                {errors.password && <p className="mt-2 text-xs italic text-red-500">{errors.password?.message}</p>}
+                {errors.password && (
+                    <p className="mt-2 text-xs italic text-red-500 dark:text-red-400">{errors.password?.message}</p>
+                )}
             </div>
 
             <div className="mb-6 text-center">
-                <Button type="submit" disabled={isSubmitting || !isDirty}>
-                    Confirm
+                <Button
+                    type="submit"
+                    disabled={isSubmitting || !isDirty}
+                    className="dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+                >
+                    Create
                 </Button>
             </div>
         </form>
