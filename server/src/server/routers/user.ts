@@ -8,7 +8,7 @@ export const userRouter = router({
     list: authedProcedure.input(userListSchema).query(async ({ ctx, input }) => {
         try {
             return ctx.container.get(UserService).list(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "Error fetching users",
@@ -18,7 +18,7 @@ export const userRouter = router({
     getById: authedProcedure.input(userSchema).query(async ({ ctx, input }) => {
         try {
             return ctx.container.get(UserService).getById(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "NOT_FOUND",
                 message: `No user with id '${input.id}'`,
@@ -28,7 +28,7 @@ export const userRouter = router({
     create: authedProcedure.input(userCreateSchema).mutation(async ({ ctx, input }) => {
         try {
             return ctx.container.get(UserService).create(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "Error adding user",
@@ -38,7 +38,7 @@ export const userRouter = router({
     update: authedProcedure.input(userUpdateSchema).mutation(async ({ ctx, input }) => {
         try {
             return ctx.container.get(UserService).update(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: `Error updating user with id '${input.id}'`,
@@ -48,7 +48,7 @@ export const userRouter = router({
     delete: authedProcedure.input(userSchema).mutation(async ({ ctx, input }) => {
         try {
             return ctx.container.get(UserService).delete(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: `Error deleting user with id '${input.id}'`,

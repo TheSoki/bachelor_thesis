@@ -9,7 +9,7 @@ import type { NextApiRequest, NextApiResponse } from "@trpc/server/adapters/next
 export const createContext = async (opts: CreateNextContextOptions): Promise<Context> => {
     const session = await getServerSession(opts.req, opts.res, authOptions);
 
-    const requestId = session?.user.id ? `user:${session.user.id}` : "anonymous";
+    const requestId = session?.user.id ? `user:${session.user.id}` : undefined;
     const container = Container.of(requestId);
     container.set(LoggerRepository, new LoggerRepository(requestId));
 

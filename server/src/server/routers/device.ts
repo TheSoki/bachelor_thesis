@@ -8,7 +8,7 @@ export const deviceRouter = router({
     list: authedProcedure.input(deviceListSchema).query(async ({ ctx, input }) => {
         try {
             return ctx.container.get(DeviceService).list(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "Error fetching devices",
@@ -18,7 +18,7 @@ export const deviceRouter = router({
     getById: authedProcedure.input(deviceSchema).query(async ({ ctx, input }) => {
         try {
             return ctx.container.get(DeviceService).getById(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "NOT_FOUND",
                 message: `No device with id '${input.id}'`,
@@ -28,7 +28,7 @@ export const deviceRouter = router({
     create: authedProcedure.input(deviceCreateSchema).mutation(async ({ ctx, input }) => {
         try {
             return ctx.container.get(DeviceService).create(input, ctx.user.id);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "Error adding device",
@@ -38,7 +38,7 @@ export const deviceRouter = router({
     update: authedProcedure.input(deviceUpdateSchema).mutation(async ({ ctx, input }) => {
         try {
             return ctx.container.get(DeviceService).update(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: `Error updating device with id '${input.id}'`,
@@ -48,7 +48,7 @@ export const deviceRouter = router({
     delete: authedProcedure.input(deviceSchema).mutation(async ({ ctx, input }) => {
         try {
             return ctx.container.get(DeviceService).delete(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: `Error deleting device with id '${input.id}'`,
@@ -58,7 +58,7 @@ export const deviceRouter = router({
     getDeviceToken: authedProcedure.input(deviceSchema).query(async ({ ctx, input }) => {
         try {
             return ctx.container.get(DeviceService).getDeviceToken(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: `No device with id '${input.id}'`,

@@ -10,7 +10,7 @@ export type LoggerType = Logger;
 export class LoggerRepository {
     readonly logger: LoggerType;
 
-    constructor(requestId: string) {
+    constructor(requestId: string | undefined) {
         const isProd = process.env.NODE_ENV === "production";
 
         const customFormat = isProd ? combine(timestamp(), json()) : combine(timestamp(), prettyPrint());

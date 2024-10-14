@@ -8,7 +8,7 @@ export const auditLogRouter = router({
     list: authedProcedure.input(auditLogListSchema).query(async ({ ctx, input }) => {
         try {
             return ctx.container.get(AuditLogService).list(input);
-        } catch (e) {
+        } catch {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "Error fetching audit logs",

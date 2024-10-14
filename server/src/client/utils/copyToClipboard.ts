@@ -14,7 +14,7 @@ export const copyToClipboard = async (value: string) => {
         } else {
             throw new Error("writeText not supported");
         }
-    } catch (e) {
+    } catch {
         oldSchoolCopy(value);
     }
 };
