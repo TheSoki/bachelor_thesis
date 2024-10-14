@@ -6,6 +6,9 @@ import { registerSchema } from "@/server/schema/user";
 import { prisma } from "@/server/database";
 import { createAuditLog } from "@/server/utils/createAuditLog";
 import { Container } from "typedi";
+import { LoggerRepository } from "@/server/repositories/logger.repository";
+
+const logger = Container.get(LoggerRepository);
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -113,6 +116,18 @@ export const authOptions: AuthOptions = {
     },
     theme: {
         logo: "/favicon.ico",
+    },
+    logger: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        debug: (code, metadata) => logger.debug(code, metadata as any),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (code, metadata) => logger.error(code, metadata as any),
+        warn: (code) => logger.warn(code),
+    },
+    session: {
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+        strategy: "jwt",
+        updateAge: 24 * 60 * 60, // 24 hours
     },
 };
 
