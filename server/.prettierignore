@@ -36,3 +36,8 @@ docker-compose.dev.yaml
 
 # Prisma
 prisma/
+
+# Test files
+test-results/
+playwright-report/
+output.log

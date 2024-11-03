@@ -11,6 +11,7 @@
         "migrate": "prisma migrate dev",
         "migrate:up": "prisma migrate deploy",
         "migrate:seed": "tsx src/scripts/db-seed.ts",
+        "migrate:seed:test": "tsx src/scripts/db-seed-test.ts",
         "migrate:reset": "prisma migrate reset",
         "generate": "prisma generate --no-hints",
         "postinstall": "prisma generate --no-hints",
@@ -19,7 +20,9 @@
         "format": "prettier --write .",
         "typecheck": "tsc --pretty --noEmit",
         "validateDependencyTree": "tsx src/scripts/validateDependencyTree.ts",
-        "integrate": "pnpm run lint && pnpm run typecheck && pnpm run validateDependencyTree"
+        "integrate": "pnpm run lint && pnpm run typecheck && pnpm run validateDependencyTree",
+        "test:e2e": "playwright test",
+        "test:e2e:ui": "playwright test --ui"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.9.0",
@@ -61,6 +64,7 @@
         "zustand": "5.0.0-rc.2"
     },
     "devDependencies": {
+        "@playwright/test": "^1.48.1",
         "@svgr/webpack": "^8.1.0",
         "@types/bcrypt": "^5.0.2",
         "@types/node": "^22.7.5",
