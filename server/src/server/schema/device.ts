@@ -12,9 +12,12 @@ const buildingId = z.string().regex(buildingIdRegex, {
 const roomId = z.string().regex(roomIdRegex, {
     message: "Room ID must be three numbers",
 });
+const id = z.string().max(255, {
+    message: "Device ID must be 255 characters or less",
+});
 
 export const deviceSchema = z.object({
-    id: z.string(),
+    id,
 });
 
 export const deviceCreateSchema = z.object({
@@ -23,11 +26,16 @@ export const deviceCreateSchema = z.object({
 });
 
 export const deviceUpdateSchema = z.object({
-    id: z.string(),
+    id,
     buildingId,
     roomId,
 });
 
 export const deviceListSchema = paginationSchema.extend({
-    search: z.string().optional(),
+    search: z
+        .string()
+        .max(255, {
+            message: "Search must be 255 characters or less",
+        })
+        .optional(),
 });

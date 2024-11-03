@@ -34,7 +34,8 @@ export const SearchBar = ({ defaultValue, onSubmit }: SearchBarProps) => {
     return (
         <div className="mb-4 flex items-center gap-2">
             <Input value={value} onChange={onChange} placeholder="Search" onKeyDown={onKeyDown} autoFocus />
-            <Button type="submit" onClick={onSubmitButtonClick}>
+            <Button type="submit" onClick={onSubmitButtonClick} className="gap-2">
+                Search
                 <SearchIcon className="h-4 w-4" />
             </Button>
         </div>
