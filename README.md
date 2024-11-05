@@ -1,6 +1,6 @@
-# OSU_Bachelor_Thesis
+# Bachelor Thesis
 
-OSU Bachelor's Thesis "Digitization of school timetables for teaching rooms" (2023/24)
+Bachelor thesis "Digitization of school timetables for teaching rooms" at University of Ostrava
 
 ## Content
 

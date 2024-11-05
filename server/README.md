@@ -1,6 +1,6 @@
-# OSU_Bachelor_Thesis - Server
+# Bachelor Thesis - Server
 
-Server part of the OSU Bachelor's Thesis "Digitization of school timetables for teaching rooms" (2023/24)
+Server part of the bachelor thesis "Digitization of school timetables for teaching rooms" at University of Ostrava
 
 ## Development
 
@@ -8,7 +8,7 @@ Server part of the OSU Bachelor's Thesis "Digitization of school timetables for 
 
 You need to have installed:
 
--   [nvm](https://github.com/nvm-sh/nvm),
+-   [Volta](https://volta.sh/),
 -   [Docker](https://www.docker.com/),
 -   [pnpm](https://pnpm.io/)
 
@@ -22,10 +22,10 @@ cp .env.example .env
 
 And update them accordingly to your environment.
 
-Use nvm to install node.
+Use Volta to install node and pnpm.
 
 ```
-nvm use
+volta install node@20.10.0 pnpm@9.1.0
 ```
 
 Setup database docker.
@@ -87,6 +87,42 @@ pnpm run format
 ### Environment Variables
 
 To add environment variables, add them to `.env.example` file with values that will work for local development.
+
+### Testing
+
+This project uses [Playwright](https://playwright.dev/) for end-to-end (E2E) testing.
+
+#### Seeding for Testing
+
+Seed the database with test data specifically for E2E tests:
+
+```bash
+pnpm run migrate:seed:test
+```
+
+This will populate the database with a test dataset used as the base for end-to-end testing.
+
+#### Running E2E Tests
+
+Before running the E2E tests, install the Playwright dependencies:
+
+```bash
+pnpm exec playwright install
+```
+
+To execute the E2E tests, use:
+
+```bash
+pnpm run test:e2e
+```
+
+To run tests interactively in the Playwright UI for debugging purposes, use:
+
+```bash
+pnpm run test:e2e:ui
+```
+
+The Playwright UI provides a visual interface for debugging and stepping through tests.
 
 ## Production
 

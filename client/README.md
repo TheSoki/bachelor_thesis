@@ -1,6 +1,6 @@
-# OSU_Bachelor_Thesis - Client
+# Bachelor Thesis - Client
 
-Client part of the OSU Bachelor's Thesis "Digitization of school timetables for teaching rooms" (2023/24)
+Client part of the bachelor thesis "Digitization of school timetables for teaching rooms" at University of Ostrava
 
 ## Development
 
