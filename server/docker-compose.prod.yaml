@@ -1,5 +1,4 @@
 name: timetable
-version: "3.8"
 
 services:
     database:
@@ -23,7 +22,7 @@ services:
         restart: unless-stopped
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile-server
         expose:
             - 3000
         depends_on:
@@ -33,7 +32,9 @@ services:
 
     caddy:
         container_name: proxy
-        image: caddy:2.9
+        build:
+            context: .
+            dockerfile: Dockerfile-caddy
         restart: unless-stopped
         ports:
             - "80:80"

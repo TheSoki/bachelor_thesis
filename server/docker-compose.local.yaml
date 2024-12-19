@@ -1,5 +1,4 @@
 name: timetable
-version: "3.8"
 
 services:
     database:

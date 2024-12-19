@@ -1,4 +1,23 @@
 :80 {
+    rate_limit {
+        # General access limit
+        zone global {
+            key {remote_host}
+            events 1000        
+            window 1m
+        }
+        
+        # Stricter limit for /api/schedule endpoint
+        zone schedule-api {
+            key {remote_host}
+            events 1          
+            window 10s
+            match {
+                path /api/schedule  
+            }
+        }
+    }
+
     reverse_proxy server:3000 {
         # Forward real client IP
         header_up X-Real-IP {remote_host}
