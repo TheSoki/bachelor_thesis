@@ -1,0 +1,53 @@
+:80 {
+    rate_limit {
+        # General access limit
+        zone global {
+            key {remote_host}
+            events 1000        
+            window 1m
+        }
+        
+        # Stricter limit for /api/schedule endpoint
+        zone schedule-api {
+            key {remote_host}
+            events 1          
+            window 10s
+            match {
+                path /api/schedule  
+            }
+        }
+    }
+
+    reverse_proxy server:3000 {
+        # Forward real client IP
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    
+    header {
+        # Prevent clickjacking attacks
+        X-Frame-Options "DENY"
+
+        # Disable content type sniffing 
+        X-Content-Type-Options "nosniff"
+
+        # Enable XSS protection in browsers
+        X-XSS-Protection "1; mode=block"
+
+        # Strict Transport Security (HSTS)
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+        # Referrer Policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+
+        # Content Security Policy (CSP)
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
+
+        # Permissions Policy
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+        # Remove server identification
+        -Server
+    }
+}

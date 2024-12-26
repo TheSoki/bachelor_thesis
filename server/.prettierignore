@@ -27,7 +27,9 @@ yarn.lock
 *.pdf
 
 # Docker
-Dockerfile
+Dockerfile-server
+Dockerfile-caddy
+Caddyfile
 .dockerignore
 
 # Docker

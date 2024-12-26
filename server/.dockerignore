@@ -1,4 +1,5 @@
-Dockerfile
+Dockerfile-server
+Dockerfile-caddy
 .dockerignore
 .git
 .gitignore
@@ -11,3 +12,6 @@ docker-compose.yaml
 docker-compose.local.yaml
 docker-compose.prod.yaml
 tsconfig.tsbuildinfo
+Caddyfile
+e2e
+components.json
