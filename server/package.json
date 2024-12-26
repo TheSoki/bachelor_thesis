@@ -18,7 +18,7 @@
         "local": "docker-compose -f docker-compose.local.yaml up -d",
         "local:remove": "docker-compose -f docker-compose.local.yaml down --remove-orphans",
         "format": "prettier --write .",
-        "typecheck": "tsc --pretty --noEmit",
+        "typecheck": "tsc --noEmit",
         "validateDependencyTree": "tsx src/scripts/validateDependencyTree.ts",
         "integrate": "pnpm run lint && pnpm run typecheck && pnpm run validateDependencyTree",
         "test:e2e": "playwright test",

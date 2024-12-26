@@ -8,7 +8,7 @@ Server part of the bachelor thesis "Digitization of school timetables for teachi
 
 You need to have installed:
 
--   [Volta](https://volta.sh/),
+-   [Volta](https://volta.sh/) or [nvm](https://github.com/nvm-sh/nvm),
 -   [Docker](https://www.docker.com/),
 -   [pnpm](https://pnpm.io/)
 
@@ -26,6 +26,16 @@ Use Volta to install node and pnpm.
 
 ```
 volta install node@20.10.0 pnpm@9.1.0
+```
+
+or use nvm
+
+```bash
+nvm install
+```
+
+```bash
+nvm use
 ```
 
 Setup database docker.
