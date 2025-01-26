@@ -7,3 +7,4 @@ Bachelor thesis "Digitization of school timetables for teaching rooms" at Univer
 - [Server](./server/README.md)
 - [Client](./client/README.md)
 - [Docs](./docs/README.md)
+- [Schema](./schema/README.md)
