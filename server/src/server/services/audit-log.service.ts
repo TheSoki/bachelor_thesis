@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import type { auditLogListSchema } from "@/server/schema/audit-log";
+import type { auditLogListSchema, auditLogDeleteSchema } from "@/server/schema/audit-log";
 import type { AuditLog } from "@/server/database";
 import { Service } from "typedi";
 import { AuditLogRepository } from "../repositories/audit-log.repository";
@@ -48,6 +48,22 @@ export class AuditLogService {
             this.logger.error(`Error fetching audit logs: ${e}`);
 
             throw new Error("Error fetching audit logs");
+        }
+    }
+
+    async deleteMany(input: z.infer<typeof auditLogDeleteSchema>): Promise<void> {
+        const { timestamp } = input;
+
+        try {
+            await this.auditLogRepository.deleteMany({
+                where: {
+                    timestamp: { lt: timestamp },
+                },
+            });
+        } catch (e) {
+            this.logger.error(`Error audit logs with timestamp '${timestamp}': ${e}`);
+
+            throw new Error(`Error audit logs with timestamp '${timestamp}'`);
         }
     }
 }

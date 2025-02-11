@@ -36,4 +36,8 @@ export class AuditLogRepository {
             [Result, number]
         >;
     }
+
+    deleteMany<T extends Prisma.AuditLogDeleteManyArgs>(args: T) {
+        return prisma.auditLog.deleteMany(args);
+    }
 }

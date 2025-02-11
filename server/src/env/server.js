@@ -8,6 +8,7 @@ const serverSchema = z.object({
     NEXTAUTH_SECRET: z.string(),
     NEXTAUTH_URL: z.string().url(),
     SCHEDULE_EVENTS_API_URL: z.string().url(),
+    CRON_SECRET: z.string(),
 });
 
 const serverEnv = {
@@ -16,6 +17,7 @@ const serverEnv = {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     SCHEDULE_EVENTS_API_URL: process.env.SCHEDULE_EVENTS_API_URL,
+    CRON_SECRET: process.env.CRON_SECRET,
 };
 
 const _serverEnv = serverSchema.safeParse(serverEnv);

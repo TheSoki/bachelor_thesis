@@ -50,8 +50,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     const scheduleService = container.get(ScheduleService);
 
-    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-
     const pngBuffer = await scheduleService.getScheduleBuffer(parsedData.data);
 
     if (!pngBuffer) {
@@ -65,6 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return;
     }
 
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     res.setHeader("Content-Type", "image/png");
     res.setHeader("Content-Length", pngBuffer.length.toString());
 
