@@ -21,9 +21,9 @@ export const AuthLayout = ({ children }: AuthLayoutProps) => {
                     },
                     () => (
                         <>
-                            <Skeleton className="mb-2 h-10 w-1/2" />
-                            <Skeleton className="mb-2 h-10 w-1/3" />
-                            <Skeleton className="mb-2 h-10 w-2/4" />
+                            {[...Array(10)].map((_, i) => (
+                                <Skeleton className="mb-2 h-10" key={`auth-layout-skeleton-${i}`} />
+                            ))}
                         </>
                     ),
                 )
