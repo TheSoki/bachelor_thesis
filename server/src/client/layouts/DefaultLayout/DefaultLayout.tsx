@@ -28,11 +28,19 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `
-                        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                            document.documentElement.classList.add('dark')
-                        } else {
-                            document.documentElement.classList.remove('dark')
-                        }
+                            const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+                            const handleThemeChange = (e) => {
+                                if (e.matches) {
+                                    document.documentElement.classList.add('dark');
+                                } else {
+                                    document.documentElement.classList.remove('dark');
+                                }
+                            };
+
+                            handleThemeChange(darkModeMediaQuery);
+
+                            darkModeMediaQuery.addEventListener('change', handleThemeChange);
                         `,
                     }}
                 />
