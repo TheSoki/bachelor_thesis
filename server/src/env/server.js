@@ -7,7 +7,8 @@ const serverSchema = z.object({
     BCRYPT_SALT_ROUNDS: z.number().int().positive(),
     NEXTAUTH_SECRET: z.string(),
     NEXTAUTH_URL: z.string().url(),
-    SCHEDULE_EVENTS_API_URL: z.string().url(),
+    STAG_SCHEDULE_EVENTS_API_URL: z.string().url(),
+    STAG_SCHEDULE_EVENTS_API_AUTHORIZATION_HEADER_TOKEN: z.string(),
     CRON_SECRET: z.string(),
 });
 
@@ -16,7 +17,9 @@ const serverEnv = {
     BCRYPT_SALT_ROUNDS: process.env.BCRYPT_SALT_ROUNDS ? parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) : undefined,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    SCHEDULE_EVENTS_API_URL: process.env.SCHEDULE_EVENTS_API_URL,
+    STAG_SCHEDULE_EVENTS_API_URL: process.env.STAG_SCHEDULE_EVENTS_API_URL,
+    STAG_SCHEDULE_EVENTS_API_AUTHORIZATION_HEADER_TOKEN:
+        process.env.STAG_SCHEDULE_EVENTS_API_AUTHORIZATION_HEADER_TOKEN,
     CRON_SECRET: process.env.CRON_SECRET,
 };
 

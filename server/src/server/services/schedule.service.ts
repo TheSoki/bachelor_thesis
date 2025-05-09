@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { serverEnv } from "@/env/server";
 import puppeteer from "puppeteer";
-import { parseString } from "xml2js";
 import { z } from "zod";
 import { Service } from "typedi";
 import { LoggerRepository } from "../repositories/logger.repository";
@@ -105,32 +103,66 @@ export class ScheduleService {
         buildingId: string;
         roomId: string;
     }): Promise<ScheduleEvent[]> {
-        const response = await fetch(`${serverEnv.SCHEDULE_EVENTS_API_URL}?budova=${buildingId}&mistnost=${roomId}`);
+        const response = await fetch(
+            `${serverEnv.STAG_SCHEDULE_EVENTS_API_URL}?budova=${buildingId}&mistnost=${roomId}`,
+            {
+            headers: {
+                Accept: "application/json",
+                    Authorization: `Basic ${serverEnv.STAG_SCHEDULE_EVENTS_API_AUTHORIZATION_HEADER_TOKEN}`,
+            },
+            },
+        );
 
         if (!response.ok) {
             this.logger.error(`Failed to fetch schedule events: ${response.statusText}`);
             return [];
         }
 
-        const data = await response.text();
-        const xml: Record<string, any> = await new Promise((resolve, reject) => {
-            parseString(data, (err: any, result: unknown) => {
-                err ? reject(err) : resolve(result as any);
-            });
-        });
+        const data = await response.json();
 
         const now = new Date();
 
         const day = CZECH_WEEK_DAYS[getDay(now)] ?? "Ne";
 
-        const actions = xml?.["ns2:rozvrh"]?.["rozvrhovaAkce"] || [];
+        const actions = data?.rozvrhovaAkce || [];
+
         if (actions.length === 0) {
             this.logger.error(`No schedule events found`);
             return [];
         }
 
-        return actions
-            .map((akce: any) => this.parseEvent(akce))
+        return (
+            actions
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .map((akce: any) => {
+                if (!akce) {
+                    return null;
+                }
+
+                const teacher = akce.ucitel
+                    ? `${akce.ucitel.titulPred ?? ""} ${akce.ucitel.jmeno ?? ""} ${akce.ucitel.prijmeni ?? ""} ${akce.ucitel.titulZa ?? ""}`.trim()
+                    : "N/A";
+
+                const event = {
+                    name: akce.nazev,
+                    fromTime: akce.hodinaSkutOd?.value,
+                    toTime: akce.hodinaSkutDo?.value,
+                    startDate: akce.datumOd?.value,
+                    endDate: akce.datumDo?.value,
+                    dayOfWeek: akce.denZkr,
+                    teacher,
+                };
+
+                const parsedEvent = eventSchema.safeParse(event);
+
+                if (!parsedEvent.success) {
+                    this.logger.error(`Failed to parse event: ${JSON.stringify(event)}`);
+                    this.logger.error(`Error: ${parsedEvent.error}`);
+                    return null;
+                }
+
+                return parsedEvent.data;
+            })
             .filter((event: z.infer<typeof eventSchema> | null) => event && this.isEventToday(event, now, day))
             .map((event: z.infer<typeof eventSchema>) => {
                 return {
@@ -139,38 +171,8 @@ export class ScheduleService {
                     to: event.toTime,
                     teacher: event.teacher,
                 };
-            });
-    }
-
-    private parseEvent(akce: any): z.infer<typeof eventSchema> | null {
-        const teacher =
-            akce["ucitel"]
-                ?.map((ucitel: any) => {
-                    const { jmeno, prijmeni, titulPred, titulZa } = ucitel;
-
-                    return `${titulPred?.[0] ?? ""} ${jmeno?.[0] ?? ""} ${prijmeni?.[0] ?? ""} ${titulZa?.[0] ?? ""}`.trim();
                 })
-                ?.join(", ") ?? "N/A";
-
-        const event = {
-            name: akce["nazev"][0],
-            fromTime: akce["hodinaSkutOd"][0],
-            toTime: akce["hodinaSkutDo"][0],
-            startDate: akce["datumOd"][0],
-            endDate: akce["datumDo"][0],
-            dayOfWeek: akce["denZkr"][0],
-            teacher,
-        };
-
-        const parsedEvent = eventSchema.safeParse(event);
-
-        if (!parsedEvent.success) {
-            this.logger.error(`Failed to parse event: ${JSON.stringify(event)}`);
-            this.logger.error(`Error: ${parsedEvent.error}`);
-            return null;
-        }
-
-        return parsedEvent.data;
+        );
     }
 
     private isEventToday(event: z.infer<typeof eventSchema>, now: Date, day: string): boolean {
