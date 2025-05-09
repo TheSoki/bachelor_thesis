@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { serverEnv } from "@/env/server";
 import { hashSync } from "bcrypt";
-import { PrismaClient, type Device, type User } from "@prisma/client";
+import { PrismaClient, type Device, type User } from "@prisma-client";
 
 const prisma = new PrismaClient();
 

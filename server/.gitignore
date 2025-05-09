@@ -34,3 +34,5 @@ next-env.d.ts
 test-results/
 playwright-report/
 output.log
+
+/prisma/generated
