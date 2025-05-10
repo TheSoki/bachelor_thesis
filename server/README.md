@@ -8,9 +8,9 @@ Server part of the bachelor thesis "Digitization of school timetables for teachi
 
 You need to have installed:
 
--   [Volta](https://volta.sh/) or [nvm](https://github.com/nvm-sh/nvm),
--   [Docker](https://www.docker.com/),
--   [pnpm](https://pnpm.io/)
+- [Volta](https://volta.sh/) or [nvm](https://github.com/nvm-sh/nvm),
+- [Docker](https://www.docker.com/),
+- [pnpm](https://pnpm.io/)
 
 ### Getting started
 

@@ -287,7 +287,11 @@ export class ScheduleService {
     }
 
     private async generatePngFromHtml(width: number, height: number, html: string): Promise<Buffer> {
-        const browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+        const isProduction = process.env.NODE_ENV === "production";
+        const browser = await puppeteer.launch({
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+            ...(isProduction && { executablePath: "/usr/bin/chromium" }),
+        });
         const page = await browser.newPage();
         await page.setContent(html);
         await page.setViewport({ width, height });
