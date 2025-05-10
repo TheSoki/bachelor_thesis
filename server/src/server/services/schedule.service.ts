@@ -9,8 +9,9 @@ import { cs } from "date-fns/locale";
 
 interface ScheduleEvent {
     name: string;
-    from: string;
-    to: string;
+    type: string;
+    fromTime: string;
+    toTime: string;
     teacher: string;
 }
 
@@ -38,6 +39,7 @@ const CZECH_WEEK_DAYS = ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"] as const;
 
 const eventSchema = z.object({
     name: z.string(),
+    type: z.string(),
     teacher: z.string(),
     fromTime: z.string().regex(/^\d{2}:\d{2}$/),
     toTime: z.string().regex(/^\d{2}:\d{2}$/),
@@ -106,10 +108,10 @@ export class ScheduleService {
         const response = await fetch(
             `${serverEnv.STAG_SCHEDULE_EVENTS_API_URL}?budova=${buildingId}&mistnost=${roomId}`,
             {
-            headers: {
-                Accept: "application/json",
+                headers: {
+                    Accept: "application/json",
                     Authorization: `Basic ${serverEnv.STAG_SCHEDULE_EVENTS_API_AUTHORIZATION_HEADER_TOKEN}`,
-            },
+                },
             },
         );
 
@@ -134,44 +136,37 @@ export class ScheduleService {
         return (
             actions
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .map((akce: any) => {
-                if (!akce) {
-                    return null;
-                }
+                .map((akce: any) => {
+                    if (!akce) {
+                        return null;
+                    }
 
-                const teacher = akce.ucitel
-                    ? `${akce.ucitel.titulPred ?? ""} ${akce.ucitel.jmeno ?? ""} ${akce.ucitel.prijmeni ?? ""} ${akce.ucitel.titulZa ?? ""}`.trim()
-                    : "N/A";
+                    const teacher = akce.ucitel
+                        ? `${akce.ucitel.titulPred ?? ""} ${akce.ucitel.jmeno ?? ""} ${akce.ucitel.prijmeni ?? ""} ${akce.ucitel.titulZa ?? ""}`.trim()
+                        : "N/A";
 
-                const event = {
-                    name: akce.nazev,
-                    fromTime: akce.hodinaSkutOd?.value,
-                    toTime: akce.hodinaSkutDo?.value,
-                    startDate: akce.datumOd?.value,
-                    endDate: akce.datumDo?.value,
-                    dayOfWeek: akce.denZkr,
-                    teacher,
-                };
+                    const event = {
+                        name: akce.nazev,
+                        type: akce.typAkce,
+                        fromTime: akce.hodinaSkutOd?.value,
+                        toTime: akce.hodinaSkutDo?.value,
+                        startDate: akce.datumOd?.value,
+                        endDate: akce.datumDo?.value,
+                        dayOfWeek: akce.denZkr,
+                        teacher,
+                    };
 
-                const parsedEvent = eventSchema.safeParse(event);
+                    const parsedEvent = eventSchema.safeParse(event);
 
-                if (!parsedEvent.success) {
-                    this.logger.error(`Failed to parse event: ${JSON.stringify(event)}`);
-                    this.logger.error(`Error: ${parsedEvent.error}`);
-                    return null;
-                }
+                    if (!parsedEvent.success) {
+                        this.logger.error(`Failed to parse event: ${JSON.stringify(event)}`);
+                        this.logger.error(`Error: ${parsedEvent.error}`);
+                        return null;
+                    }
 
-                return parsedEvent.data;
-            })
-            .filter((event: z.infer<typeof eventSchema> | null) => event && this.isEventToday(event, now, day))
-            .map((event: z.infer<typeof eventSchema>) => {
-                return {
-                    name: event.name,
-                    from: event.fromTime,
-                    to: event.toTime,
-                    teacher: event.teacher,
-                };
+                    return parsedEvent.data;
                 })
+                .filter((event: z.infer<typeof eventSchema> | null) => event && this.isEventToday(event, now, day))
         );
     }
 
@@ -196,8 +191,8 @@ export class ScheduleService {
         const cellHeight = contentHeight / LEARNING_HOURS.length;
 
         const eventsWithOffset = events.map((event) => {
-            const startBlock = LEARNING_HOURS.findIndex((hour) => hour.from === event.from);
-            const endBlock = LEARNING_HOURS.findIndex((hour) => hour.to === event.to) + 1;
+            const startBlock = LEARNING_HOURS.findIndex((hour) => hour.from === event.fromTime);
+            const endBlock = LEARNING_HOURS.findIndex((hour) => hour.to === event.toTime) + 1;
             return {
                 ...event,
                 offset: startBlock * cellHeight,
@@ -278,7 +273,7 @@ export class ScheduleService {
                         .map(
                             (event, index) => `
                         <div class="event" style="top: ${event.offset}px; height: ${event.height}px; border-top: ${index === 0 ? "1px solid #000" : "none"};">
-                            <div>${event.name} (${event.from} - ${event.to})</div>
+                            <div>${event.name}, ${event.type} (${event.fromTime} - ${event.toTime})</div>
                             <div>${event.teacher}</div>
                         </div>
                     `,
